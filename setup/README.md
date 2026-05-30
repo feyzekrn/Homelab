@@ -56,10 +56,6 @@ How the cluster is powered cleanly and safely. Covers the power supply unit, DC/
 | MikroTik CRS310 | Full load | ~ 34 W | ~ 8.69 € | ~ 104 € |
 | | | | | |
 | | | | | |
-| 1 node + switch | Idle | ~ 31–36 W | ~ 7.92–9.20 € | ~ 95–110 € |
-| 1 node + switch | Default | ~ 47–52 W | ~ 12.01–13.29 € | ~ 144–160 € |
-| 1 node + switch | Full load | ~ 69 W | ~ 17.63 € | ~ 212 € |
-| | | | | |
 | 3 nodes + switch | Idle | ~ 51–66 W | ~ 13.03–16.87 € | ~ 156–202 € |
 | 3 nodes + switch | Default | ~ 87–102 W | ~ 22.23–26.06 € | ~ 267–313 € |
 | 3 nodes + switch | Full load | ~ 139 W | ~ 35.53 € | ~ 426 € |
