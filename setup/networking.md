@@ -8,9 +8,9 @@
 
 The central switch for the whole cluster. Bought new, because this switch brings real features that actually matter for Kubernetes.
 
-| Part | Details | Price | Where to find it |
-|---|---|---:|---|
-| MikroTik CRS310-8G+2S+IN | 8× 2.5G ports + 2× SFP+ | **~ €180** | [MikroTik official](https://mikrotik.com/product/crs310_8g_2s_in) · [Amazon](https://www.amazon.de/s?k=MikroTik+CRS310-8G%2B2S%2BIN) |
+| Part | Details |        Price | Where to find it |
+|---|---|-------------:|---|
+| MikroTik CRS310-8G+2S+IN | 8× 2.5G ports + 2× SFP+ |      ~ 180 € | [MikroTik official](https://mikrotik.com/product/crs310_8g_2s_in) · [Amazon](https://www.amazon.de/s?k=MikroTik+CRS310-8G%2B2S%2BIN) |
 
 ### Why this switch and not a cheap unmanaged 2.5G switch?
 

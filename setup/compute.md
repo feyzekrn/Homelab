@@ -8,12 +8,12 @@
 
 The foundation of the cluster. Three identical mini PCs, bought as **barebones on eBay** — meaning they came with a weak Pentium CPU and no RAM. That is completely fine because both get replaced anyway.
 
-| Part | Details | What I paid | Where to find it |
-|---|---|---:|---|
-| Lenovo ThinkCentre M910q Tiny (barebone) | Pentium, no RAM — both get replaced | **~ €32 each** | [eBay listing](https://www.ebay.de/itm/136979171958?_skw=Lenovo+ThinkCentre+M910q+Tiny+pentium) |
-| Intel Core i5-6500T (CPU) | Quad-core, 35 W TDP, fits the M910q | **~ €16 each** | [eBay](https://www.ebay.de/sch/i.html?_nkw=Intel+i5-6500T) |
-| 256 GB Samsung 870 SATA SSD | For OS, container images and Longhorn storage | **~ €29.90 each** | [Amazon](https://www.amazon.de/s?k=Samsung+870+256GB+SSD) |
-| 2.5G M.2 Ethernet Adapter | Extra NIC via the M.2 slot | **~ €18 each** | [Amazon](https://www.amazon.de/s?k=2.5g+m.2+ethernet+adapter) |
+| Part | Details |    What I paid | Where to find it |
+|---|---|---------------:|---|
+| Lenovo ThinkCentre M910q Tiny (barebone) | Pentium, no RAM — both get replaced |    ~ 32 € each | [eBay listing](https://www.ebay.de/itm/136979171958?_skw=Lenovo+ThinkCentre+M910q+Tiny+pentium) |
+| Intel Core i5-6500T (CPU) | Quad-core, 35 W TDP, fits the M910q |    ~ 16 € each | [eBay](https://www.ebay.de/sch/i.html?_nkw=Intel+i5-6500T) |
+| 256 GB Samsung 870 SATA SSD | For OS, container images and Longhorn storage | ~ 29.90 € each | [Amazon](https://www.amazon.de/s?k=Samsung+870+256GB+SSD) |
+| 2.5G M.2 Ethernet Adapter | Extra NIC via the M.2 slot |    ~ 18 € each | [Amazon](https://www.amazon.de/s?k=2.5g+m.2+ethernet+adapter) |
 
 > **eBay tip:** Listings with a Pentium or Celeron and no RAM are usually the cheapest — and that is perfectly fine since you replace both anyway. Just check the condition of the chassis and power supply.
 
@@ -43,11 +43,11 @@ The M910q Tiny has an M.2 slot that sits unused in the default configuration. Ad
 
 Before buying everything new it is worth checking what you already have at home. Old laptops and desktop PCs often contain usable components. I pulled parts from two different machines.
 
-| Part | Where it came from | Approx. value |
-|---|---|---:|
-| 16 GB DDR4 SODIMM | Had a spare stick from another PC | ~ €25–35 |
-| 8 GB DDR4 SODIMM | Pulled from a second unused PC | ~ €15–20 |
-| 256 GB Samsung 870 SATA SSD | Already had one — only needed to buy 2 more | ~ €25–30 |
+| Part | Where it came from |  Approx. value |
+|---|---|---------------:|
+| 16 GB DDR4 SODIMM | Had a spare stick from another PC |  ~ 25 € – 35 € |
+| 8 GB DDR4 SODIMM | Pulled from a second unused PC |   ~ 15 € –20 € |
+| 256 GB Samsung 870 SATA SSD | Already had one — only needed to buy 2 more |  ~ 25 € – 30 € |
 
 If you have old laptops or desktop PCs sitting unused, check whether they contain DDR4 SODIMM RAM or a SATA SSD before spending money on new parts.
 
