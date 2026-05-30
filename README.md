@@ -1,84 +1,72 @@
-# Autonomous Bare-Metal Kubernetes Homelab Cluster 🚀
-### A Cloud-Native, DevOps, and Full-Stack Engineering Learning Journey
+# Bare-Metal Kubernetes Homelab Cluster
 
-Welcome to my bare-metal Kubernetes (K8s) homelab cluster repository. This project is a curated, open-source showcase designed to demonstrate how a fleet of budget-friendly **Lenovo ThinkCentre M910q Tiny** PCs can be transformed into an enterprise-grade mini data center. This repo is not a manual how to setup your future cluster. It will show you my ups and downs, the debates and questions i had in my head and how i solved or decided. starting in the setup of the hardware, and never finding an end in the software. I am planing to start small and always make upgrades as needed in both hardware and software. Maybe someone will check this out and locate improvements i wasn't able to see myself.
-
-This repository serves two purposes:
-1. **My Personal Skill Accelerator:** Mastering advanced Kubernetes, Networking Skills, Cloud-Native Engineering, Go (Golang), Python automation, DevOps, and modern Full-Stack UI design (Next.js / Flutter).
-2. **A Blueprint for Developers:** Providing a practical guide and inspiration on how to build a highly professional, automated, and self-hosted infrastructure on a strict budget.
-
-
-### My person
-I am not new into this business, I already work as Full-Stack Engineer & Architect since 6 years in a corporate business. I already have senior skills in coding with all kind of language especially in JS, TS, C#, Java, managed Kubernetes in AWS EKS which i am working with daily. During my professional work I am suiting a role as technical lead in many different Projects. This project will help me to get back more into doing myself and learning newer version of the techstack i used previously or learn new stuff just like Golang or Flutter instead of evaluating stuff and writing tickets for coworkers. Next to my profession as Software Engineer and fulltime Business Informatics Studies this project will be my escape from reality
+**A living documentation of building, breaking and rebuilding a self-hosted infrastructure — from raw hardware to production-grade services.**
 
 ---
 
-## 🎯 The Core Learning Pillars (My Tech Stack Goals)
+## What is this?
 
-This homelab is structurally engineered to master specific, high-demand industry skills:
+Three budget mini PCs. One managed switch. A Kubernetes cluster running on a shelf at home.
 
-### 1. ☸️ Advanced Kubernetes & Cloud-Native Engineering
-* **Deep K8s Internals:** Going far beyond basic deployments. This involves tweaking container runtimes, advanced scheduling, custom resource definitions (CRDs), and debugging multi-node failures.
-* **Storage & Data Integrity:** Implementing **Longhorn** distributed block storage across asymmetric hardware.
-* **The DB & Messaging Matrix:** Hosting and optimizing production-grade instances of `PostgreSQL`, `MySQL`, `MongoDB`, `Redis`, and `RabbitMQ`.
-* **Telemetry & Big Data:** Aggregating infrastructure and application metrics using an active `ELK Stack` (Elasticsearch, Logstash, Kibana).
+This repository documents everything: the hardware decisions, the network design, the software stack and every problem I ran into along the way. It is not a polished tutorial and it is not meant to be. Things will break here, get rebuilt differently and evolve over time. If you are looking for a clean, finished reference — this is not that. If you are interested in watching something grow from scratch and seeing the real reasoning behind every decision, stick around.
 
-### 2. 🐹 Go (Golang) Core Mastery
-* **Kubernetes Operators:** Writing custom K8s operators in Go to automate the lifecycle of my application stack.
-* **High-Performance Microservices:** Building cloud-native backends utilizing Go's brutal speed and native concurrency (goroutines).
-
-### 3. 🐍 Python Home Automation
-* **Hardware & IoT Control:** Scripting automated triggers based on server metrics (e.g., node temperatures, power usage, physical intrusion alerts).
-* **Intel vPro/AMT API Integration:** Writing Python wrappers to interact with Intel's hardware management layer to automatically boot, reboot, or isolate physical nodes based on cluster health.
-
-### 4. 🎨 Next.js & Flutter UI/UX Engineering
-* **Next.js Web Admin Dashboards:** Building visually stunning, responsive server management panels with server-side rendering (SSR), real-time WebSockets, and tailwind-crafted analytics.
-* **Flutter Mobile Interfaces:** Developing cross-platform mobile apps to monitor cluster status, receive critical push notifications, and trigger vPro hardware actions right from my phone.
-
-### 5. 🌐 Infrastructure as Code (IaC) & Advanced Networking
-* **Network Engineering:** Deploying a secure **Multi-Homing** network. A budget unmanaged switch isolates Intel vPro (1G), while a **MikroTik CRS310-8G+2S+IN** leverages **L3 Hardware Offloading** to route heavy Kubernetes & Storage traffic at native **2.5 Gbps**, entirely offloading our internet router.
-* **GitOps & DevOps Pipelines:** Managing the entire infrastructure programmatically using `Terraform` (for MikroTik configuration), `Ansible` (for bare-metal provisioning), and GitOps (for continuous application deployment).
+If you spot something that could be done better, I am genuinely open to that conversation.
 
 ---
 
-## 🏗️ Hardware Architecture (Budget-Optimized)
-Check out more detials: 
+## Who is behind this?
 
-| Component | Specification (Per Node) | Strategy / Notes |
-| :--- | :--- | :--- |
-| **Compute** | Lenovo ThinkCentre M910q Tiny | Highly efficient, cheap, vPro/AMT capable. |
-| **CPU Path** | Intel i5-6500T (Initial) -> i7-7700T | Step-by-step upgrade to prevent bottlenecks. |
-| **RAM Path** | Symmetrical: 16GB, 8GB, 8GB -> 32GB each | Cost-efficient start for local hobby projects. |
-| **Storage** | 258GB Samsung 850 PRO 2,5 SSD | The sweet spot to handle heavy DB writes & Cluster logs for home-applications. |
+I work as a software engineer during the day — full-stack, mostly TypeScript and C#, with a fair amount of AWS and Kubernetes on the managed side. Studies in Business Informatics fill whatever time is left. This project lives in the gaps between both.
 
-### 🔌 Physical Topology
+The honest reason this exists: managed cloud services are great at hiding complexity. After a while you stop understanding what is actually happening underneath and just trust that it works. This homelab is the counterweight to that. Running Kubernetes on bare metal, configuring a switch by hand, writing operators that talk to hardware APIs — these are things that do not come up in a day job where infrastructure is someone else's problem.
 
-* **Lenovo Tiny Nodes** (Dual Cable Setup):
-  * Onboard Port (1G) -> Connected to **Netgear GS308 Switch** (Dedicated vPro & K8s Management Network)
-  * M.2 Expansion Port (2.5G) -> Connected to **MikroTik CRS310 Switch** (Dedicated K8s Data & Storage Network)
-* **Switch Interconnection**:
-  * Netgear GS308 (1G) -> Uplinked directly to **MikroTik CRS310** (VLAN 10 Trunking)
-  * MikroTik CRS310 (2.5G Core) -> Uplinked to **Old Internet Router** (Strictly for external WAN internet access only)
+It is also just something I enjoy. Not everything needs a professional justification.
 
 ---
 
-## 🗂️ Repository Structure
+## What is being built here?
 
-* `/talus` - OS running on the machines.
-* `/setup` - Introduction to hardware setup and evaluation why I decided to use which component
-* `/terraform` - Network infrastructure as code (VLAN configs, L3 interfaces on the MikroTik Switch).
-* `/k8s-infra` - Core cluster components (Cilium/Calico CNI, Longhorn Storage, MetalLB).
-* `db-designs` - The Design Patterns ORM sheets and ER Diagrams of the publicly availably DBs
-* `/k8s-apps` - GitOps declarations for the database stack, Redis caches, and ELK logging.
-* `/services-go` - Source code for custom cloud-native Go microservices and K8s operators.
-* `/automation-py` - Hardware automation, vPro controllers, and smart-home IoT integrations.
-* `/dashboard_next.js` - Source code for the web-based administrative command center.
-* `/mobile-flutter` - Cross-platform companion app for real-time cluster monitoring.
+The cluster is the foundation, but it is not the goal. It is the environment where everything else runs and gets learned. Here is what that looks like in practice:
+
+**Kubernetes on bare metal** — not managed, not abstracted. Custom CNI configuration, distributed block storage with Longhorn, real multi-node failure scenarios and the debugging that comes with them. Databases and message brokers — PostgreSQL, MongoDB, Redis, RabbitMQ — self-hosted and actually maintained.
+
+**Go** is the language I have never used professionally and want to change that. The plan is to learn it by building things that run on the cluster itself: custom Kubernetes operators and cloud-native microservices.
+
+**Python / C, C++ for hardware automation** — the nodes support Intel vPro, which is a hardware management interface that works independently of the operating system. The idea is to write tooling that talks to this layer: automated reboots, node isolation based on cluster health and power-triggered events from temperature or load metrics.
+
+**Infrastructure as Code across the whole stack** — Terraform for the MikroTik network configuration, Ansible for bare-metal provisioning, GitOps for application deployment. The goal is that nothing is configured manually without it being tracked somewhere.
+
+**Next.js and Flutter** — a proper admin dashboard with real-time data and a mobile companion app for cluster monitoring and hardware control from a phone.
+
+**C# and Java** - mainly my backend-languages which i am already good in but still love the code with (could be used for other application and probably makes no sense in some points but who cares, I never said I will do everything the right way ... sometimes we should stick to things we like the most)
 
 ---
 
-## 🛠️ The Clean Rack Integration
+## How it is documented
 
-To ensure the homelab looks as professional as it operates, the physical layout features:
-* **3D-Printed 1U Mounts:** Fitting three Lenovo Tinys side-by-side with custom front-facing **Keystone slots**.
-* **Matte-Black 1U Patchpanel:** Using 0.25m slim patch cables to cleanly route the dual-network lines (vPro and 2.5G) directly to the switches without visible clutter.
+Each area of the project has its own section:
+
+| Path | Content |
+|---|---|
+| `/setup` | Hardware decisions, full shopping list, specs and reasoning |
+| `/talus` | OS configuration on the nodes |
+| `/terraform` | Network infrastructure as code — VLANs and L3 routing on the MikroTik |
+| `/k8s-infra` | Core cluster components: CNI, Longhorn, MetalLB |
+| `/db-designs` | ER diagrams and design patterns for the hosted databases |
+| `/k8s-apps` | GitOps declarations for databases, caches and logging |
+| `/services-go` | Go microservices and Kubernetes operators |
+| `/automation-py` | Hardware automation and vPro integrations |
+| `/dashboard_next.js` | Web-based cluster management dashboard |
+| `/mobile-flutter` | Cross-platform companion app |
+
+The hardware build, cost breakdown and upgrade path are fully documented in [`/setup`](/setup). Everything in this README is intentionally kept at the project level so the two documents do not repeat each other.
+
+---
+
+## The physical setup
+
+Three Lenovo Tiny nodes sit side by side in 3D-printed 1U mounts with custom Keystone slots. A matte-black 1U patch panel with 0.25m slim patch cables keeps the dual network lines — management and data — routed cleanly to the switches. The goal was a setup that looks deliberate, not like a pile of hardware on a desk.
+
+---
+
+*Started small. Breaks occasionally. Gets better every time.*
