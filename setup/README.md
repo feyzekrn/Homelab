@@ -27,19 +27,22 @@ How the cluster is powered cleanly and safely. Covers the power supply unit, DC/
 
 ## 💰 Total Cost Breakdown
 
-| Item | Qty | Unit price | Total |
-|---|---:|---:|---:|
-| M910q Tiny barebone | 3 | ~ 32 € | ~ 96 € |
-| Intel i5-6500T CPU | 3 | ~ 16 € | ~ 48 € |
-| Samsung 870 SSD 256 GB | 2 | ~ 29.90 € | ~ 59.80 € |
-| Samsung 870 SSD 256 GB | 1 | from old PC | 0 € |
-| 2.5G M.2 network adapter | 3 | ~ 18 € | ~ 54 € |
-| MikroTik CRS310 | 1 | ~ 180 € | ~ 180 € |
-| 16 GB DDR4 SODIMM (Node 1) | 1 | from old PC | 0 € |
-| 8 GB DDR4 SODIMM (Node 2) | 1 | from old PC | 0 € |
-| 8 GB DDR4 SODIMM (Node 3) | 1 | ~ 15 € | ~ 15 € |
-| | | | |
-| Total | | | ~ 452.80 € |
+| Item | Qty |  Unit price |      Total |
+|---|---:|------------:|-----------:|
+| M910q Tiny barebone | 3 |      ~ 32 € |     ~ 96 € |
+| Intel i5-6500T CPU | 3 |      ~ 16 € |     ~ 48 € |
+| Samsung 870 SSD 256 GB | 2 |   ~ 29.90 € |  ~ 59.80 € |
+| Samsung 870 SSD 256 GB | 1 | from old PC |        0 € |
+| 2.5G M.2 network adapter | 3 |      ~ 18 € |     ~ 54 € |
+| MikroTik CRS310 | 1 |     ~ 180 € |    ~ 180 € |
+| Patch Panel 12-Port Cat.6a 10" 1HE | 1 |   ~ 35.90 € |  ~ 35.90 € |
+| 0.25m Slim Patch Cables | 10 |       ~ 2 € |     ~ 20 € |
+| 16 GB DDR4 SODIMM (Node 1) | 1 | from old PC |        0 € |
+| 8 GB DDR4 SODIMM (Node 2) | 1 | from old PC |        0 € |
+| 8 GB DDR4 SODIMM (Node 3) | 1 |      ~ 15 € |     ~ 15 € |
+| ARCTIC MX-4 (4g) Thermalpaste  | 1 |       ~ 5 € |      ~ 5 € |
+| | |             |            |
+| Total | |             | ~ 508.70 € |
 
 ---
 

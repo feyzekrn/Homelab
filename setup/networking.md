@@ -38,8 +38,32 @@ if a 5th Node is sat up then there is no room a NAS or future expansion.
 ```
 
 ---
+ 
+## Patch Panel: HB-Digital 12-Port Cat.6a 10" 1HE
+ 
+A clean build needs a clean cable termination point. Instead of plugging patch cables directly into the switch, all node cables terminate at the patch panel first. From there, short 0.25m slim patch cables run to the switch ports — keeping the cable routing tidy and making it easy to move, relabel or replace connections without touching the longer runs.
+ 
+| Part | Details | Price | Where to find it |
+|---|---|---:|---|
+| HB-Digital 12-Port Patchpanel Cat.6a | 10" 1HE, STP, schwarz, 12× Cat.6a Keystone included | 35.90 € | [hb-digital.de](https://www.hb-digital.de/Patchpanel-12-Port-mit-Cat6a-RJ45-Keystone-Module-10-Patchfeld-1HE-schwarz) |
+ 
+The 10" format matches the 3D-printed 1U rack mount used for the Tiny nodes. The Cat.6a Keystone modules are included and clip in tool-less via LSA snap-in — no crimping needed. With 12 ports there is enough room for the current 3-node dual-cable setup (6 ports used) and space to grow.
+ 
+---
+ 
+## Patch Cables — 0.25m Slim
+ 
+Short slim patch cables connect the patch panel front to the switch ports directly beside it. Keeping these as short as possible is what makes the dual-cable layout look intentional rather than chaotic.
+ 
+| Part | Details | Price | Where to find it |
+|---|---|---:|---|
+| 0.25m Slim Patch Cable Cat.6 | Short run from patch panel to switch, per cable | ~ 1.50–2.50 € | [Amazon](https://www.amazon.de/s?k=0.25m+patchkabel+slim+cat6) |
+ 
+For the current 3-node setup with dual cables: 6 node connections + 1 router uplink = **7 cables minimum**. Buying 10 leaves a few spares for future nodes or replacements.
 
-## Management Extension: Netgear GS308 *(Planned)*
+---
+
+## Management Extension: Netgear GS308 *(When scaling horizontally)*
 
 Not purchased yet — planned for a later stage when a dedicated management network becomes necessary.
 
