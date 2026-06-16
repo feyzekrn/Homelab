@@ -27,27 +27,36 @@ How the cluster is powered cleanly and safely. Covers the power supply unit, DC/
 
 ## 💰 Total Cost Breakdown
 
-| Item | Qty |  Unit price |      Total |
-|---|---:|------------:|-----------:|
-| M910q Tiny barebone | 3 |      ~ 32 € |     ~ 96 € |
-| Intel i5-6500T CPU | 3 |      ~ 16 € |     ~ 48 € |
-| Samsung 870 SSD 256 GB | 2 |   ~ 29.90 € |  ~ 59.80 € |
-| Samsung 870 SSD 256 GB | 1 | from old PC |        0 € |
-| 2.5G M.2 network adapter | 3 |      ~ 18 € |     ~ 54 € |
-| MikroTik CRS310 | 1 |     ~ 180 € |    ~ 180 € |
-| Patch Panel 12-Port Cat.6a 10" 1HE | 1 |   ~ 35.90 € |  ~ 35.90 € |
-| 0.25m Slim Patch Cables | 10 |       ~ 2 € |     ~ 20 € |
-| 16 GB DDR4 SODIMM (Node 1) | 1 | from old PC |        0 € |
-| 8 GB DDR4 SODIMM (Node 2) | 1 | from old PC |        0 € |
-| 8 GB DDR4 SODIMM (Node 3) | 1 |      ~ 15 € |     ~ 15 € |
-| ARCTIC MX-4 (4g) Thermalpaste  | 1 |       ~ 5 € |      ~ 5 € |
-| | |             |            |
-| Total | |             | ~ 508.70 € |
+✅ = purchased · ⬜ = still needed
+
+| Status | Item                               | Qty | Unit price | Total |
+|:---:|------------------------------------|---:|---:|---:|
+| ✅ | M910q Tiny barebone                | 3 | ~ 32 € | ~ 96 € |
+| ✅ | Intel i5-6500T CPU                 | 3 | ~ 16 € | ~ 48 € |
+| ✅ | Samsung 850 Pro SSD 256 GB         | 2 | ~ 30 € | ~ 60 € |
+| ✅ | Samsung 850 Pro SSD 256 GB         | 1 | from old PC | 0 € |
+| ✅ | 16 GB DDR4 SODIMM (Node 1)         | 1 | from old PC | 0 € |
+| ✅ | 8 GB DDR4 SODIMM (Node 2)          | 1 | from old PC | 0 € |
+| ✅ | 8 GB DDR4 SODIMM (Node 3)          | 1 | ~ 15 € | ~ 15 € |
+| ✅ | ARCTIC MX-4 (4g) Thermal Paste     | 1 | ~ 5 € | ~ 5 € |
+| |                                    | | | |
+| ⬜ | 2.5G M.2 network adapter           | 3 | ~ 18 € | ~ 54 € |
+| ⬜ | MikroTik CRS310                    | 1 | ~ 180 € | ~ 180 € |
+| ⬜ | Patch Panel 12-Port Cat.6a 10" 1HE | 1 | ~ 35.90 € | ~ 35.90 € |
+| ⬜ | 0.25m Slim Patch Cables            | 10 | ~ 2 € | ~ 20 € |
+| ⬜ | PSU MEAN WELL MW UHP-500-24        | 1 | ~ 75 € | ~ 75 € |
+| ⬜ | DC-DC Step-Down Converter 20A      | 1 | ~ 25 € | ~ 25 € |
+| ⬜ | KFZ Fuse Box 6-Port                | 1 | ~ 8 € | ~ 8 € |
+| ⬜ | Kill Switch + fuses + cable        | 1 | ~ 20 € | ~ 20 € |
+| |                                    | | | |
+| | **Total (all listed parts)**       | | | **~ 641.90 €** |
+| | **Already spent** ✅                | | | **~ 224 €** |
+| | **Still outstanding** ⬜            | | | **~ 417.90 €** |
 
 ---
 
 ## 🔌 Running Costs (24/7, €0.35/kWh)
- 
+
 | Device | Scenario | Watt | Per month | Per year |
 |---|---|---:|---:|---:|
 | 1× Node | Idle | ~ 10–15 W | ~ 2.56–3.83 € | ~ 31–46 € |
@@ -57,7 +66,6 @@ How the cluster is powered cleanly and safely. Covers the power supply unit, DC/
 | MikroTik CRS310 | Idle | ~ 21 W | ~ 5.37 € | ~ 64 € |
 | MikroTik CRS310 | Default | ~ 27 W | ~ 6.90 € | ~ 83 € |
 | MikroTik CRS310 | Full load | ~ 34 W | ~ 8.69 € | ~ 104 € |
-| | | | | |
 | | | | | |
 | 3 nodes + switch | Idle | ~ 51–66 W | ~ 13.03–16.87 € | ~ 156–202 € |
 | 3 nodes + switch | Default | ~ 87–102 W | ~ 22.23–26.06 € | ~ 267–313 € |

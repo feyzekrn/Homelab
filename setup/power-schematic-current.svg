@@ -1,0 +1,168 @@
+<svg viewBox="0 0 1000 640" xmlns="http://www.w3.org/2000/svg" font-family="'IBM Plex Mono', 'Courier New', monospace">
+  <defs>
+    <marker id="ar" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L7,3 L0,6 Z" fill="#22d3ee"/>
+    </marker>
+    <marker id="arG" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L7,3 L0,6 Z" fill="#4ade80"/>
+    </marker>
+  </defs>
+
+  <rect width="1000" height="640" fill="#0a0e14"/>
+
+  <!-- TITLE BLOCK -->
+  <rect x="20" y="20" width="960" height="44" fill="none" stroke="#2a3550" stroke-width="1"/>
+  <text x="34" y="40" fill="#e6edf3" font-size="14" font-weight="bold" letter-spacing="1.5">POWER DISTRIBUTION — CONFIG A: 3 NODES, ALL LOADS VIA CONVERTER</text>
+  <text x="34" y="56" fill="#556070" font-size="10">12V system · 25.2V source · single 20V rail</text>
+  <text x="966" y="40" text-anchor="end" fill="#22d3ee" font-size="11" font-weight="bold">DWG A</text>
+  <text x="966" y="56" text-anchor="end" fill="#556070" font-size="9">current build</text>
+
+  <!-- HORIZONTAL POWER CHAIN -->
+  <!-- 230V AC -->
+  <rect x="40" y="100" width="110" height="64" rx="3" fill="#141a24" stroke="#f59e0b" stroke-width="1.5"/>
+  <text x="95" y="124" text-anchor="middle" fill="#f59e0b" font-size="10" font-weight="bold">MAINS</text>
+  <text x="95" y="140" text-anchor="middle" fill="#e6edf3" font-size="12" font-weight="bold">230V AC</text>
+  <text x="95" y="155" text-anchor="middle" fill="#556070" font-size="8">50Hz Schuko</text>
+
+  <line x1="150" y1="132" x2="195" y2="132" stroke="#f59e0b" stroke-width="2"/>
+
+  <!-- PSU -->
+  <rect x="195" y="94" width="120" height="76" rx="3" fill="#141a24" stroke="#22d3ee" stroke-width="2"/>
+  <text x="255" y="114" text-anchor="middle" fill="#22d3ee" font-size="10" font-weight="bold">PSU 500W</text>
+  <line x1="205" y1="120" x2="305" y2="120" stroke="#2a3550" stroke-width="0.75"/>
+  <text x="255" y="135" text-anchor="middle" fill="#e6edf3" font-size="12" font-weight="bold">25.2V DC</text>
+  <text x="255" y="149" text-anchor="middle" fill="#c9d1d9" font-size="9">20A · fanless</text>
+  <text x="255" y="162" text-anchor="middle" fill="#556070" font-size="8">adjustable</text>
+
+  <line x1="315" y1="132" x2="360" y2="132" stroke="#22d3ee" stroke-width="2" marker-end="url(#ar)"/>
+  <text x="337" y="126" text-anchor="middle" fill="#22d3ee" font-size="8">25.2V</text>
+
+  <!-- KILL + FUSE -->
+  <rect x="360" y="94" width="110" height="76" rx="3" fill="#141a24" stroke="#f87171" stroke-width="1.5"/>
+  <text x="415" y="112" text-anchor="middle" fill="#f87171" font-size="9" font-weight="bold">PROTECTION</text>
+  <line x1="370" y1="118" x2="460" y2="118" stroke="#2a3550" stroke-width="0.75"/>
+  <!-- kill switch symbol -->
+  <circle cx="382" cy="138" r="3" fill="none" stroke="#f87171" stroke-width="1.2"/>
+  <line x1="382" y1="138" x2="397" y2="130" stroke="#f87171" stroke-width="1.5"/>
+  <circle cx="399" cy="138" r="3" fill="none" stroke="#f87171" stroke-width="1.2"/>
+  <text x="390" y="156" text-anchor="middle" fill="#c9d1d9" font-size="7.5">KILL DC</text>
+  <!-- fuse symbol -->
+  <rect x="420" y="132" width="24" height="11" rx="2" fill="none" stroke="#f59e0b" stroke-width="1.2"/>
+  <line x1="420" y1="137.5" x2="444" y2="137.5" stroke="#f59e0b" stroke-width="1"/>
+  <text x="432" y="156" text-anchor="middle" fill="#f59e0b" font-size="7.5">25A</text>
+
+  <line x1="470" y1="132" x2="515" y2="132" stroke="#22d3ee" stroke-width="2" marker-end="url(#ar)"/>
+
+  <!-- CONVERTER -->
+  <rect x="515" y="94" width="120" height="76" rx="3" fill="#141a24" stroke="#f59e0b" stroke-width="2"/>
+  <text x="575" y="112" text-anchor="middle" fill="#f59e0b" font-size="9" font-weight="bold">DC-DC STEP-DOWN</text>
+  <line x1="525" y1="118" x2="625" y2="118" stroke="#2a3550" stroke-width="0.75"/>
+  <text x="575" y="134" text-anchor="middle" fill="#e6edf3" font-size="12" font-weight="bold">25.2→20V</text>
+  <text x="575" y="148" text-anchor="middle" fill="#c9d1d9" font-size="9">20A · 400W</text>
+  <text x="575" y="161" text-anchor="middle" fill="#4ade80" font-size="8">load 57%</text>
+
+  <line x1="635" y1="132" x2="680" y2="132" stroke="#22d3ee" stroke-width="2" marker-end="url(#ar)"/>
+  <text x="657" y="126" text-anchor="middle" fill="#22d3ee" font-size="8">20V</text>
+
+  <!-- FUSE BOX -->
+  <rect x="680" y="94" width="130" height="76" rx="3" fill="#141a24" stroke="#60a5fa" stroke-width="2"/>
+  <text x="745" y="113" text-anchor="middle" fill="#60a5fa" font-size="9" font-weight="bold">KFZ FUSE BOX</text>
+  <line x1="690" y1="119" x2="800" y2="119" stroke="#2a3550" stroke-width="0.75"/>
+  <text x="745" y="135" text-anchor="middle" fill="#e6edf3" font-size="11" font-weight="bold">6-PORT</text>
+  <text x="745" y="149" text-anchor="middle" fill="#c9d1d9" font-size="9">common +/− bus</text>
+  <text x="745" y="162" text-anchor="middle" fill="#556070" font-size="8">single 20V rail</text>
+
+  <!-- BUS BAR -->
+  <line x1="745" y1="170" x2="745" y2="210" stroke="#60a5fa" stroke-width="2"/>
+  <line x1="150" y1="210" x2="745" y2="210" stroke="#60a5fa" stroke-width="2.5"/>
+  <text x="447" y="203" text-anchor="middle" fill="#60a5fa" font-size="9" font-weight="bold">+ 20V DC BUS   (− common return)</text>
+
+  <!-- ===== PORT DETAIL: all 6 ports drawn ===== -->
+  <!-- PORT 1 -->
+  <line x1="180" y1="210" x2="180" y2="250" stroke="#22d3ee" stroke-width="1.5"/>
+  <rect x="160" y="250" width="40" height="34" rx="2" fill="#0d1117" stroke="#f59e0b" stroke-width="1.2"/>
+  <text x="180" y="263" text-anchor="middle" fill="#556070" font-size="7">PORT 1</text>
+  <text x="180" y="277" text-anchor="middle" fill="#f59e0b" font-size="11" font-weight="bold">5A</text>
+  <line x1="180" y1="284" x2="180" y2="320" stroke="#22d3ee" stroke-width="1.5" marker-end="url(#ar)"/>
+
+  <!-- PORT 2 -->
+  <line x1="290" y1="210" x2="290" y2="250" stroke="#22d3ee" stroke-width="1.5"/>
+  <rect x="270" y="250" width="40" height="34" rx="2" fill="#0d1117" stroke="#f59e0b" stroke-width="1.2"/>
+  <text x="290" y="263" text-anchor="middle" fill="#556070" font-size="7">PORT 2</text>
+  <text x="290" y="277" text-anchor="middle" fill="#f59e0b" font-size="11" font-weight="bold">5A</text>
+  <line x1="290" y1="284" x2="290" y2="320" stroke="#22d3ee" stroke-width="1.5" marker-end="url(#ar)"/>
+
+  <!-- PORT 3 -->
+  <line x1="400" y1="210" x2="400" y2="250" stroke="#22d3ee" stroke-width="1.5"/>
+  <rect x="380" y="250" width="40" height="34" rx="2" fill="#0d1117" stroke="#f59e0b" stroke-width="1.2"/>
+  <text x="400" y="263" text-anchor="middle" fill="#556070" font-size="7">PORT 3</text>
+  <text x="400" y="277" text-anchor="middle" fill="#f59e0b" font-size="11" font-weight="bold">5A</text>
+  <line x1="400" y1="284" x2="400" y2="320" stroke="#22d3ee" stroke-width="1.5" marker-end="url(#ar)"/>
+
+  <!-- PORT 4 -->
+  <line x1="510" y1="210" x2="510" y2="250" stroke="#4ade80" stroke-width="1.5"/>
+  <rect x="490" y="250" width="40" height="34" rx="2" fill="#0d1117" stroke="#f59e0b" stroke-width="1.2"/>
+  <text x="510" y="263" text-anchor="middle" fill="#556070" font-size="7">PORT 4</text>
+  <text x="510" y="277" text-anchor="middle" fill="#f59e0b" font-size="11" font-weight="bold">3A</text>
+  <line x1="510" y1="284" x2="510" y2="320" stroke="#4ade80" stroke-width="1.5" marker-end="url(#arG)"/>
+
+  <!-- PORT 5 spare -->
+  <line x1="610" y1="210" x2="610" y2="250" stroke="#2a3550" stroke-width="1.2" stroke-dasharray="3,3"/>
+  <rect x="590" y="250" width="40" height="34" rx="2" fill="#0d1117" stroke="#2a3550" stroke-width="1" stroke-dasharray="3,2"/>
+  <text x="610" y="263" text-anchor="middle" fill="#556070" font-size="7">PORT 5</text>
+  <text x="610" y="278" text-anchor="middle" fill="#2a3550" font-size="9" font-weight="bold">SPARE</text>
+
+  <!-- PORT 6 spare -->
+  <line x1="710" y1="210" x2="710" y2="250" stroke="#2a3550" stroke-width="1.2" stroke-dasharray="3,3"/>
+  <rect x="690" y="250" width="40" height="34" rx="2" fill="#0d1117" stroke="#2a3550" stroke-width="1" stroke-dasharray="3,2"/>
+  <text x="710" y="263" text-anchor="middle" fill="#556070" font-size="7">PORT 6</text>
+  <text x="710" y="278" text-anchor="middle" fill="#2a3550" font-size="9" font-weight="bold">SPARE</text>
+
+  <!-- ===== LOAD BOXES ===== -->
+  <!-- Node 1 -->
+  <rect x="135" y="320" width="90" height="66" rx="3" fill="#141a24" stroke="#22d3ee" stroke-width="1.5"/>
+  <text x="180" y="339" text-anchor="middle" fill="#22d3ee" font-size="10" font-weight="bold">NODE 1</text>
+  <line x1="145" y1="345" x2="215" y2="345" stroke="#2a3550" stroke-width="0.75"/>
+  <text x="180" y="359" text-anchor="middle" fill="#e6edf3" font-size="9">M910q Tiny</text>
+  <text x="180" y="372" text-anchor="middle" fill="#c9d1d9" font-size="8.5">20V · 3.25A</text>
+  <text x="180" y="383" text-anchor="middle" fill="#556070" font-size="8">65W peak</text>
+
+  <!-- Node 2 -->
+  <rect x="245" y="320" width="90" height="66" rx="3" fill="#141a24" stroke="#22d3ee" stroke-width="1.5"/>
+  <text x="290" y="339" text-anchor="middle" fill="#22d3ee" font-size="10" font-weight="bold">NODE 2</text>
+  <line x1="255" y1="345" x2="325" y2="345" stroke="#2a3550" stroke-width="0.75"/>
+  <text x="290" y="359" text-anchor="middle" fill="#e6edf3" font-size="9">M910q Tiny</text>
+  <text x="290" y="372" text-anchor="middle" fill="#c9d1d9" font-size="8.5">20V · 3.25A</text>
+  <text x="290" y="383" text-anchor="middle" fill="#556070" font-size="8">65W peak</text>
+
+  <!-- Node 3 -->
+  <rect x="355" y="320" width="90" height="66" rx="3" fill="#141a24" stroke="#22d3ee" stroke-width="1.5"/>
+  <text x="400" y="339" text-anchor="middle" fill="#22d3ee" font-size="10" font-weight="bold">NODE 3</text>
+  <line x1="365" y1="345" x2="435" y2="345" stroke="#2a3550" stroke-width="0.75"/>
+  <text x="400" y="359" text-anchor="middle" fill="#e6edf3" font-size="9">M910q Tiny</text>
+  <text x="400" y="372" text-anchor="middle" fill="#c9d1d9" font-size="8.5">20V · 3.25A</text>
+  <text x="400" y="383" text-anchor="middle" fill="#556070" font-size="8">65W peak</text>
+
+  <!-- Switch -->
+  <rect x="465" y="320" width="90" height="66" rx="3" fill="#141a24" stroke="#4ade80" stroke-width="1.5"/>
+  <text x="510" y="339" text-anchor="middle" fill="#4ade80" font-size="10" font-weight="bold">SWITCH</text>
+  <line x1="475" y1="345" x2="545" y2="345" stroke="#2a3550" stroke-width="0.75"/>
+  <text x="510" y="359" text-anchor="middle" fill="#e6edf3" font-size="9">CRS310</text>
+  <text x="510" y="372" text-anchor="middle" fill="#c9d1d9" font-size="8.5">20V · 1.7A</text>
+  <text x="510" y="383" text-anchor="middle" fill="#556070" font-size="8">34W / 85W inrush</text>
+
+  <!-- LEGEND -->
+  <rect x="135" y="430" width="730" height="44" rx="3" fill="#0d1117" stroke="#2a3550" stroke-width="1"/>
+  <line x1="150" y1="445" x2="180" y2="445" stroke="#22d3ee" stroke-width="2"/>
+  <text x="186" y="448" fill="#c9d1d9" font-size="8.5">20V node rail</text>
+  <line x1="290" y1="445" x2="320" y2="445" stroke="#4ade80" stroke-width="2"/>
+  <text x="326" y="448" fill="#c9d1d9" font-size="8.5">20V switch rail</text>
+  <line x1="440" y1="445" x2="470" y2="445" stroke="#f59e0b" stroke-width="2"/>
+  <text x="476" y="448" fill="#c9d1d9" font-size="8.5">fuse / 25.2V feed</text>
+  <line x1="600" y1="445" x2="630" y2="445" stroke="#f87171" stroke-width="2"/>
+  <text x="636" y="448" fill="#c9d1d9" font-size="8.5">emergency cutoff</text>
+  <line x1="150" y1="463" x2="180" y2="463" stroke="#60a5fa" stroke-width="2.5"/>
+  <text x="186" y="466" fill="#c9d1d9" font-size="8.5">20V distribution bus</text>
+  <line x1="290" y1="463" x2="320" y2="463" stroke="#2a3550" stroke-width="1.2" stroke-dasharray="3,3"/>
+  <text x="326" y="466" fill="#c9d1d9" font-size="8.5">spare / unused</text>
+</svg>
