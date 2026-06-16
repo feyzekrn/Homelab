@@ -10,11 +10,11 @@ This page documents the complete 12V/20V power chain for the cluster: how mains 
 
 **Config A — Current build (3 nodes, all loads via converter):**
 
-![Power Schematic A](./power-schematic-current.svg)
+![Power Schematic A](./schematics/power-schematic-current.svg)
 
 **Config B — Expansion plan (5 nodes, switch relocated to raw 25.2V feed):**
 
-![Power Schematic B](./power-schematic-expanded.svg)
+![Power Schematic B](./schematics/power-schematic-expanded.svg)
 
 ```
 A:  230V AC → PSU 25.2V → Kill + Fuse → DC-DC 20V → KFZ Box → 3 Nodes + Switch
