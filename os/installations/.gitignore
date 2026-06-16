@@ -1,0 +1,12 @@
+# Keep downloaded installer images local.
+*.iso
+*.img
+*.raw
+*.raw.xz
+*.qcow2
+*.vhd
+*.vmdk
+
+# Track documentation and metadata.
+!README.md
+!*/README.md

@@ -53,7 +53,7 @@ Where a section grows large enough to justify its own repository, it moves out a
 | Path                       | Status | Content |
 |----------------------------|---|---|
 | [`/setup`](/setup)         | ✅ Active | Hardware decisions, shopping list, specs, costs and reasoning |
-| [`/os`](/operating-system) | 🔜 Planned | OS configuration running on the nodes |
+| [`/os`](/os)               | ✅ Active | Operating system strategy, installation media and node OS decisions |
 
 ### 🏗️ Infrastructure
 
