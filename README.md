@@ -61,7 +61,7 @@ IaC for everything below the application layer — network, provisioning and cor
 
 | Path | Status | Content |
 |---|---|---|
-| [`/infrastructure`](/infrastructure) | 🔜 Planned | Terraform (MikroTik), Ansible (bare-metal provisioning), core K8s components (CNI, Longhorn, MetalLB) |
+| [`/infrastructure`](/infrastructure) | ✅ Active | Terraform (MikroTik), Ansible (bare-metal provisioning), Kubernetes platform components and service documentation |
 | [`/helm-charts`](/helm-charts) | 🔜 Planned | Open source Helm charts in use and any custom charts created for this cluster |
 | [`/db-designs`](/db-designs) | 🔜 Planned | ER diagrams and design patterns for the hosted databases |
 
