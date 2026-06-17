@@ -71,7 +71,7 @@ Backend services and microservices running on the cluster. Language-agnostic —
 
 | Path | Status | Content |
 |---|---|---|
-| [`/services`](/services) | 🔜 Planned | Microservices, APIs and Kubernetes operators |
+| [`/services`](/services) | ✅ Active | Custom application services, APIs, workers and Kubernetes operators written for this homelab |
 
 ### 🤖 Automation
 
