@@ -8,6 +8,28 @@ It is intentionally documentation-first. Actual deployment assets such as Helm c
 
 ---
 
+## Why This Matters
+
+Infrastructure is the foundation that applications rely on. It includes the physical network, node provisioning, Kubernetes platform services, storage, databases, messaging, observability, security and deployment workflows.
+
+In a homelab, infrastructure documentation is especially valuable because the same person is usually the hardware owner, network admin, platform engineer and application developer. Writing decisions down avoids rebuilding the same understanding every time something breaks.
+
+In companies, this layer is often owned by platform, infrastructure or SRE teams. The goals are similar: repeatability, operational clarity, recoverability, security and a clear boundary between platform services and application code.
+
+---
+
+## What You Can Do With It
+
+- document network and hardware decisions
+- define repeatable provisioning workflows
+- describe shared Kubernetes platform services
+- explain why tools were chosen
+- keep deployment assets linked but separate
+- create a decision log for future rebuilds
+- make the homelab understandable to other developers
+
+---
+
 ## Directory Layout
 
 ```text
@@ -47,9 +69,9 @@ Do not put application source code here. Application and service code belongs un
 
 | Path | Purpose |
 |---|---|
-| [`network`](./network) | Physical and logical network configuration, especially MikroTik and VLAN planning |
-| [`provisioning`](./provisioning) | Repeatable node setup, mainly Ansible and bootstrap workflows |
-| [`kubernetes`](./kubernetes) | Cluster components, platform services, databases, messaging, observability and operators |
+| [`./network`](./network) | Physical and logical network configuration, especially MikroTik and VLAN planning |
+| [`./provisioning`](./provisioning) | Repeatable node setup, mainly Ansible and bootstrap workflows |
+| [`./kubernetes`](./kubernetes) | Cluster components, platform services, databases, messaging, observability, user-facing applications and operators |
 
 ---
 

@@ -8,15 +8,37 @@ For this homelab, networking is one of the most important learning areas because
 
 ---
 
+## Why This Matters
+
+Networking is what turns a set of containers into a usable platform. Pods need to talk to each other, users need to reach applications, services need stable addresses and the physical network needs to understand where traffic should go.
+
+In a homelab, Kubernetes networking is especially valuable because there is no cloud provider hiding the details. You have to understand CNI, LoadBalancer IPs, ingress routing, DNS, TLS and how all of that maps back to the switch and router.
+
+In companies, networking is a shared responsibility between platform, security and application teams. The same concepts appear with more policy, segmentation and audit requirements: ingress, egress, service exposure, certificates, network policies and traffic control.
+
+---
+
+## What You Can Do With It
+
+- give pods a working network
+- expose services through stable LAN IPs
+- route HTTP(S) traffic through Traefik
+- automate TLS certificates
+- test NetworkPolicy behavior
+- connect Kubernetes service exposure to MikroTik routing
+- prepare for future service mesh experiments
+
+---
+
 ## Components
 
-| Component | Role | Documentation |
-|---|---|---|
-| Cilium | CNI, NetworkPolicy, eBPF observability | [cilium](./cilium) |
-| MetalLB | Bare-metal LoadBalancer implementation | [metallb](./metallb) |
-| Traefik | Ingress controller and reverse proxy | [traefik](./traefik) |
-| Ingress controller | HTTP and HTTPS entrypoint | [ingress](./ingress) |
-| cert-manager | Certificate automation | [cert-manager](./cert-manager) |
+| Path | Role |
+|---|---|
+| [`./cilium`](./cilium) | CNI, NetworkPolicy, eBPF observability |
+| [`./metallb`](./metallb) | Bare-metal LoadBalancer implementation |
+| [`./traefik`](./traefik) | Ingress controller and reverse proxy |
+| [`./ingress`](./ingress) | HTTP and HTTPS entrypoint |
+| [`./cert-manager`](./cert-manager) | Certificate automation |
 
 ---
 

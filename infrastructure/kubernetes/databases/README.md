@@ -8,15 +8,37 @@ Running databases on Kubernetes is useful for learning, but it is also one of th
 
 ---
 
+## Why This Matters
+
+Databases hold the state that applications care about. If they are unreliable, the rest of the platform does not matter. Running databases in Kubernetes teaches practical lessons about persistence, upgrades, backups, resource limits, monitoring and failure recovery.
+
+In a homelab, databases are both useful and educational. PostgreSQL can back custom services, MySQL helps with ecosystem compatibility, MongoDB teaches document modeling, Redis covers caching and InfluxDB handles time-series measurements.
+
+In companies, database operation is usually treated with strict ownership. Teams care about data durability, backup windows, restore tests, access control, migrations, performance and upgrade planning. The homelab should document those ideas at a smaller scale.
+
+---
+
+## What You Can Do With It
+
+- store application data for custom services
+- compare relational and document modeling
+- test ORM and migration behavior
+- add caching and sessions with Redis
+- store sensor and hardware measurements
+- practice backup and restore workflows
+- learn when an operator is better than a hand-written StatefulSet
+
+---
+
 ## Database And Data Store Catalog
 
-| System | Status | Purpose | Documentation |
-|---|---|---|---|
-| PostgreSQL | ⚫ Inactive | Primary relational database and default choice for new services | [postgresql](./postgresql) |
-| MySQL | ⚫ Inactive | Compatibility with common web stacks and MySQL-specific tooling | [mysql](./mysql) |
-| MongoDB | ⚫ Inactive | Document database for JSON-heavy workloads and experiments | [mongodb](./mongodb) |
-| Redis | ⚫ Inactive | Cache, key-value store, session storage and lightweight queues | [redis](./redis) |
-| InfluxDB | ⚫ Inactive | Time-series data and sensor-style measurements | [influxdb](./influxdb) |
+| Path | Status | Purpose |
+|---|---|---|
+| [`./postgresql`](./postgresql) | ⚫ Inactive | Primary relational database and default choice for new services |
+| [`./mysql`](./mysql) | ⚫ Inactive | Compatibility with common web stacks and MySQL-specific tooling |
+| [`./mongodb`](./mongodb) | ⚫ Inactive | Document database for JSON-heavy workloads and experiments |
+| [`./redis`](./redis) | ⚫ Inactive | Cache, key-value store, session storage and lightweight queues |
+| [`./influxdb`](./influxdb) | ⚫ Inactive | Time-series data and sensor-style measurements |
 
 ---
 

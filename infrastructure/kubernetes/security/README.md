@@ -8,14 +8,36 @@ The first focus is secrets management and access control. Later this area can al
 
 ---
 
+## Why This Matters
+
+Security is the layer that decides who can access what, which services are allowed to talk to sensitive systems and how secrets are handled. Without this, a homelab quickly turns into a collection of passwords in environment files, admin tokens in notes and services with more permissions than they need.
+
+In a homelab, the goal is not enterprise bureaucracy. The goal is to build good habits early: no plain secrets in Git, separate personal passwords from application secrets, use service identities, and make privileged access intentional.
+
+In companies, these same ideas become formal controls: identity providers, least privilege, audit trails, secret rotation, compliance requirements and security reviews. This repository documents the smaller but still realistic version.
+
+---
+
+## What You Can Do With It
+
+- centralize application secrets
+- give apps runtime secret access through Dapr
+- sync selected secrets into Kubernetes
+- protect dashboards and tools with SSO
+- model user roles such as admin, operator and viewer
+- prepare future policy and authorization work
+- avoid committing credentials into Git
+
+---
+
 ## Components
 
-| Component | Role | Documentation |
-|---|---|---|
-| Secret Store | Runtime secret access for applications and infrastructure integrations | [secret-store](./secret-store) |
-| External Secrets Operator | Syncs secrets from an external secret backend into Kubernetes | [external-secrets](./external-secrets) |
-| Sealed Secrets | Encrypts Kubernetes secrets safely for Git storage | [sealed-secrets](./sealed-secrets) |
-| Rights Management | Identity, permissions and application authorization model | [rights-management](./rights-management) |
+| Path | Role |
+|---|---|
+| [`./secret-store`](./secret-store) | Runtime secret access for applications and infrastructure integrations |
+| [`./external-secrets`](./external-secrets) | Syncs secrets from an external secret backend into Kubernetes |
+| [`./sealed-secrets`](./sealed-secrets) | Encrypts Kubernetes secrets safely for Git storage |
+| [`./rights-management`](./rights-management) | Identity, permissions and application authorization model |
 
 ---
 

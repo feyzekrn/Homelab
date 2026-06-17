@@ -4,7 +4,7 @@
 
 This directory is the main catalog for Kubernetes platform components used or evaluated in this homelab.
 
-It covers cluster bootstrap, GitOps, networking, security, storage, databases, messaging, APIs, observability, backups, registries, runtimes and operators. Deployment manifests do not live here. The future deployment source of truth should live under [`../../helm-charts`](../../helm-charts), while this directory explains why each component exists and how it should be operated.
+It covers cluster bootstrap, GitOps, networking, security, storage, databases, messaging, APIs, observability, backups, registries, runtimes, user-facing applications and operators. Deployment manifests do not live here. The future deployment source of truth should live under [`../../helm-charts`](../../helm-charts), while this directory explains why each component exists and how it should be operated.
 
 ---
 
@@ -19,6 +19,8 @@ Current state: every component is `⚫ Inactive` until the cluster build starts.
 
 Do not read this catalog as an installation checklist. It is a map of possible platform building blocks. Start with the unavoidable cluster pieces, add the recommended standards when they solve a real problem, and keep advanced or specialized systems inactive until there is a workload or learning goal for them.
 
+The first link in each catalog row points to the local documentation. The second link points to the planned Helm chart location. Most chart directories are intentionally still empty or not created yet.
+
 Recommendation meanings:
 
 - `Unavoidable`: needed for the cluster or this repository structure to make sense
@@ -29,104 +31,112 @@ Recommendation meanings:
 
 ### Bootstrap
 
-| Service | Status | What it is | Recommendation | Last update | Documentation | Helm charts |
-|---|---|---|---|---|---|---|
-| Cluster bootstrap | ⚫ Inactive | The first process that creates the Kubernetes cluster | Unavoidable | 2026-06-17 | [bootstrap](./bootstrap) | [bootstrap](../../helm-charts/bootstrap) |
+| Path | Status | What it is | Recommendation | Last update |
+|---|---|---|---|---|
+| [./bootstrap](./bootstrap)<br>[../../helm-charts/bootstrap](../../helm-charts/bootstrap) | ⚫ Inactive | The first process that creates the Kubernetes cluster | Unavoidable | 2026-06-17 |
 
 ### GitOps
 
-| Service | Status | What it is | Recommendation | Last update | Documentation | Helm charts |
-|---|---|---|---|---|---|---|
-| Flux | ⚫ Inactive | GitOps controller that keeps the cluster synced from Git | Recommended standard | 2026-06-17 | [flux](./gitops/flux) | [flux](../../helm-charts/gitops/flux) |
-| Argo CD | ⚫ Inactive | GitOps platform with a strong visual application UI | Optional alternative | 2026-06-17 | [argocd](./gitops/argocd) | [argocd](../../helm-charts/gitops/argocd) |
+| Path | Status | What it is | Recommendation | Last update |
+|---|---|---|---|---|
+| [./gitops/flux](./gitops/flux)<br>[../../helm-charts/gitops/flux](../../helm-charts/gitops/flux) | ⚫ Inactive | GitOps controller that keeps the cluster synced from Git | Recommended standard | 2026-06-17 |
+| [./gitops/argocd](./gitops/argocd)<br>[../../helm-charts/gitops/argocd](../../helm-charts/gitops/argocd) | ⚫ Inactive | GitOps platform with a strong visual application UI | Optional alternative | 2026-06-17 |
 
 ### Networking
 
-| Service | Status | What it is | Recommendation | Last update | Documentation | Helm charts |
-|---|---|---|---|---|---|---|
-| Cilium | ⚫ Inactive | The pod network layer for Kubernetes | Unavoidable CNI choice | 2026-06-17 | [cilium](./networking/cilium) | [cilium](../../helm-charts/networking/cilium) |
-| MetalLB | ⚫ Inactive | LoadBalancer IP provider for bare-metal clusters | Bare-metal standard | 2026-06-17 | [metallb](./networking/metallb) | [metallb](../../helm-charts/networking/metallb) |
-| Traefik | ⚫ Inactive | Reverse proxy that exposes HTTP(S) services | Homelab standard | 2026-06-17 | [traefik](./networking/traefik) | [traefik](../../helm-charts/networking/traefik) |
-| Ingress controller | ⚫ Inactive | The general HTTP(S) entrypoint concept | Required once apps are exposed | 2026-06-17 | [ingress](./networking/ingress) | [ingress](../../helm-charts/networking/ingress) |
-| cert-manager | ⚫ Inactive | Automatic TLS certificate management | Strongly recommended | 2026-06-17 | [cert-manager](./networking/cert-manager) | [cert-manager](../../helm-charts/networking/cert-manager) |
+| Path | Status | What it is | Recommendation | Last update |
+|---|---|---|---|---|
+| [./networking/cilium](./networking/cilium)<br>[../../helm-charts/networking/cilium](../../helm-charts/networking/cilium) | ⚫ Inactive | The pod network layer for Kubernetes | Unavoidable CNI choice | 2026-06-17 |
+| [./networking/metallb](./networking/metallb)<br>[../../helm-charts/networking/metallb](../../helm-charts/networking/metallb) | ⚫ Inactive | LoadBalancer IP provider for bare-metal clusters | Bare-metal standard | 2026-06-17 |
+| [./networking/traefik](./networking/traefik)<br>[../../helm-charts/networking/traefik](../../helm-charts/networking/traefik) | ⚫ Inactive | Reverse proxy that exposes HTTP(S) services | Homelab standard | 2026-06-17 |
+| [./networking/ingress](./networking/ingress)<br>[../../helm-charts/networking/ingress](../../helm-charts/networking/ingress) | ⚫ Inactive | The general HTTP(S) entrypoint concept | Required once apps are exposed | 2026-06-17 |
+| [./networking/cert-manager](./networking/cert-manager)<br>[../../helm-charts/networking/cert-manager](../../helm-charts/networking/cert-manager) | ⚫ Inactive | Automatic TLS certificate management | Strongly recommended | 2026-06-17 |
 
 ### Security
 
-| Service | Status | What it is | Recommendation | Last update | Documentation | Helm charts |
-|---|---|---|---|---|---|---|
-| Secret Store | ⚫ Inactive | Central vault for app secrets, tokens and accounts | Core before real apps | 2026-06-17 | [secret-store](./security/secret-store) | [secret-store](../../helm-charts/security/secret-store) |
-| External Secrets Operator | ⚫ Inactive | Syncs selected vault secrets into Kubernetes Secrets | GitOps standard | 2026-06-17 | [external-secrets](./security/external-secrets) | [external-secrets](../../helm-charts/security/external-secrets) |
-| Sealed Secrets | ⚫ Inactive | Encrypted Kubernetes Secrets stored in Git | Optional fallback | 2026-06-17 | [sealed-secrets](./security/sealed-secrets) | [sealed-secrets](../../helm-charts/security/sealed-secrets) |
-| Rights Management | ⚫ Inactive | Identity, roles and app permission decisions | Important later | 2026-06-17 | [rights-management](./security/rights-management) | [rights-management](../../helm-charts/security/rights-management) |
+| Path | Status | What it is | Recommendation | Last update |
+|---|---|---|---|---|
+| [./security/secret-store](./security/secret-store)<br>[../../helm-charts/security/secret-store](../../helm-charts/security/secret-store) | ⚫ Inactive | Central vault for app secrets, tokens and accounts | Core before real apps | 2026-06-17 |
+| [./security/external-secrets](./security/external-secrets)<br>[../../helm-charts/security/external-secrets](../../helm-charts/security/external-secrets) | ⚫ Inactive | Syncs selected vault secrets into Kubernetes Secrets | GitOps standard | 2026-06-17 |
+| [./security/sealed-secrets](./security/sealed-secrets)<br>[../../helm-charts/security/sealed-secrets](../../helm-charts/security/sealed-secrets) | ⚫ Inactive | Encrypted Kubernetes Secrets stored in Git | Optional fallback | 2026-06-17 |
+| [./security/rights-management](./security/rights-management)<br>[../../helm-charts/security/rights-management](../../helm-charts/security/rights-management) | ⚫ Inactive | Identity, roles and app permission decisions | Important later | 2026-06-17 |
+| [./security/rights-management/keycloak](./security/rights-management/keycloak)<br>[../../helm-charts/security/rights-management/keycloak](../../helm-charts/security/rights-management/keycloak) | ⚫ Inactive | Identity provider for SSO, OIDC, OAuth2, users, groups and service accounts | Best first rights-management component | 2026-06-17 |
 
 ### Storage
 
-| Service | Status | What it is | Recommendation | Last update | Documentation | Helm charts |
-|---|---|---|---|---|---|---|
-| Longhorn | ⚫ Inactive | Persistent volumes for stateful Kubernetes workloads | Storage standard | 2026-06-17 | [longhorn](./storage/longhorn) | [longhorn](../../helm-charts/storage/longhorn) |
-| MinIO | ⚫ Inactive | The homelab S3 bucket equivalent for object storage | Homelab S3 standard | 2026-06-17 | [minio](./storage/minio) | [minio](../../helm-charts/storage/minio) |
+| Path | Status | What it is | Recommendation | Last update |
+|---|---|---|---|---|
+| [./storage/longhorn](./storage/longhorn)<br>[../../helm-charts/storage/longhorn](../../helm-charts/storage/longhorn) | ⚫ Inactive | Persistent volumes for stateful Kubernetes workloads | Storage standard | 2026-06-17 |
+| [./storage/minio](./storage/minio)<br>[../../helm-charts/storage/minio](../../helm-charts/storage/minio) | ⚫ Inactive | The homelab S3 bucket equivalent for object storage | Homelab S3 standard | 2026-06-17 |
 
 ### Databases And Data Stores
 
-| Service | Status | What it is | Recommendation | Last update | Documentation | Helm charts |
-|---|---|---|---|---|---|---|
-| PostgreSQL | ⚫ Inactive | Main SQL database for most custom services | Default database | 2026-06-17 | [postgresql](./databases/postgresql) | [postgresql](../../helm-charts/databases/postgresql) |
-| MySQL | ⚫ Inactive | SQL database for MySQL-compatible apps and learning | Useful compatibility | 2026-06-17 | [mysql](./databases/mysql) | [mysql](../../helm-charts/databases/mysql) |
-| MongoDB | ⚫ Inactive | Document database for JSON-shaped data | Useful learning target | 2026-06-17 | [mongodb](./databases/mongodb) | [mongodb](../../helm-charts/databases/mongodb) |
-| Redis | ⚫ Inactive | Fast cache, session store and lightweight key-value system | Add when apps need it | 2026-06-17 | [redis](./databases/redis) | [redis](../../helm-charts/databases/redis) |
-| InfluxDB | ⚫ Inactive | Time-series database for sensors and measurements | Optional/specialized | 2026-06-17 | [influxdb](./databases/influxdb) | [influxdb](../../helm-charts/databases/influxdb) |
+| Path | Status | What it is | Recommendation | Last update |
+|---|---|---|---|---|
+| [./databases/postgresql](./databases/postgresql)<br>[../../helm-charts/databases/postgresql](../../helm-charts/databases/postgresql) | ⚫ Inactive | Main SQL database for most custom services | Default database | 2026-06-17 |
+| [./databases/mysql](./databases/mysql)<br>[../../helm-charts/databases/mysql](../../helm-charts/databases/mysql) | ⚫ Inactive | SQL database for MySQL-compatible apps and learning | Useful compatibility | 2026-06-17 |
+| [./databases/mongodb](./databases/mongodb)<br>[../../helm-charts/databases/mongodb](../../helm-charts/databases/mongodb) | ⚫ Inactive | Document database for JSON-shaped data | Useful learning target | 2026-06-17 |
+| [./databases/redis](./databases/redis)<br>[../../helm-charts/databases/redis](../../helm-charts/databases/redis) | ⚫ Inactive | Fast cache, session store and lightweight key-value system | Add when apps need it | 2026-06-17 |
+| [./databases/influxdb](./databases/influxdb)<br>[../../helm-charts/databases/influxdb](../../helm-charts/databases/influxdb) | ⚫ Inactive | Time-series database for sensors and measurements | Optional/specialized | 2026-06-17 |
 
 ### Messaging
 
-| Service | Status | What it is | Recommendation | Last update | Documentation | Helm charts |
-|---|---|---|---|---|---|---|
-| NATS | ⚫ Inactive | Lightweight event bus for simple service communication | Best first messaging choice | 2026-06-17 | [nats](./messaging/nats) | [nats](../../helm-charts/messaging/nats) |
-| RabbitMQ | ⚫ Inactive | Message broker for queues, retries and workers | Use for job queues | 2026-06-17 | [rabbitmq](./messaging/rabbitmq) | [rabbitmq](../../helm-charts/messaging/rabbitmq) |
-| Kafka | ⚫ Inactive | Durable event log for replayable streams | Advanced/later | 2026-06-17 | [kafka](./messaging/kafka) | [kafka](../../helm-charts/messaging/kafka) |
+| Path | Status | What it is | Recommendation | Last update |
+|---|---|---|---|---|
+| [./messaging/nats](./messaging/nats)<br>[../../helm-charts/messaging/nats](../../helm-charts/messaging/nats) | ⚫ Inactive | Lightweight event bus for simple service communication | Best first messaging choice | 2026-06-17 |
+| [./messaging/rabbitmq](./messaging/rabbitmq)<br>[../../helm-charts/messaging/rabbitmq](../../helm-charts/messaging/rabbitmq) | ⚫ Inactive | Message broker for queues, retries and workers | Use for job queues | 2026-06-17 |
+| [./messaging/kafka](./messaging/kafka)<br>[../../helm-charts/messaging/kafka](../../helm-charts/messaging/kafka) | ⚫ Inactive | Durable event log for replayable streams | Advanced/later | 2026-06-17 |
 
 ### API Platform
 
-| Service | Status | What it is | Recommendation | Last update | Documentation | Helm charts |
-|---|---|---|---|---|---|---|
-| GraphQL gateway | ⚫ Inactive | API layer that combines data for clients and dashboards | Optional/app-driven | 2026-06-17 | [graphql](./api/graphql) | [graphql](../../helm-charts/api/graphql) |
+| Path | Status | What it is | Recommendation | Last update |
+|---|---|---|---|---|
+| [./api/graphql](./api/graphql)<br>[../../helm-charts/api/graphql](../../helm-charts/api/graphql) | ⚫ Inactive | API layer that combines data for clients and dashboards | Optional/app-driven | 2026-06-17 |
 
 ### Observability
 
-| Service | Status | What it is | Recommendation | Last update | Documentation | Helm charts |
-|---|---|---|---|---|---|---|
-| Prometheus | ⚫ Inactive | Metrics database and alerting engine | Observability standard | 2026-06-17 | [prometheus](./observability/metrics/prometheus) | [prometheus](../../helm-charts/observability/prometheus) |
-| Grafana | ⚫ Inactive | Dashboard UI for metrics, logs and traces | Observability standard | 2026-06-17 | [grafana](./observability/metrics/grafana) | [grafana](../../helm-charts/observability/grafana) |
-| OpenSearch stack | ⚫ Inactive | Search engine for logs and analytics | Optional/heavy | 2026-06-17 | [opensearch](./observability/logging/opensearch) | [opensearch](../../helm-charts/observability/opensearch) |
-| Fluent Bit | ⚫ Inactive | Lightweight log collector for Kubernetes nodes | Logging standard | 2026-06-17 | [fluent-bit](./observability/logging/fluent-bit) | [fluent-bit](../../helm-charts/observability/fluent-bit) |
-| OpenTelemetry Collector | ⚫ Inactive | Neutral pipeline for traces, metrics and logs | Modern standard | 2026-06-17 | [opentelemetry-collector](./observability/tracing/opentelemetry-collector) | [opentelemetry-collector](../../helm-charts/observability/opentelemetry-collector) |
-| Jaeger | ⚫ Inactive | Trace UI/backend for distributed services | Good first tracing backend | 2026-06-17 | [jaeger](./observability/tracing/jaeger) | [jaeger](../../helm-charts/observability/jaeger) |
-| Zipkin | ⚫ Inactive | Simpler tracing backend and compatibility target | Mostly optional | 2026-06-17 | [zipkin](./observability/tracing/zipkin) | [zipkin](../../helm-charts/observability/zipkin) |
+| Path | Status | What it is | Recommendation | Last update |
+|---|---|---|---|---|
+| [./observability/metrics/prometheus](./observability/metrics/prometheus)<br>[../../helm-charts/observability/prometheus](../../helm-charts/observability/prometheus) | ⚫ Inactive | Metrics database and alerting engine | Observability standard | 2026-06-17 |
+| [./observability/metrics/grafana](./observability/metrics/grafana)<br>[../../helm-charts/observability/grafana](../../helm-charts/observability/grafana) | ⚫ Inactive | Dashboard UI for metrics, logs and traces | Observability standard | 2026-06-17 |
+| [./observability/logging/opensearch](./observability/logging/opensearch)<br>[../../helm-charts/observability/opensearch](../../helm-charts/observability/opensearch) | ⚫ Inactive | Search engine for logs and analytics | Optional/heavy | 2026-06-17 |
+| [./observability/logging/fluent-bit](./observability/logging/fluent-bit)<br>[../../helm-charts/observability/fluent-bit](../../helm-charts/observability/fluent-bit) | ⚫ Inactive | Lightweight log collector for Kubernetes nodes | Logging standard | 2026-06-17 |
+| [./observability/tracing/opentelemetry-collector](./observability/tracing/opentelemetry-collector)<br>[../../helm-charts/observability/opentelemetry-collector](../../helm-charts/observability/opentelemetry-collector) | ⚫ Inactive | Neutral pipeline for traces, metrics and logs | Modern standard | 2026-06-17 |
+| [./observability/tracing/jaeger](./observability/tracing/jaeger)<br>[../../helm-charts/observability/jaeger](../../helm-charts/observability/jaeger) | ⚫ Inactive | Trace UI/backend for distributed services | Good first tracing backend | 2026-06-17 |
+| [./observability/tracing/zipkin](./observability/tracing/zipkin)<br>[../../helm-charts/observability/zipkin](../../helm-charts/observability/zipkin) | ⚫ Inactive | Simpler tracing backend and compatibility target | Mostly optional | 2026-06-17 |
 
 ### Backup
 
-| Service | Status | What it is | Recommendation | Last update | Documentation | Helm charts |
-|---|---|---|---|---|---|---|
-| Velero | ⚫ Inactive | Backup and restore tool for Kubernetes resources and volumes | Important before real data | 2026-06-17 | [velero](./backup/velero) | [velero](../../helm-charts/backup/velero) |
+| Path | Status | What it is | Recommendation | Last update |
+|---|---|---|---|---|
+| [./backup/velero](./backup/velero)<br>[../../helm-charts/backup/velero](../../helm-charts/backup/velero) | ⚫ Inactive | Backup and restore tool for Kubernetes resources and volumes | Important before real data | 2026-06-17 |
 
 ### Registry
 
-| Service | Status | What it is | Recommendation | Last update | Documentation | Helm charts |
-|---|---|---|---|---|---|---|
-| Harbor | ⚫ Inactive | Private container registry for images and OCI artifacts | Good container standard | 2026-06-17 | [harbor](./registry/harbor) | [harbor](../../helm-charts/registry/harbor) |
-| Artifact Repository | ⚫ Inactive | Private package registry for Docker, npm, NuGet and artifacts | Homelab: Nexus, business: Artifactory | 2026-06-17 | [artifact-repository](./registry/artifact-repository) | [artifact-repository](../../helm-charts/registry/artifact-repository) |
+| Path | Status | What it is | Recommendation | Last update |
+|---|---|---|---|---|
+| [./registry/harbor](./registry/harbor)<br>[../../helm-charts/registry/harbor](../../helm-charts/registry/harbor) | ⚫ Inactive | Private container registry for images and OCI artifacts | Good container standard | 2026-06-17 |
+| [./registry/artifact-repository](./registry/artifact-repository)<br>[../../helm-charts/registry/artifact-repository](../../helm-charts/registry/artifact-repository) | ⚫ Inactive | Private package registry for Docker, npm, NuGet and artifacts | Homelab: Nexus, business: Artifactory | 2026-06-17 |
 
 ### Runtime
 
-| Service | Status | What it is | Recommendation | Last update | Documentation | Helm charts |
-|---|---|---|---|---|---|---|
-| Dapr | ⚫ Inactive | App runtime for pub/sub, state, secrets and service calls | Useful after custom services | 2026-06-17 | [dapr](./runtime/dapr) | [dapr](../../helm-charts/runtime/dapr) |
-| Service mesh | ⚫ Inactive | Traffic security and control between services | Usually later | 2026-06-17 | [service-mesh](./runtime/service-mesh) | [service-mesh](../../helm-charts/runtime/service-mesh) |
+| Path | Status | What it is | Recommendation | Last update |
+|---|---|---|---|---|
+| [./runtime/dapr](./runtime/dapr)<br>[../../helm-charts/runtime/dapr](../../helm-charts/runtime/dapr) | ⚫ Inactive | App runtime for pub/sub, state, secrets and service calls | Useful after custom services | 2026-06-17 |
+| [./runtime/service-mesh](./runtime/service-mesh)<br>[../../helm-charts/runtime/service-mesh](../../helm-charts/runtime/service-mesh) | ⚫ Inactive | Traffic security and control between services | Usually later | 2026-06-17 |
+
+### Applications
+
+| Path | Status | What it is | Recommendation | Last update |
+|---|---|---|---|---|
+| [./applications/nextcloud](./applications/nextcloud)<br>[../../helm-charts/applications/nextcloud](../../helm-charts/applications/nextcloud) | ⚫ Inactive | Self-hosted file sync, sharing and productivity app | Good user-facing homelab app | 2026-06-17 |
+| [./applications/plex](./applications/plex)<br>[../../helm-charts/applications/plex](../../helm-charts/applications/plex) | ⚫ Inactive | Self-hosted media server for movies, shows and music | Optional/lifestyle app | 2026-06-17 |
 
 ### Operators
 
-| Service | Status | What it is | Recommendation | Last update | Documentation | Helm charts |
-|---|---|---|---|---|---|---|
-| Operators | ⚫ Inactive | Controllers that automate lifecycle of complex software | Use selectively | 2026-06-17 | [operators](./operators) | [operators](../../helm-charts/operators) |
+| Path | Status | What it is | Recommendation | Last update |
+|---|---|---|---|---|
+| [./operators](./operators)<br>[../../helm-charts/operators](../../helm-charts/operators) | ⚫ Inactive | Controllers that automate lifecycle of complex software | Use selectively | 2026-06-17 |
 
 ---
 
@@ -162,5 +172,7 @@ Deployment files should be linked from future paths such as:
 ```text
 ../../helm-charts/<component>/
 ../../helm-charts/platform/<component>/
+../../helm-charts/applications/<application>/
 ../../helm-charts/databases/<component>/
+../../helm-charts/security/rights-management/keycloak/
 ```

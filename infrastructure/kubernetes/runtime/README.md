@@ -10,9 +10,28 @@ Dapr lives here under [`dapr`](./dapr) because it is a distributed application r
 
 ---
 
+## Why This Matters
+
+Kubernetes runs containers, but it does not automatically solve every application concern. Applications still need service calls, retries, pub/sub, state access, secrets, bindings and traffic policy. Runtime tools provide reusable patterns for those concerns.
+
+In a homelab, runtime tools should come after plain Kubernetes services are understood. In companies, runtimes and meshes can standardize cross-cutting concerns across many teams, but they also add operational complexity.
+
+---
+
+## What You Can Do With It
+
+- abstract pub/sub behind Dapr
+- read secrets through a runtime API
+- experiment with service invocation
+- add mTLS and traffic policy through a mesh
+- compare app-facing and network-facing abstractions
+- avoid baking every integration directly into application code
+
+---
+
 ## Components
 
-| Component | Role | Documentation |
-|---|---|---|
-| Dapr | Distributed application runtime | [dapr](./dapr) |
-| Service mesh | Traffic management and service-to-service security | [service-mesh](./service-mesh) |
+| Path | Role |
+|---|---|
+| [`./dapr`](./dapr) | Distributed application runtime |
+| [`./service-mesh`](./service-mesh) | Traffic management and service-to-service security |

@@ -8,6 +8,25 @@ This directory tracks free operators that may be useful and future custom operat
 
 ---
 
+## Why This Matters
+
+Some systems are too stateful or complex to manage well with a plain Deployment. Databases, message brokers, certificate systems and storage platforms often need backups, upgrades, failover, users, cluster membership and health checks. Operators encode that operational logic into Kubernetes controllers.
+
+In a homelab, operators are useful because they teach how production-style Kubernetes platforms manage complex software. In companies, operators often become the standard way to run databases, messaging systems and platform components safely.
+
+---
+
+## What You Can Do With It
+
+- run PostgreSQL with automated failover and backups
+- manage RabbitMQ or Kafka clusters
+- automate certificate lifecycle
+- create custom controllers for hardware automation
+- define custom resources for homelab operations
+- learn Kubernetes reconciliation patterns
+
+---
+
 ## Why Operators Matter
 
 Stateful systems are more than a Deployment and a PVC. Databases, message brokers and storage systems need backups, failover, upgrades, user management and health checks. Operators encode that operational knowledge into Kubernetes controllers.

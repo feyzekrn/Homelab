@@ -8,13 +8,35 @@ This directory documents NATS, RabbitMQ and Kafka because they teach different m
 
 ---
 
+## Why This Matters
+
+Direct HTTP calls are simple, but they tightly couple services. Messaging gives services another way to communicate: publish an event, enqueue a task or write to a stream. That makes systems more resilient when one part is slow, temporarily offline or needs to process work asynchronously.
+
+In a homelab, messaging is useful once custom services appear. Hardware events, dashboard updates, background jobs and automation triggers are better examples than artificial demo queues.
+
+In companies, messaging is often part of the core architecture. It supports event-driven systems, worker fleets, retries, audit trails, integrations and data pipelines. The important lesson is choosing the right model: NATS for lightweight events, RabbitMQ for queues and Kafka for replayable streams.
+
+---
+
+## What You Can Do With It
+
+- publish hardware and cluster events
+- run background workers
+- decouple APIs from slow tasks
+- retry failed jobs
+- build event-driven services
+- replay historical events with Kafka
+- compare queue-based and stream-based architectures
+
+---
+
 ## Messaging Catalog
 
-| System | Status | Best fit | Documentation |
-|---|---|---|---|
-| NATS | ⚫ Inactive | Lightweight eventing, internal service communication, JetStream | [nats](./nats) |
-| RabbitMQ | ⚫ Inactive | Queues, routing patterns, job processing, AMQP ecosystem | [rabbitmq](./rabbitmq) |
-| Kafka | ⚫ Inactive | Durable event logs, replayable streams, stream processing | [kafka](./kafka) |
+| Path | Status | Best fit |
+|---|---|---|
+| [`./nats`](./nats) | ⚫ Inactive | Lightweight eventing, internal service communication, JetStream |
+| [`./rabbitmq`](./rabbitmq) | ⚫ Inactive | Queues, routing patterns, job processing, AMQP ecosystem |
+| [`./kafka`](./kafka) | ⚫ Inactive | Durable event logs, replayable streams, stream processing |
 
 ---
 

@@ -8,6 +8,28 @@ The current target is a MikroTik-based network with a clear split between manage
 
 ---
 
+## Why This Matters
+
+The network decides how nodes, users and services reach each other. In cloud Kubernetes, many networking details are hidden behind provider-managed load balancers and virtual networks. In a bare-metal homelab, those details are your responsibility.
+
+In a homelab, documenting the network prevents confusion around IP ranges, VLANs, static addresses, DNS names and exposed services. It also makes it easier to safely experiment without mixing management access and application traffic.
+
+In companies, network design is tied to segmentation, access control, compliance, routing, firewalling and availability. The homelab version should stay simpler, but it should still teach the same fundamentals.
+
+---
+
+## What You Can Do With It
+
+- separate management and data traffic
+- plan VLANs and address ranges
+- define MetalLB LoadBalancer pools
+- document switch ports and connected devices
+- plan internal DNS names
+- define firewall boundaries
+- prepare Terraform or RouterOS-based network automation
+
+---
+
 ## Scope
 
 This area should document:
@@ -25,9 +47,9 @@ This area should document:
 
 ## Components
 
-| Component | Status | Location | Recommendation | Role | Documentation |
-|---|---|---|---|---|---|
-| MikroTik CRS310 | ⚫ Inactive | Self-hosted hardware | Homelab network standard | Managed switch, VLANs, routing and service exposure | [mikrotik](./mikrotik) |
+| Path | Status | Location | Recommendation | Role |
+|---|---|---|---|---|
+| [`./mikrotik`](./mikrotik) | ⚫ Inactive | Self-hosted hardware | Homelab network standard | Managed switch, VLANs, routing and service exposure |
 
 ---
 

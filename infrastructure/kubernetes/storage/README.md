@@ -6,12 +6,34 @@ Storage covers persistent data for workloads. In Kubernetes this usually means S
 
 ---
 
+## Why This Matters
+
+Containers are disposable, but data is not. Kubernetes can restart pods on different nodes, reschedule workloads and replace containers, but stateful applications need their data to survive those changes.
+
+In a homelab, storage is where the cluster becomes real. Databases, file uploads, media metadata, dashboards and backups all depend on storage behavior. It is also where failures become visible quickly: node reboots, disk pressure, broken mounts and restore mistakes are hard to hide.
+
+In companies, storage is treated as a reliability layer. Teams care about performance, replication, encryption, backup policies, restore time, data ownership and compliance. The homelab version should stay smaller, but it should teach the same operational instincts.
+
+---
+
+## What You Can Do With It
+
+- provide persistent volumes for databases
+- store uploaded files and application data
+- create S3-compatible buckets with MinIO
+- test node failure and volume recovery
+- practice backup and restore workflows
+- separate block storage from object storage
+- document which data is important and how it is recovered
+
+---
+
 ## Components
 
-| Component | Status | Location | Recommendation | Role | Documentation |
-|---|---|---|---|---|---|
-| Longhorn | ⚫ Inactive | Self-hosted | Homelab standard | Distributed block storage | [longhorn](./longhorn) |
-| MinIO | ⚫ Inactive | Self-hosted | Homelab S3 standard | S3-compatible object storage | [minio](./minio) |
+| Path | Status | Location | Recommendation | Role |
+|---|---|---|---|---|
+| [`./longhorn`](./longhorn) | ⚫ Inactive | Self-hosted | Homelab standard | Distributed block storage |
+| [`./minio`](./minio) | ⚫ Inactive | Self-hosted | Homelab S3 standard | S3-compatible object storage |
 
 ---
 

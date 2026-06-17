@@ -24,14 +24,24 @@ Both are needed.
 
 ## Candidate Systems
 
-| System | Best fit | Notes |
-|---|---|---|
-| Keycloak | Identity provider, OIDC, OAuth2, SSO, realm and client management | Strong default if self-hosted identity is needed |
-| Authentik | Modern self-hosted identity provider | Good UX and homelab-friendly |
-| Zitadel | Identity provider with strong modern cloud-native design | Good candidate for OIDC/OAuth2 learning |
-| OpenFGA | Relationship-based authorization | Good for fine-grained app permissions |
-| SpiceDB | Zanzibar-style authorization system | Powerful for complex permission graphs |
-| Casbin | Authorization library embedded in apps | Lightweight but less centralized |
+| Path | Category | Best fit | Recommendation |
+|---|---|---|---|
+| [`./keycloak`](./keycloak) | Identity provider | OIDC, OAuth2, SSO, realms, clients, users and roles | Best first choice |
+| [Authentik docs](https://docs.goauthentik.io/docs/) | Identity provider | Modern self-hosted identity with strong UX | Good alternative |
+| [Zitadel docs](https://zitadel.com/docs) | Identity provider | Cloud-native identity provider and OIDC/OAuth2 learning | Good alternative |
+| [OpenFGA docs](https://openfga.dev/docs) | Authorization | Relationship-based authorization for app permissions | Later if needed |
+| [SpiceDB docs](https://authzed.com/docs/spicedb) | Authorization | Zanzibar-style permission graph | Advanced/later |
+| [Casbin docs](https://casbin.org/docs/overview) | Authorization library | Embedded authorization inside application code | Lightweight fallback |
+
+---
+
+## Best First Choice
+
+Use [Keycloak](./keycloak) first.
+
+It is the strongest default for this project because it solves the immediate platform problem: users, login, OIDC/OAuth2, SSO, clients, service accounts and roles. Most dashboards, APIs and developer tools understand OIDC, so Keycloak becomes the central identity provider that other systems can trust.
+
+OpenFGA, SpiceDB and Casbin solve a different problem. They are about fine-grained authorization inside applications. They do not replace an identity provider. Add them later only if simple roles and groups are not enough.
 
 ---
 
@@ -39,7 +49,7 @@ Both are needed.
 
 Start with identity first, then authorization:
 
-1. Use an identity provider such as Keycloak, Authentik or Zitadel for login, OIDC and service identities.
+1. Use Keycloak first for login, OIDC, OAuth2, SSO and service identities.
 2. Use Kubernetes RBAC for cluster-level permissions.
 3. Evaluate OpenFGA or SpiceDB if application permissions become complex.
 4. Build a custom rights-management service only if the generic tools do not fit the desired model.
@@ -88,5 +98,9 @@ Planned deployment location:
 
 ## References
 
+- [Keycloak documentation](https://www.keycloak.org/documentation)
+- [Authentik documentation](https://docs.goauthentik.io/docs/)
+- [Zitadel documentation](https://zitadel.com/docs)
 - [OpenFGA documentation](https://openfga.dev/docs)
 - [SpiceDB documentation](https://authzed.com/docs/spicedb)
+- [Casbin documentation](https://casbin.org/docs/overview)
