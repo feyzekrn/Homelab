@@ -46,5 +46,5 @@ Longhorn is currently `⚫ Inactive`. It should run permanently once stateful wo
 Planned deployment location:
 
 ```text
-../../../../helm-charts/platform/longhorn/
+../../../../helm-charts/storage/longhorn/
 ```

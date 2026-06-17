@@ -48,5 +48,5 @@ The ingress controller is currently `⚫ Inactive`. One ingress controller shoul
 Planned deployment location:
 
 ```text
-../../../../helm-charts/platform/ingress/
+../../../../helm-charts/networking/ingress/
 ```

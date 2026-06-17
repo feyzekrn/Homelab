@@ -44,5 +44,5 @@ MetalLB is currently `⚫ Inactive`. It should run permanently once external ser
 Planned deployment location:
 
 ```text
-../../../../helm-charts/platform/metallb/
+../../../../helm-charts/networking/metallb/
 ```

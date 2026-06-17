@@ -43,5 +43,5 @@ Cilium is currently `⚫ Inactive`. It should run permanently once the Kubernete
 Planned deployment location:
 
 ```text
-../../../../helm-charts/platform/cilium/
+../../../../helm-charts/networking/cilium/
 ```

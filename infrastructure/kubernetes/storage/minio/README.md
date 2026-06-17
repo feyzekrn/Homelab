@@ -74,7 +74,7 @@ After installing, create a first bucket for test uploads and configure one appli
 Planned deployment location:
 
 ```text
-../../../../helm-charts/platform/minio/
+../../../../helm-charts/storage/minio/
 ```
 
 ---

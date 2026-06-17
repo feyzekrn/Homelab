@@ -2,9 +2,9 @@
 
 [<- Back to Repository Overview](../README.md)
 
-This directory describes everything below the application layer: network configuration, bare-metal provisioning, Kubernetes platform components, shared databases, messaging, observability and runtime building blocks.
+This directory describes the homelab infrastructure layer: network configuration, bare-metal provisioning, Kubernetes platform components, shared services and cluster-hosted applications.
 
-It is intentionally documentation-first. Actual deployment assets such as Helm charts, HelmRelease files, values files, Kustomize overlays or Argo CD applications should live under [`../helm-charts`](../helm-charts) once that directory exists. Infrastructure documentation links to those deployment assets instead of duplicating them.
+It is intentionally documentation-first. Actual deployment assets such as Helm charts, HelmRelease files, values files, Kustomize overlays or Argo CD applications should live under [`../helm-charts`](../helm-charts) as that directory is populated. Infrastructure documentation links to those deployment assets instead of duplicating them.
 
 ---
 
@@ -35,17 +35,64 @@ In companies, this layer is often owned by platform, infrastructure or SRE teams
 ```text
 infrastructure/
 ├── network/
+│   └── mikrotik/
 ├── provisioning/
+│   └── ansible/
 └── kubernetes/
-    ├── bootstrap/
-    ├── networking/
-    ├── storage/
-    ├── databases/
-    ├── messaging/
     ├── api/
+    │   └── graphql/
+    ├── applications/
+    │   ├── nextcloud/
+    │   └── plex/
+    ├── backup/
+    │   └── velero/
+    ├── bootstrap/
+    ├── databases/
+    │   ├── influxdb/
+    │   ├── mongodb/
+    │   ├── mysql/
+    │   ├── postgresql/
+    │   └── redis/
+    ├── gitops/
+    │   ├── argocd/
+    │   └── flux/
+    ├── messaging/
+    │   ├── kafka/
+    │   ├── nats/
+    │   └── rabbitmq/
+    ├── networking/
+    │   ├── cert-manager/
+    │   ├── cilium/
+    │   ├── ingress/
+    │   ├── metallb/
+    │   └── traefik/
     ├── observability/
+    │   ├── logging/
+    │   │   ├── fluent-bit/
+    │   │   └── opensearch/
+    │   ├── metrics/
+    │   │   ├── grafana/
+    │   │   └── prometheus/
+    │   └── tracing/
+    │       ├── jaeger/
+    │       ├── opentelemetry-collector/
+    │       └── zipkin/
+    ├── operators/
+    ├── registry/
+    │   ├── artifact-repository/
+    │   └── harbor/
     ├── runtime/
-    └── operators/
+    │   ├── dapr/
+    │   └── service-mesh/
+    ├── security/
+    │   ├── external-secrets/
+    │   ├── rights-management/
+    │   │   └── keycloak/
+    │   ├── sealed-secrets/
+    │   └── secret-store/
+    └── storage/
+        ├── longhorn/
+        └── minio/
 ```
 
 ---

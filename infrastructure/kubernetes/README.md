@@ -171,8 +171,9 @@ Deployment files should be linked from future paths such as:
 
 ```text
 ../../helm-charts/<component>/
-../../helm-charts/platform/<component>/
+../../helm-charts/networking/<component>/
 ../../helm-charts/applications/<application>/
 ../../helm-charts/databases/<component>/
+../../helm-charts/storage/<component>/
 ../../helm-charts/security/rights-management/keycloak/
 ```

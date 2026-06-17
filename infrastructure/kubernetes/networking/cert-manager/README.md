@@ -44,5 +44,5 @@ cert-manager is currently `⚫ Inactive`. It should run permanently once TLS is 
 Planned deployment location:
 
 ```text
-../../../../helm-charts/platform/cert-manager/
+../../../../helm-charts/networking/cert-manager/
 ```
