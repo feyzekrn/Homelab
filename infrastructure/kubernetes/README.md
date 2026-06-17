@@ -8,6 +8,68 @@ It covers cluster bootstrap, GitOps, networking, security, storage, databases, m
 
 ---
 
+## Directory Layout
+
+```text
+kubernetes/
+├── api/
+│   └── graphql/
+├── applications/
+│   ├── nextcloud/
+│   └── plex/
+├── backup/
+│   └── velero/
+├── bootstrap/
+├── databases/
+│   ├── influxdb/
+│   ├── mongodb/
+│   ├── mysql/
+│   ├── postgresql/
+│   └── redis/
+├── gitops/
+│   ├── argocd/
+│   └── flux/
+├── messaging/
+│   ├── kafka/
+│   ├── nats/
+│   └── rabbitmq/
+├── networking/
+│   ├── cert-manager/
+│   ├── cilium/
+│   ├── ingress/
+│   ├── metallb/
+│   └── traefik/
+├── observability/
+│   ├── logging/
+│   │   ├── fluent-bit/
+│   │   └── opensearch/
+│   ├── metrics/
+│   │   ├── grafana/
+│   │   └── prometheus/
+│   └── tracing/
+│       ├── jaeger/
+│       ├── opentelemetry-collector/
+│       └── zipkin/
+├── operators/
+├── registry/
+│   ├── artifact-repository/
+│   └── harbor/
+├── runtime/
+│   ├── dapr/
+│   └── service-mesh/
+├── security/
+│   ├── external-secrets/
+│   ├── rights-management/
+│   │   └── keycloak/
+│   ├── sealed-secrets/
+│   └── secret-store/
+└── storage/
+    ├── longhorn/
+    └── minio/
+```
+
+---
+
 ## Service Catalog
 
 Status meanings:
