@@ -6,6 +6,12 @@ This directory documents applications that run on the cluster and are used direc
 
 They are different from platform services. PostgreSQL, Traefik, Prometheus and Dapr help the cluster or applications operate. Nextcloud and Plex are end-user applications that consume the platform.
 
+User-facing applications are the things a person opens in a browser, mobile app or desktop client. They are the visible reason the platform exists.
+
+Platform services usually support other workloads. A database stores data. An ingress controller routes traffic. A storage system provides persistent volumes. A user-facing application consumes those services to provide an actual experience, such as file sync, media streaming or document management.
+
+This separation matters because not every installed application should become core infrastructure. If Plex is down, media streaming is affected. If Cilium, storage or DNS is down, the platform itself is affected.
+
 ---
 
 ## Why This Matters
@@ -60,6 +66,20 @@ Do not put custom code here. Custom APIs, workers and operators written for this
 
 ---
 
+## Operational Questions
+
+Every user-facing application should answer:
+
+- What data does it store?
+- Which database does it need?
+- Which volumes or buckets does it use?
+- How is it exposed through ingress?
+- Does it support SSO?
+- How is it backed up and restored?
+- Is it important enough to run permanently?
+
+---
+
 ## Deployment Rule
 
 Application documentation lives here. Helm charts, values and release definitions should live under:
@@ -67,3 +87,11 @@ Application documentation lives here. Helm charts, values and release definition
 ```text
 ../../../../helm-charts/applications/<application-name>/
 ```
+
+---
+
+## Learning Links
+
+- [Wikipedia: Self-hosting](https://en.wikipedia.org/wiki/Self-hosting_(web_services))
+- [Wikipedia: Web application](https://en.wikipedia.org/wiki/Web_application)
+- [Kubernetes workloads documentation](https://kubernetes.io/docs/concepts/workloads/)

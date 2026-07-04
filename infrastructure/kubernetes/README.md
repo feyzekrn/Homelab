@@ -6,6 +6,26 @@ This directory is the main catalog for Kubernetes platform components used or ev
 
 It covers cluster bootstrap, GitOps, networking, security, storage, databases, messaging, APIs, observability, backups, registries, runtimes, user-facing applications and operators. Deployment manifests do not live here. The future deployment source of truth should live under [`../../helm-charts`](../../helm-charts), while this directory explains why each component exists and how it should be operated.
 
+Kubernetes is a platform for running containers across a group of machines. It schedules workloads, restarts failed containers, exposes services, mounts storage and provides a declarative API for infrastructure automation.
+
+Kubernetes by itself is not the whole platform. A useful cluster also needs networking, ingress, TLS, storage, secrets, databases, observability, backups, registries and deployment workflows. This directory is the map of those platform building blocks.
+
+For beginners, read this catalog as a set of layers, not as an installation checklist. Cilium and bootstrap are foundational. Kafka, service mesh and OpenSearch are advanced or workload-dependent. The right cluster is the smallest one that teaches the target concepts and supports the real applications.
+
+---
+
+## How To Read This Catalog
+
+Each component page should explain the concept first and the project decision second. The docs intentionally include alternatives and weaknesses because a homelab should teach decision-making, not only tool names.
+
+Use the status and recommendation columns as guidance:
+
+- `Unavoidable`: required for the cluster or this repository structure to work.
+- `Standard`: common default in Kubernetes or platform engineering.
+- `Recommended`: strong first choice for this homelab.
+- `Optional`: useful when a workload needs it.
+- `Advanced/later`: valuable learning target, but not an early dependency.
+
 ---
 
 ## Directory Layout
@@ -239,3 +259,13 @@ Deployment files should be linked from future paths such as:
 ../../helm-charts/storage/<component>/
 ../../helm-charts/security/rights-management/keycloak/
 ```
+
+---
+
+## Learning Links
+
+- [Wikipedia: Kubernetes](https://en.wikipedia.org/wiki/Kubernetes)
+- [Kubernetes concepts documentation](https://kubernetes.io/docs/concepts/)
+- [Wikipedia: Containerization](https://en.wikipedia.org/wiki/OS-level_virtualization)
+- [Wikipedia: Microservices](https://en.wikipedia.org/wiki/Microservices)
+- [Wikipedia: DevOps](https://en.wikipedia.org/wiki/DevOps)

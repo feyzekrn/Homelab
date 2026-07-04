@@ -4,6 +4,12 @@
 
 Storage covers persistent data for workloads. In Kubernetes this usually means StorageClasses, PersistentVolumeClaims, backup plans and restore testing.
 
+Containers are temporary. Kubernetes may stop a pod, move it to another node or replace it during an update. That is fine for stateless applications, but it is not fine for data that must survive.
+
+Kubernetes storage gives pods a way to use persistent data. A workload asks for storage through a PersistentVolumeClaim, Kubernetes binds that request to a PersistentVolume and a StorageClass defines how the storage is provisioned.
+
+There are different storage types. Block storage behaves like a disk attached to a workload and is common for databases. Object storage behaves like buckets accessed through an API and is common for backups, uploads and S3-compatible applications. This directory documents both because they solve different problems.
+
 ---
 
 ## Why This Matters
@@ -37,6 +43,16 @@ In companies, storage is treated as a reliability layer. Teams care about perfor
 
 ---
 
+## Block Storage vs Object Storage
+
+| Type | Looks like | Best for | Example |
+|---|---|---|---|
+| Block storage | A mounted disk or volume | Databases, app data directories, stateful pods | Longhorn volume for PostgreSQL |
+| Object storage | Buckets and objects through an API | Backups, uploads, artifacts, S3-compatible apps | MinIO bucket for Velero backups |
+| File storage | Shared filesystem path | Shared media or legacy apps | NFS or SMB share |
+
+---
+
 ## Baseline Choice
 
 Use Longhorn as the first storage layer. It is approachable, Kubernetes-native and exposes important concepts such as replicas, volume attachment, node failure and backup targets.
@@ -55,3 +71,12 @@ Databases make storage problems visible quickly. Before putting real data into P
 - backup
 - restore
 - disk pressure behavior
+
+---
+
+## Learning Links
+
+- [Kubernetes storage documentation](https://kubernetes.io/docs/concepts/storage/)
+- [Wikipedia: Computer data storage](https://en.wikipedia.org/wiki/Computer_data_storage)
+- [Wikipedia: Block-level storage](https://en.wikipedia.org/wiki/Block-level_storage)
+- [Wikipedia: Object storage](https://en.wikipedia.org/wiki/Object_storage)

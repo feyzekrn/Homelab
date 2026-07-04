@@ -6,6 +6,10 @@ Plex is a self-hosted media server for organizing and streaming movies, shows, m
 
 In this homelab, it belongs under `applications` because it is a user-facing workload. It is not required for Kubernetes itself, but it is a useful real-world app for testing storage, networking and hardware capabilities.
 
+Plex scans a media library, organizes metadata and streams media to clients such as TVs, phones, browsers and media boxes. It is not a database, ingress controller or storage system; it is an application that uses those platform services.
+
+Plex is interesting in Kubernetes because it has practical infrastructure needs: persistent metadata, access to large media files, stable network exposure and sometimes hardware transcoding. That makes it a good example of an application that may be possible in Kubernetes but still needs careful placement.
+
 ---
 
 ## Why It Fits
@@ -31,6 +35,26 @@ It also forces a practical decision: some workloads are easier to run on Kuberne
 - testing large persistent media volumes
 - testing hardware transcoding support
 - learning node affinity and workload placement
+
+---
+
+## Strengths
+
+- Real workload with visible user value.
+- Tests storage layout and LAN service exposure.
+- Good case study for node affinity and hardware access.
+- Mature client ecosystem.
+- Useful comparison between Kubernetes and dedicated-host deployment.
+
+---
+
+## Weaknesses
+
+- Hardware transcoding can complicate Kubernetes scheduling.
+- Media files may be better stored outside Longhorn volumes.
+- Network discovery and remote access can be more awkward than normal web apps.
+- Some features depend on Plex account or paid plan.
+- It is optional and should not block core platform work.
 
 ---
 
@@ -115,3 +139,5 @@ Planned deployment location:
 
 - [Plex Support](https://support.plex.tv/)
 - [Plex Docker image](https://hub.docker.com/r/plexinc/pms-docker)
+- [Wikipedia: Plex](https://en.wikipedia.org/wiki/Plex_(software))
+- [Wikipedia: Media server](https://en.wikipedia.org/wiki/Media_server)

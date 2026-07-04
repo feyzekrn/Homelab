@@ -6,6 +6,12 @@ Operators extend Kubernetes with application-specific automation. They usually m
 
 This directory tracks free operators that may be useful and future custom operators built for this homelab.
 
+Kubernetes already uses controllers. A Deployment controller keeps the right number of pods running. A Job controller runs tasks to completion. An operator applies that same controller pattern to a specific application or platform system.
+
+For example, running PostgreSQL is not just "start a container." A real PostgreSQL setup may need initialization, backups, failover, upgrades, replica management, users and health checks. A PostgreSQL operator can define custom Kubernetes resources and reconcile the database cluster toward the desired state.
+
+For beginners, the important idea is that an operator encodes operational knowledge. It is software that watches Kubernetes resources and acts when reality differs from the desired state.
+
 ---
 
 ## Why This Matters
@@ -31,6 +37,8 @@ In a homelab, operators are useful because they teach how production-style Kuber
 
 Stateful systems are more than a Deployment and a PVC. Databases, message brokers and storage systems need backups, failover, upgrades, user management and health checks. Operators encode that operational knowledge into Kubernetes controllers.
 
+That does not mean every system needs an operator. Operators add CRDs, controllers and another lifecycle to manage. Use them when the operational complexity they remove is greater than the complexity they add.
+
 ---
 
 ## Free Operators To Evaluate
@@ -49,6 +57,26 @@ Stateful systems are more than a Deployment and a PVC. Databases, message broker
 | OpenTelemetry Operator | OpenTelemetry | Collector and auto-instrumentation management | Research |
 | cert-manager | Certificates | Certificate lifecycle automation | Core |
 | Longhorn Manager | Longhorn | Storage lifecycle managed by Longhorn | Core |
+
+---
+
+## Strengths
+
+- Automates lifecycle tasks that are easy to forget manually.
+- Fits Kubernetes reconciliation and declarative resource models.
+- Can provide safer upgrades, backups and failover workflows.
+- Teaches how custom resources and controllers work.
+- Often becomes the recommended production path for complex stateful systems.
+
+---
+
+## Weaknesses
+
+- Operators can fail or contain bugs like any other software.
+- They introduce CRDs and controller behavior that must be understood.
+- Switching operators later can be hard because each operator owns resources differently.
+- Not every operator is equally mature.
+- Operators are not a substitute for reading the product's operational requirements.
 
 ---
 
@@ -82,3 +110,12 @@ Operator documentation lives here. Operator Helm charts, values and installation
 ```text
 ../../../helm-charts/operators/<operator-name>/
 ```
+
+---
+
+## Learning Links
+
+- [Kubernetes Operator pattern documentation](https://kubernetes.io/docs/concepts/extend-kubernetes/operator/)
+- [Wikipedia: Kubernetes](https://en.wikipedia.org/wiki/Kubernetes)
+- [Wikipedia: Control theory](https://en.wikipedia.org/wiki/Control_theory)
+- [Operator SDK documentation](https://sdk.operatorframework.io/)

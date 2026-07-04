@@ -146,3 +146,7 @@ Planned deployment location:
 - [Keycloak Server Administration Guide](https://www.keycloak.org/docs/latest/server_admin/)
 - [Keycloak Securing Applications Guide](https://www.keycloak.org/docs/latest/securing_apps/)
 - [Keycloak Operator documentation](https://www.keycloak.org/operator/)
+- [Wikipedia: Keycloak](https://en.wikipedia.org/wiki/Keycloak)
+- [Wikipedia: OpenID Connect](https://en.wikipedia.org/wiki/OpenID_Connect)
+- [Wikipedia: OAuth](https://en.wikipedia.org/wiki/OAuth)
+- [Wikipedia: Single sign-on](https://en.wikipedia.org/wiki/Single_sign-on)

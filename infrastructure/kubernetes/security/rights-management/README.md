@@ -12,6 +12,12 @@ For this homelab, it should eventually answer questions like:
 - Which dashboard user may modify cluster settings?
 - Which automation job may access private account credentials?
 
+Rights Management is the answer to "who may do what?" Authentication can prove that a user is Alice, but authorization decides whether Alice may restart a node, read a secret, publish a package or open an admin dashboard.
+
+Kubernetes RBAC only answers that question for Kubernetes API resources. It does not decide whether a user can click a button inside a custom dashboard or whether a service may perform a hardware power action. That application-level permission model must be designed separately.
+
+For this homelab, the first step is identity through Keycloak. More advanced systems such as OpenFGA, SpiceDB or Casbin become interesting only when simple roles and groups are not enough.
+
 ---
 
 ## Scope
@@ -104,3 +110,7 @@ Planned deployment location:
 - [OpenFGA documentation](https://openfga.dev/docs)
 - [SpiceDB documentation](https://authzed.com/docs/spicedb)
 - [Casbin documentation](https://casbin.org/docs/overview)
+- [Wikipedia: Authorization](https://en.wikipedia.org/wiki/Authorization)
+- [Wikipedia: Role-based access control](https://en.wikipedia.org/wiki/Role-based_access_control)
+- [Wikipedia: Access-control list](https://en.wikipedia.org/wiki/Access-control_list)
+- [Wikipedia: OAuth](https://en.wikipedia.org/wiki/OAuth)

@@ -6,6 +6,12 @@ MinIO provides S3-compatible object storage.
 
 It is useful for applications that expect S3, for backup targets and for learning object storage patterns without using a public cloud provider.
 
+Object storage stores data as objects inside buckets. Applications access those objects through an API instead of mounting a disk. This is the model popularized by Amazon S3, and many modern applications know how to talk to S3-compatible storage.
+
+MinIO provides that kind of API in a self-hosted form. A service can upload a file to a bucket, read it later through an object key and manage access through credentials and bucket policies.
+
+Object storage is different from block storage. A database usually wants block storage. Backups, artifacts, exports and file uploads often fit object storage better.
+
 ---
 
 ## Why It Fits
@@ -24,6 +30,25 @@ For this project, MinIO is the first choice for self-hosted buckets, backup targ
 - S3-compatible development and testing
 - storing uploads from services
 - testing S3 SDK integrations
+
+---
+
+## Strengths
+
+- Strong S3-compatible API for self-hosted environments.
+- Useful for Velero-style backup targets and application uploads.
+- Easier to reason about than larger object-storage platforms.
+- Good local development substitute for cloud S3.
+- Integrates with many SDKs and tools that already support S3.
+
+---
+
+## Weaknesses
+
+- It is not a POSIX filesystem replacement.
+- Bucket policies and credentials still need security design.
+- Distributed production-style MinIO requires careful disk and node planning.
+- It should not be treated as the only backup location if it runs in the same failure domain as the cluster.
 
 ---
 
@@ -84,3 +109,5 @@ Planned deployment location:
 - [MinIO documentation](https://min.io/docs/minio/kubernetes/upstream/)
 - [MinIO JavaScript SDK](https://min.io/docs/minio/linux/developers/javascript/minio-javascript.html)
 - [MinIO Go SDK](https://min.io/docs/minio/linux/developers/go/minio-go.html)
+- [Wikipedia: MinIO](https://en.wikipedia.org/wiki/MinIO)
+- [Wikipedia: Object storage](https://en.wikipedia.org/wiki/Object_storage)

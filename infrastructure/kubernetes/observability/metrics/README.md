@@ -6,6 +6,10 @@ Metrics are numeric measurements collected over time.
 
 They answer questions like: Is the node under CPU pressure? Is Longhorn healthy? Is PostgreSQL using too much memory? Are requests getting slower?
 
+A metric is a number with labels and a timestamp. Examples include CPU usage, memory usage, request count, request latency, disk space, pod restart count and error rate. Because metrics are numbers over time, they are good for dashboards, alerts and capacity planning.
+
+Metrics are not detailed stories. They usually tell you that something changed or broke, but not every reason why. A metric might show that API errors increased at 13:05. Logs and traces may then explain which error happened and which request path failed.
+
 ---
 
 ## Why This Matters
@@ -39,3 +43,12 @@ In a homelab, metrics help you learn how workloads behave under load and how muc
 ## Baseline
 
 Prometheus and Grafana are the standard starting point for Kubernetes metrics. They should be added when there are enough running services to justify monitoring.
+
+---
+
+## Learning Links
+
+- [Wikipedia: Time series](https://en.wikipedia.org/wiki/Time_series)
+- [Wikipedia: System monitoring](https://en.wikipedia.org/wiki/System_monitoring)
+- [Prometheus documentation](https://prometheus.io/docs/introduction/overview/)
+- [Grafana documentation](https://grafana.com/docs/)

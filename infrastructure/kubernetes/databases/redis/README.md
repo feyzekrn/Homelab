@@ -6,6 +6,12 @@ Redis is an in-memory data store commonly used for caching, session storage, rat
 
 It is not a replacement for PostgreSQL, MySQL or MongoDB. In most systems, Redis sits next to a primary database and improves speed or coordination for specific access patterns.
 
+Redis stores data primarily in memory, which makes it very fast. Applications use it for data that must be accessed quickly or shared briefly between services: cache entries, login sessions, counters, locks, rate limits and small queues.
+
+Because Redis is often used for short-lived or derived data, it should not be treated like the primary source of truth for important relational state. A common pattern is: PostgreSQL stores durable user data, while Redis stores cached query results or active session data.
+
+Redis supports useful data structures such as strings, hashes, lists, sets, sorted sets and streams. This makes it more than a simple key-value cache, but the project should still be clear about what data is safe to lose and what must be backed up.
+
 ---
 
 ## Why It Fits
@@ -25,6 +31,26 @@ In this homelab, Redis is especially useful once dashboards, APIs or automation 
 - lightweight queues
 - pub/sub for simple events
 - temporary state for dashboards and background workers
+
+---
+
+## Strengths
+
+- Very fast in-memory access.
+- Useful built-in data structures.
+- Common integration in web frameworks and job libraries.
+- Good for sessions, caches and counters.
+- Can support lightweight queue and stream patterns.
+
+---
+
+## Weaknesses
+
+- Not the right default for durable relational data.
+- Cache invalidation can become a real design problem.
+- Persistence and clustering choices need to match the data criticality.
+- Distributed locks are easy to misuse without timeouts and ownership rules.
+- Message broker features are simpler than RabbitMQ or Kafka.
 
 ---
 
@@ -77,3 +103,12 @@ Planned deployment location:
 ```text
 ../../../../helm-charts/databases/redis/
 ```
+
+---
+
+## Learning Links
+
+- [Redis documentation](https://redis.io/docs/latest/)
+- [Wikipedia: Redis](https://en.wikipedia.org/wiki/Redis)
+- [Wikipedia: Cache](https://en.wikipedia.org/wiki/Cache_(computing))
+- [Wikipedia: Key-value database](https://en.wikipedia.org/wiki/Key%E2%80%93value_database)

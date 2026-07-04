@@ -6,6 +6,12 @@ This directory documents shared database systems that may run inside the cluster
 
 Running databases on Kubernetes is useful for learning, but it is also one of the fastest ways to discover whether storage, backups and observability are actually working.
 
+A database stores state that must survive application restarts. That state can be relational rows, JSON documents, cache entries, time-series measurements or short-lived coordination data.
+
+Databases are different from stateless web applications. If a web pod crashes, Kubernetes can start another one. If a database loses its data, the application may lose users, files, settings, history or business records. That is why databases force the platform to care about storage, backups, restore tests, upgrades and monitoring.
+
+This directory includes several database categories because they solve different problems. PostgreSQL and MySQL are relational databases. MongoDB is a document database. Redis is an in-memory key-value store often used for caching and sessions. InfluxDB is a time-series database for timestamped measurements.
+
 ---
 
 ## Why This Matters
@@ -42,6 +48,17 @@ In companies, database operation is usually treated with strict ownership. Teams
 
 ---
 
+## Data Model Guide
+
+| Model | Best fit | Example |
+|---|---|---|
+| Relational | Structured data with relationships and transactions | Users, roles, orders, audit logs |
+| Document | JSON-like records with flexible shape | Device metadata, nested configuration, denormalized views |
+| Key-value/cache | Fast lookup and short-lived state | Sessions, rate limits, cached summaries |
+| Time-series | Measurements indexed by time | Power usage, temperatures, sensor readings |
+
+---
+
 ## Baseline Rule
 
 PostgreSQL should be the default relational database unless a workload specifically needs MySQL. MongoDB is useful when document modeling is part of the learning goal. Redis should be added when an application needs caching, sessions, rate limiting or short-lived coordination data.
@@ -54,3 +71,13 @@ Before storing important data, define:
 - resource requests and limits
 - monitoring targets
 - upgrade plan
+
+---
+
+## Learning Links
+
+- [Wikipedia: Database](https://en.wikipedia.org/wiki/Database)
+- [Wikipedia: Relational database](https://en.wikipedia.org/wiki/Relational_database)
+- [Wikipedia: NoSQL](https://en.wikipedia.org/wiki/NoSQL)
+- [Wikipedia: Time series database](https://en.wikipedia.org/wiki/Time_series_database)
+- [Kubernetes StatefulSet documentation](https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/)

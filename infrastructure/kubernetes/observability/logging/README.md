@@ -6,6 +6,12 @@ Logs are event records emitted by applications and infrastructure components.
 
 The goal is not just to store logs, but to make failures searchable and understandable.
 
+A log is a timestamped statement from a system. It might say that an application started, a user logged in, a database connection failed or a request returned an error. In Kubernetes, logs are produced by containers, nodes, control plane components and platform services.
+
+`kubectl logs` is enough for one pod. It becomes weak when pods restart, disappear, scale horizontally or fail across multiple namespaces. A logging stack collects logs centrally, attaches Kubernetes metadata and makes them searchable after the original pod is gone.
+
+Logs are different from metrics. Metrics show trends and health. Logs explain specific events. A useful platform needs both once the number of services grows.
+
 ---
 
 ## Why This Matters
@@ -40,4 +46,13 @@ In a homelab, logging is useful once there are enough services that `kubectl log
 
 Use Fluent Bit for collection and OpenSearch for storage and search.
 
-This is similar to an ELK-style setup, but avoids tying the project too early to a heavier Elasticsearch and Logstash deployment.
+This is similar to an ELK-style setup, but avoids tying the project too early to a heavier Elasticsearch and Logstash deployment. Loki should also remain a serious alternative if the goal is a lighter Kubernetes-native log backend.
+
+---
+
+## Learning Links
+
+- [Wikipedia: Logging](https://en.wikipedia.org/wiki/Logging_(computing))
+- [Wikipedia: Elasticsearch](https://en.wikipedia.org/wiki/Elasticsearch)
+- [OpenSearch documentation](https://opensearch.org/docs/)
+- [Fluent Bit documentation](https://docs.fluentbit.io/)

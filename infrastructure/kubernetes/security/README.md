@@ -6,6 +6,16 @@ This directory documents cluster security building blocks that are shared across
 
 The first focus is secrets management and access control. Later this area can also include policy engines, image scanning and runtime security.
 
+Security in this project is about controlling sensitive access. That includes human login, application credentials, service accounts, Kubernetes permissions, secret storage and the rules that decide who may do what.
+
+For beginners, it helps to separate three ideas:
+
+- Authentication asks: who are you?
+- Authorization asks: what are you allowed to do?
+- Secret management asks: how are sensitive values stored, accessed, rotated and audited?
+
+Kubernetes has built-in security features such as RBAC and `Secret` objects, but those are not the whole solution. A real platform also needs identity, least privilege, safe GitOps secret workflows and a clear boundary between personal passwords and application secrets.
+
 ---
 
 ## Why This Matters
@@ -60,3 +70,24 @@ There are three related but different problems:
 - Authorization: deciding which user, service or workload is allowed to read or use which secret.
 
 The project should connect these worlds carefully, not collapse them into one unrestricted store.
+
+---
+
+## Typical Security Flow
+
+1. A human logs in through an identity provider such as Keycloak.
+2. The application receives a token that proves who the user is.
+3. The application checks roles or permissions before allowing an action.
+4. The application reads only the runtime secrets it is allowed to use.
+5. The Secret Store or External Secrets workflow provides credentials without putting plain values in Git.
+6. Audit logs and documentation explain what happened later.
+
+---
+
+## Learning Links
+
+- [Wikipedia: Authentication](https://en.wikipedia.org/wiki/Authentication)
+- [Wikipedia: Authorization](https://en.wikipedia.org/wiki/Authorization)
+- [Wikipedia: Principle of least privilege](https://en.wikipedia.org/wiki/Principle_of_least_privilege)
+- [Wikipedia: Single sign-on](https://en.wikipedia.org/wiki/Single_sign-on)
+- [Kubernetes Secrets documentation](https://kubernetes.io/docs/concepts/configuration/secret/)

@@ -6,6 +6,12 @@ A registry stores images and packages built for services and internal tooling.
 
 The cluster can start without an internal registry by using public registries or GitHub Container Registry. A self-hosted registry becomes useful once there are many custom services, private packages or image scanning requirements.
 
+Kubernetes usually runs container images. Those images must be stored somewhere before the cluster can pull and run them. A container registry is the storage and distribution system for those images.
+
+Modern projects often need more than container images. They may also publish Helm charts, npm packages, NuGet packages, generated SDKs, binaries and release archives. That broader category is artifact management.
+
+This directory separates Harbor from a general artifact repository because they overlap but are not identical. Harbor is strong for container images and OCI artifacts. Nexus or Artifactory can handle many package ecosystems in one place.
+
 ---
 
 ## Why This Matters
@@ -38,3 +44,20 @@ In a company, artifact management is a core supply-chain concern. Registries are
 | Nexus Repository | [`./artifact-repository`](./artifact-repository) | ⚫ Inactive | Self-hosted | Homelab artifact standard | Docker, npm, NuGet and generic repositories |
 | JFrog Artifactory | [`./artifact-repository`](./artifact-repository) | ⚫ Inactive | Self-hosted or external | Business artifact standard | Enterprise-grade artifact management |
 | GitHub Packages | [`./artifact-repository`](./artifact-repository) | ⚫ Inactive | External | Optional hosted alternative | Hosted container and package registry |
+
+---
+
+## Decision Guide
+
+Start with an external registry such as GitHub Container Registry if the project only has a few private images. Add a self-hosted registry when the homelab needs to learn supply-chain operations, image scanning, internal package feeds or fully local artifact hosting.
+
+Do not install every registry product at once. Harbor and Nexus can overlap for Docker images. Choose the product based on whether the main goal is container-image operations or broad package management.
+
+---
+
+## Learning Links
+
+- [Wikipedia: Container registry](https://en.wikipedia.org/wiki/Container_registry)
+- [Wikipedia: Software repository](https://en.wikipedia.org/wiki/Software_repository)
+- [Open Container Initiative](https://opencontainers.org/)
+- [Kubernetes image documentation](https://kubernetes.io/docs/concepts/containers/images/)

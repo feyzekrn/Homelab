@@ -6,6 +6,12 @@ Ansible is the planned provisioning tool for the Ubuntu Server phase of this hom
 
 It should automate repeatable node setup before Kubernetes and GitOps take over.
 
+Ansible is an automation tool that connects to machines, usually over SSH, and applies a desired configuration. Its instructions are written as playbooks. A playbook might create users, install packages, configure SSH, mount disks or prepare Kubernetes prerequisites.
+
+Ansible is useful because it makes manual server setup steps explicit and repeatable. Instead of remembering a sequence of shell commands, the project can keep a playbook that describes the intended node configuration.
+
+For beginners, the important word is idempotent. A good Ansible task can be run more than once without breaking the system or duplicating work.
+
 ---
 
 ## Why It Fits
@@ -27,6 +33,25 @@ During the Ubuntu phase, that is useful: the goal is not to hide Linux, but to u
 - applying firewall basics
 - preparing kubeadm or Kubernetes prerequisites
 - documenting repeatable node changes
+
+---
+
+## Strengths
+
+- Agentless SSH-based model is easy to start.
+- Playbooks are readable compared with many low-level scripts.
+- Good for Linux host configuration.
+- Strong ecosystem of modules and roles.
+- Fits the Ubuntu learning phase well.
+
+---
+
+## Weaknesses
+
+- Not the best long-term owner for Kubernetes resources in a GitOps platform.
+- Playbooks can become messy if they are used as shell-script wrappers.
+- Requires careful inventory and variable organization as the environment grows.
+- Immutable systems such as Talos reduce the need for SSH-based host changes.
 
 ---
 
@@ -108,3 +133,5 @@ Ansible provisioning is currently `⚫ Inactive`. It should become active during
 
 - [Ansible documentation](https://docs.ansible.com/)
 - [Ansible inventory guide](https://docs.ansible.com/ansible/latest/inventory_guide/intro_inventory.html)
+- [Wikipedia: Ansible](https://en.wikipedia.org/wiki/Ansible_(software))
+- [Wikipedia: Configuration management](https://en.wikipedia.org/wiki/Configuration_management)

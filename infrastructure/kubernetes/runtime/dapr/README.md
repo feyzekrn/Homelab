@@ -6,11 +6,19 @@ Dapr is a distributed application runtime. It gives services building blocks suc
 
 Dapr is not exactly the same thing as a service mesh. It overlaps with some service-to-service concerns, but it is more focused on application building blocks than transparent network traffic management.
 
+Dapr gives applications a set of common APIs for distributed-system tasks. Instead of every service directly importing a NATS client, Redis client, secret-store SDK and custom retry logic, the service can call Dapr APIs. Dapr then talks to the configured backend components.
+
+For example, an application can publish an event through Dapr pub/sub. Today the backend might be NATS. Later it might be RabbitMQ. The application code can stay closer to the Dapr API instead of being tightly coupled to one broker.
+
+Dapr usually runs as a sidecar next to the application. The app talks to the sidecar, and the sidecar talks to the configured infrastructure.
+
 ---
 
 ## Why It Fits
 
 Dapr is interesting for this homelab because the project will likely include Go services, hardware automation and event-driven workflows. Dapr can make it easier to swap messaging systems, state stores and bindings while keeping application code cleaner.
+
+It also gives a practical way to learn distributed application patterns without immediately writing custom integration code for every backend.
 
 ---
 
@@ -22,6 +30,26 @@ Dapr is interesting for this homelab because the project will likely include Go 
 - state store experiments
 - bindings for external or hardware-triggered events
 - learning sidecar-based application runtime patterns
+
+---
+
+## Strengths
+
+- Provides common APIs for recurring distributed application concerns.
+- Decouples application code from some backend-specific SDKs.
+- Supports many components for pub/sub, state and secrets.
+- Useful for event-driven and automation-heavy services.
+- Can improve consistency across services written in different languages.
+
+---
+
+## Weaknesses
+
+- Adds sidecars and platform components that must be operated.
+- Application code still needs to understand Dapr's programming model.
+- It can be unnecessary for a small number of simple services.
+- It does not replace all service-mesh traffic features.
+- Debugging includes both app behavior and Dapr component configuration.
 
 ---
 
@@ -87,3 +115,5 @@ Planned deployment location:
 
 - [Dapr Kubernetes hosting documentation](https://docs.dapr.io/operations/hosting/kubernetes/)
 - [Dapr Secrets API](https://docs.dapr.io/developing-applications/building-blocks/secrets/)
+- [Wikipedia: Sidecar pattern](https://en.wikipedia.org/wiki/Sidecar_pattern)
+- [Wikipedia: Event-driven architecture](https://en.wikipedia.org/wiki/Event-driven_architecture)

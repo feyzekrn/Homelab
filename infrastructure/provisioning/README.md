@@ -6,6 +6,12 @@ This directory documents how bare-metal nodes are prepared before Kubernetes tak
 
 During the Ubuntu phase, provisioning is expected to use Ansible. During the later Talos phase, most node configuration should move into Talos machine configuration and GitOps-controlled Kubernetes resources.
 
+Provisioning is the process of turning raw or freshly installed machines into consistent servers. Before Kubernetes can run reliably, nodes need users, SSH access, packages, disk layout, kernel settings, container runtime dependencies and other base configuration.
+
+Manual setup is useful while learning, but repeated manual setup becomes unreliable. If a node must be rebuilt, the project should not depend on memory or terminal history. Provisioning automation makes node setup repeatable.
+
+This layer ends where Kubernetes ownership begins. Provisioning prepares the machine. Kubernetes and GitOps manage the cluster workloads after that.
+
 ---
 
 ## Why This Matters
@@ -64,3 +70,12 @@ Manual work is acceptable while learning, but once a step is understood it shoul
 - GitOps for Kubernetes resources
 
 The long-term goal is that a node can be wiped and rebuilt without relying on memory or terminal history.
+
+---
+
+## Learning Links
+
+- [Wikipedia: Provisioning](https://en.wikipedia.org/wiki/Provisioning)
+- [Wikipedia: Configuration management](https://en.wikipedia.org/wiki/Configuration_management)
+- [Ansible documentation](https://docs.ansible.com/)
+- [Talos Linux documentation](https://www.talos.dev/latest/introduction/what-is-talos/)

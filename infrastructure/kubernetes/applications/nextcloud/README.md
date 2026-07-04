@@ -6,6 +6,10 @@ Nextcloud is a self-hosted file sync, sharing and productivity platform.
 
 In this homelab, it belongs under `applications` because it is not required for the cluster itself. It is a user-facing app that consumes infrastructure: storage, database, ingress, TLS, backups and identity.
 
+Nextcloud is often described as a self-hosted personal cloud. It can store files, sync them between devices, share links, manage calendars and contacts and integrate with office/collaboration features depending on installed apps.
+
+From a platform perspective, Nextcloud is valuable because it is a real stateful application. It needs persistent storage, a database, caching, web ingress, TLS, background jobs and backups. That makes it a practical test of whether the homelab can run software people actually rely on.
+
 ---
 
 ## Why It Fits
@@ -33,6 +37,26 @@ It is useful both as a personal tool and as a practical test of whether the clus
 - calendar and contacts experiments
 - testing SSO with Keycloak
 - testing S3-compatible storage with MinIO
+
+---
+
+## Strengths
+
+- Real user-facing workload with practical value.
+- Exercises many platform layers at once.
+- Strong ecosystem of clients and plugins.
+- Useful for testing SSO, backups and object storage.
+- Good example of why stateful Kubernetes operation matters.
+
+---
+
+## Weaknesses
+
+- Heavier than a simple file browser.
+- Needs careful backup and restore planning.
+- Performance depends on database, cache and storage choices.
+- Plugins can increase maintenance and security surface.
+- Object storage mode and filesystem mode have different tradeoffs.
 
 ---
 
@@ -107,3 +131,5 @@ Planned deployment location:
 
 - [Nextcloud documentation](https://docs.nextcloud.com/)
 - [Nextcloud administration manual](https://docs.nextcloud.com/server/latest/admin_manual/)
+- [Wikipedia: Nextcloud](https://en.wikipedia.org/wiki/Nextcloud)
+- [Wikipedia: File synchronization](https://en.wikipedia.org/wiki/File_synchronization)

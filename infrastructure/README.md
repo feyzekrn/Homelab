@@ -8,6 +8,27 @@ It is intentionally documentation-first. Actual deployment assets such as Helm c
 
 ---
 
+## Documentation Goal
+
+The infrastructure documentation should be readable by two very different audiences:
+
+- experienced Kubernetes, platform and SRE users who want to understand the intended architecture quickly
+- beginners who may not know what a CNI, ingress controller, message broker, CI/CD pipeline or GitOps reconciler is yet
+
+Every area should therefore explain both the concept and the project decision. A good component page should answer:
+
+- What is this thing in plain language?
+- What problem does it solve?
+- Why does this project document or recommend it?
+- When should it run and when should it stay inactive?
+- What are its strengths and weaknesses?
+- What alternatives exist?
+- Which Wikipedia or official documentation links help a beginner continue learning?
+
+The goal is not marketing copy. The goal is practical, Wikipedia-like context that helps a reader decide whether a component matters for their use case.
+
+---
+
 ## Why This Matters
 
 Infrastructure is the foundation that applications rely on. It includes the physical network, node provisioning, Kubernetes platform services, storage, databases, messaging, observability, security and deployment workflows.
@@ -133,3 +154,13 @@ infrastructure/kubernetes/messaging/nats/README.md
 ```
 
 That file explains what NATS is, why it exists in this project, when it should run, what alternatives exist and where the future Helm deployment will live.
+
+---
+
+## Learning Links
+
+- [Wikipedia: Infrastructure](https://en.wikipedia.org/wiki/Infrastructure)
+- [Wikipedia: Infrastructure as code](https://en.wikipedia.org/wiki/Infrastructure_as_code)
+- [Wikipedia: Computer network](https://en.wikipedia.org/wiki/Computer_network)
+- [Wikipedia: Kubernetes](https://en.wikipedia.org/wiki/Kubernetes)
+- [Wikipedia: Self-hosting](https://en.wikipedia.org/wiki/Self-hosting_(web_services))

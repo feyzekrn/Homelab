@@ -6,6 +6,12 @@ An Artifact Repository stores build outputs that should stay private: Docker ima
 
 This is broader than Harbor. Harbor is excellent for container images and OCI artifacts, but a full-stack homelab also needs private package feeds for application development.
 
+Software projects produce artifacts. A Docker image is an artifact. A Helm chart is an artifact. A private npm package, NuGet package, generated SDK or compiled binary is also an artifact.
+
+An artifact repository stores those outputs so other systems can download known versions. CI publishes artifacts after building them. Developers and deployment tools pull artifacts later. This creates a controlled chain between source code, build output and deployment.
+
+For beginners, the important distinction is that Git stores source code, while an artifact repository stores built or packaged outputs. Kubernetes should usually pull images from a registry, not build them directly from Git.
+
 ---
 
 ## Project Goal
@@ -44,6 +50,25 @@ For this homelab, Nexus is a strong first candidate because it is commonly used,
 For a business-style standard, Artifactory is the stronger reference platform. For this homelab, Nexus is the more pragmatic first installation.
 
 Check the current license, edition and feature limits before installing any repository product. The architecture decision should not depend on an outdated free-tier assumption.
+
+---
+
+## Strengths
+
+- Central place for internal packages and release outputs.
+- Makes CI/CD workflows repeatable and private.
+- Supports versioned deployment artifacts for GitOps.
+- Allows scoped publish and read credentials.
+- Teaches software supply-chain concepts used in companies.
+
+---
+
+## Weaknesses
+
+- Adds operational responsibility for storage, backups and access control.
+- Package repositories can overlap, so product boundaries must be clear.
+- Self-hosted artifact repositories need retention policies to avoid uncontrolled growth.
+- Credentials must be managed carefully because publish tokens can affect the whole platform.
 
 ---
 
@@ -111,3 +136,5 @@ Planned deployment location:
 - [JFrog Artifactory documentation](https://jfrog.com/help/r/jfrog-artifactory-documentation/jfrog-artifactory)
 - [GitHub Packages documentation](https://docs.github.com/en/packages)
 - [Gitea Packages documentation](https://docs.gitea.com/usage/packages/overview)
+- [Wikipedia: Software repository](https://en.wikipedia.org/wiki/Software_repository)
+- [Wikipedia: Package manager](https://en.wikipedia.org/wiki/Package_manager)

@@ -6,6 +6,10 @@ MikroTik is the planned network foundation for this homelab.
 
 The current target device is the MikroTik CRS310. It should provide the managed switching and routing layer needed for a realistic bare-metal Kubernetes setup.
 
+MikroTik is a vendor of routers, switches and wireless networking equipment. RouterOS is the operating system used on many MikroTik devices. In this homelab, the MikroTik device is expected to handle the network layer around the Kubernetes cluster.
+
+That means it is responsible for practical things: VLANs, switch ports, routing, firewall rules, DHCP, static addresses and possibly DNS forwarding. Kubernetes does not replace these responsibilities. Kubernetes networking sits on top of the physical and routed network.
+
 ---
 
 ## Why It Fits
@@ -13,6 +17,8 @@ The current target device is the MikroTik CRS310. It should provide the managed 
 MikroTik hardware is powerful enough for serious networking experiments while still being affordable for a homelab.
 
 For this project, it is especially useful because Kubernetes on bare metal needs the operator to understand real networking: VLANs, routing, firewall rules, DHCP, DNS and LoadBalancer IP ranges.
+
+The CRS310 is also relevant because a homelab cluster benefits from faster LAN links and managed switching while still staying under direct local control.
 
 ---
 
@@ -26,6 +32,25 @@ For this project, it is especially useful because Kubernetes on bare metal needs
 - firewall boundaries
 - MetalLB address pool planning
 - future Terraform-managed RouterOS configuration
+
+---
+
+## Strengths
+
+- Powerful feature set for the price.
+- Strong learning value for real routing, VLAN and firewall concepts.
+- Good fit for self-contained homelab networking.
+- RouterOS can be exported and potentially automated.
+- Supports more low-level control than many simplified home-network systems.
+
+---
+
+## Weaknesses
+
+- Steeper learning curve than consumer or UniFi-style interfaces.
+- Misconfiguration can break management access.
+- RouterOS concepts should be documented carefully to avoid "works but unknown" setups.
+- Business environments may prefer different support models or managed network platforms.
 
 ---
 
@@ -98,3 +123,5 @@ If Terraform is used later, this README should link to the exact module and stat
 
 - [MikroTik RouterOS documentation](https://help.mikrotik.com/docs/)
 - [MikroTik CRS310 product page](https://mikrotik.com/product/crs310_8g_2s_in)
+- [Wikipedia: MikroTik](https://en.wikipedia.org/wiki/MikroTik)
+- [Wikipedia: RouterOS](https://en.wikipedia.org/wiki/RouterOS)

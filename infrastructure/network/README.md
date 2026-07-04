@@ -6,6 +6,12 @@ This directory is reserved for network-level infrastructure: switch configuratio
 
 The current target is a MikroTik-based network with a clear split between management traffic and cluster data traffic.
 
+The network is the foundation underneath Kubernetes. Nodes need IP addresses, users need DNS names, services need reachable routes and exposed applications need firewall boundaries.
+
+In a cloud environment, much of this is provided by the cloud provider. In a bare-metal homelab, the owner has to design it: which VLANs exist, which IP ranges are used, where DHCP runs, how DNS names resolve and which traffic is allowed between zones.
+
+This directory documents those decisions so Kubernetes networking does not float in isolation. MetalLB, Traefik and service exposure depend on the physical and logical network being planned correctly.
+
 ---
 
 ## Why This Matters
@@ -53,6 +59,17 @@ This area should document:
 
 ---
 
+## Learning Questions
+
+- Which IP ranges are reserved for nodes, services and management?
+- Which VLAN contains Kubernetes node traffic?
+- Which network can access admin interfaces?
+- Where does DNS live and how are internal names resolved?
+- Which IP range is reserved for MetalLB?
+- Which services may be exposed outside the trusted LAN?
+
+---
+
 ## Future Deployment Assets
 
 Terraform or RouterOS configuration should be linked from here once created.
@@ -65,3 +82,12 @@ infrastructure/network/   # Documentation and network IaC references
 ```
 
 If Terraform modules are added later, this README should link to the exact module and state backend notes.
+
+---
+
+## Learning Links
+
+- [Wikipedia: Computer network](https://en.wikipedia.org/wiki/Computer_network)
+- [Wikipedia: Virtual LAN](https://en.wikipedia.org/wiki/VLAN)
+- [Wikipedia: Dynamic Host Configuration Protocol](https://en.wikipedia.org/wiki/Dynamic_Host_Configuration_Protocol)
+- [Wikipedia: Domain Name System](https://en.wikipedia.org/wiki/Domain_Name_System)

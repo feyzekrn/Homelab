@@ -6,6 +6,12 @@ A service mesh manages service-to-service traffic, usually through sidecars or n
 
 Typical features include mTLS, retries, traffic splitting, observability and policy enforcement.
 
+A service mesh adds a traffic-management layer between services. Instead of every application implementing mutual TLS, retries, timeouts and traffic policy itself, a proxy can handle much of that behavior.
+
+In many service meshes, each workload gets a sidecar proxy. Application traffic passes through the proxy, and the mesh control plane configures those proxies. Some newer approaches use node-level or eBPF-based proxies instead of one sidecar per pod.
+
+For beginners, the important point is that a service mesh is mostly about service-to-service network traffic. It is not the same as Dapr, which exposes application building-block APIs.
+
 ---
 
 ## Recommendation
@@ -13,6 +19,37 @@ Typical features include mTLS, retries, traffic splitting, observability and pol
 Do not start with a service mesh. First build normal Kubernetes networking, ingress, metrics and a few real services. Add a mesh only when there is a clear reason.
 
 If a mesh is needed later, evaluate Linkerd first because it is easier to operate than Istio. Evaluate Istio when advanced traffic management, Gateway API integration or complex policy is a real requirement.
+
+---
+
+## What It Can Be Used For
+
+- mutual TLS between internal services
+- traffic splitting between service versions
+- retries, timeouts and circuit-breaking policies
+- service-to-service observability
+- policy enforcement for east-west traffic
+- learning zero-trust networking patterns
+
+---
+
+## Strengths
+
+- Standardizes service-to-service security and traffic behavior.
+- Can add mTLS without every app implementing TLS directly.
+- Useful for controlled rollouts and traffic splitting.
+- Provides visibility into service communication.
+- Teaches production patterns used in large Kubernetes environments.
+
+---
+
+## Weaknesses
+
+- Adds meaningful operational complexity.
+- Can make networking harder to debug for beginners.
+- Sidecar-based meshes add resource overhead.
+- Many homelab services do not need mesh features early.
+- Misconfigured policy can break service communication.
 
 ---
 
@@ -64,3 +101,5 @@ Planned deployment location:
 - [Linkerd documentation](https://linkerd.io/2/overview/)
 - [Istio documentation](https://istio.io/latest/docs/)
 - [Cilium service mesh documentation](https://docs.cilium.io/en/stable/network/servicemesh/)
+- [Wikipedia: Service mesh](https://en.wikipedia.org/wiki/Service_mesh)
+- [Wikipedia: Mutual authentication](https://en.wikipedia.org/wiki/Mutual_authentication)

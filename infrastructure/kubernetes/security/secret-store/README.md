@@ -142,3 +142,7 @@ Planned deployment location:
 - [Dapr supported secret stores](https://docs.dapr.io/reference/components-reference/supported-secret-stores/)
 - [Infisical documentation](https://infisical.com/docs)
 - [OpenBao documentation](https://openbao.org/docs/)
+- [Wikipedia: Secret management](https://en.wikipedia.org/wiki/Secrets_management)
+- [Wikipedia: Password manager](https://en.wikipedia.org/wiki/Password_manager)
+- [Wikipedia: Privileged access management](https://en.wikipedia.org/wiki/Privileged_access_management)
+- [Wikipedia: Principle of least privilege](https://en.wikipedia.org/wiki/Principle_of_least_privilege)
