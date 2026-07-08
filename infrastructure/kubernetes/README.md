@@ -35,7 +35,10 @@ kubernetes/
 ├── api/
 │   └── graphql/
 ├── applications/
+│   ├── immich/
+│   ├── jellyfin/
 │   ├── nextcloud/
+│   ├── owncloud/
 │   └── plex/
 ├── backup/
 │   └── velero/
@@ -56,6 +59,11 @@ kubernetes/
 ├── networking/
 │   ├── cert-manager/
 │   ├── cilium/
+│   ├── cloudflare-tunnel/
+│   ├── dns/
+│   │   ├── adguard-home/
+│   │   ├── coredns/
+│   │   └── pihole/
 │   ├── ingress/
 │   ├── metallb/
 │   └── traefik/
@@ -79,6 +87,8 @@ kubernetes/
 │   └── service-mesh/
 ├── security/
 │   ├── external-secrets/
+│   ├── password-manager/
+│   │   └── bitwarden/
 │   ├── rights-management/
 │   │   └── keycloak/
 │   ├── sealed-secrets/
@@ -133,6 +143,10 @@ Recommendation meanings:
 | [./networking/traefik](./networking/traefik)<br>[../../helm-charts/networking/traefik](../../helm-charts/networking/traefik) | ⚫ Inactive | Reverse proxy that exposes HTTP(S) services | Homelab standard | 2026-06-17 |
 | [./networking/ingress](./networking/ingress)<br>[../../helm-charts/networking/ingress](../../helm-charts/networking/ingress) | ⚫ Inactive | The general HTTP(S) entrypoint concept | Required once apps are exposed | 2026-06-17 |
 | [./networking/cert-manager](./networking/cert-manager)<br>[../../helm-charts/networking/cert-manager](../../helm-charts/networking/cert-manager) | ⚫ Inactive | Automatic TLS certificate management | Strongly recommended | 2026-06-17 |
+| [./networking/dns/coredns](./networking/dns/coredns)<br>[../../helm-charts/networking/dns/coredns](../../helm-charts/networking/dns/coredns) | ⚫ Inactive | Cluster DNS and authoritative internal zone DNS | Cluster standard | 2026-07-08 |
+| [./networking/dns/adguard-home](./networking/dns/adguard-home)<br>[../../helm-charts/networking/dns/adguard-home](../../helm-charts/networking/dns/adguard-home) | ⚫ Inactive | LAN resolver with network-wide ad/tracker blocking | Chosen LAN resolver | 2026-07-08 |
+| [./networking/dns/pihole](./networking/dns/pihole)<br>[../../helm-charts/networking/dns/pihole](../../helm-charts/networking/dns/pihole) | ⚫ Inactive | Classic filtering DNS resolver | Documented alternative to AdGuard Home | 2026-07-08 |
+| [./networking/cloudflare-tunnel](./networking/cloudflare-tunnel)<br>[../../helm-charts/networking/cloudflare-tunnel](../../helm-charts/networking/cloudflare-tunnel) | ⚫ Inactive | External access to selected apps without VPN or port forwarding | Recommended for remote app access | 2026-07-08 |
 
 ### Security
 
@@ -143,6 +157,8 @@ Recommendation meanings:
 | [./security/sealed-secrets](./security/sealed-secrets)<br>[../../helm-charts/security/sealed-secrets](../../helm-charts/security/sealed-secrets) | ⚫ Inactive | Encrypted Kubernetes Secrets stored in Git | Optional fallback | 2026-06-17 |
 | [./security/rights-management](./security/rights-management)<br>[../../helm-charts/security/rights-management](../../helm-charts/security/rights-management) | ⚫ Inactive | Identity, roles and app permission decisions | Important later | 2026-06-17 |
 | [./security/rights-management/keycloak](./security/rights-management/keycloak)<br>[../../helm-charts/security/rights-management/keycloak](../../helm-charts/security/rights-management/keycloak) | ⚫ Inactive | Identity provider for SSO, OIDC, OAuth2, users, groups and service accounts | Best first rights-management component | 2026-06-17 |
+| [./security/password-manager](./security/password-manager)<br>[../../helm-charts/security/password-manager](../../helm-charts/security/password-manager) | ⚫ Inactive | Human password vault, separate from application secrets | High daily value | 2026-07-08 |
+| [./security/password-manager/bitwarden](./security/password-manager/bitwarden)<br>[../../helm-charts/security/password-manager/bitwarden](../../helm-charts/security/password-manager/bitwarden) | ⚫ Inactive | Family password manager (Vaultwarden server, Bitwarden clients) | Chosen password manager | 2026-07-08 |
 
 ### Storage
 
@@ -211,8 +227,11 @@ Recommendation meanings:
 
 | Path | Status | What it is | Recommendation | Last update |
 |---|---|---|---|---|
-| [./applications/nextcloud](./applications/nextcloud)<br>[../../helm-charts/applications/nextcloud](../../helm-charts/applications/nextcloud) | ⚫ Inactive | Self-hosted file sync, sharing and productivity app | Good user-facing homelab app | 2026-06-17 |
-| [./applications/plex](./applications/plex)<br>[../../helm-charts/applications/plex](../../helm-charts/applications/plex) | ⚫ Inactive | Self-hosted media server for movies, shows and music | Optional/lifestyle app | 2026-06-17 |
+| [./applications/nextcloud](./applications/nextcloud)<br>[../../helm-charts/applications/nextcloud](../../helm-charts/applications/nextcloud) | ⚫ Inactive | Self-hosted files, calendars and contacts — the family's source of truth | Chosen personal cloud | 2026-07-08 |
+| [./applications/owncloud](./applications/owncloud)<br>[../../helm-charts/applications/owncloud](../../helm-charts/applications/owncloud) | ⚫ Inactive | Lean file sync platform, the project Nextcloud was forked from | Documented alternative to Nextcloud | 2026-07-08 |
+| [./applications/immich](./applications/immich)<br>[../../helm-charts/applications/immich](../../helm-charts/applications/immich) | ⚫ Inactive | Self-hosted family photo cloud replacing iCloud/Google Photos | Chosen photo platform | 2026-07-08 |
+| [./applications/jellyfin](./applications/jellyfin)<br>[../../helm-charts/applications/jellyfin](../../helm-charts/applications/jellyfin) | ⚫ Inactive | Fully open-source media server for movies, shows and music | Chosen media server | 2026-07-08 |
+| [./applications/plex](./applications/plex)<br>[../../helm-charts/applications/plex](../../helm-charts/applications/plex) | ⚫ Inactive | Polished commercial media server | Documented alternative to Jellyfin | 2026-07-08 |
 
 ### Operators
 

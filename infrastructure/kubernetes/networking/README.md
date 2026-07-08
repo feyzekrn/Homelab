@@ -14,6 +14,8 @@ In a cloud provider, many of these pieces are hidden behind managed networking p
 - MetalLB gives `LoadBalancer` services real LAN IP addresses.
 - An ingress controller routes HTTP and HTTPS traffic to services.
 - cert-manager automates TLS certificates.
+- DNS gives services names — inside the cluster, on the LAN and with network-wide filtering.
+- Cloudflare Tunnel exposes selected apps to the internet without port forwarding.
 - MikroTik networking provides the physical and routed network under the cluster.
 
 ---
@@ -49,6 +51,8 @@ In companies, networking is a shared responsibility between platform, security a
 | Bare-metal LoadBalancer | How does a Service get a LAN-reachable IP? | [`./metallb`](./metallb) |
 | HTTP routing | How does `grafana.example` reach the right Service? | [`./ingress`](./ingress), [`./traefik`](./traefik) |
 | TLS | How are HTTPS certificates created and renewed? | [`./cert-manager`](./cert-manager) |
+| Name resolution | How do devices and pods resolve homelab names? | [`./dns`](./dns) |
+| External access | How do devices reach apps from outside, without VPN or port forwarding? | [`./cloudflare-tunnel`](./cloudflare-tunnel) |
 | Physical network | Which VLAN, route or firewall permits traffic? | [`../../network`](../../network) |
 
 ---
@@ -62,6 +66,8 @@ In companies, networking is a shared responsibility between platform, security a
 | [`./traefik`](./traefik) | Ingress controller and reverse proxy |
 | [`./ingress`](./ingress) | HTTP and HTTPS entrypoint concept |
 | [`./cert-manager`](./cert-manager) | Certificate automation |
+| [`./dns`](./dns) | Cluster DNS (CoreDNS), LAN resolver and filtering (AdGuard Home, Pi-hole) |
+| [`./cloudflare-tunnel`](./cloudflare-tunnel) | Publish selected apps externally without port forwarding (not a VPN replacement) |
 
 ---
 
@@ -75,6 +81,8 @@ Recommended baseline:
 - cert-manager for TLS automation
 
 This gives a realistic self-hosted platform without requiring cloud load balancers.
+
+Once the baseline works, AdGuard Home + CoreDNS make homelab names resolvable (and block ads network-wide), and Cloudflare Tunnel adds external access for user-facing apps without opening router ports.
 
 ---
 

@@ -4,7 +4,9 @@
 
 Plex is a self-hosted media server for organizing and streaming movies, shows, music and other media.
 
-In this homelab, it belongs under `applications` because it is a user-facing workload. It is not required for Kubernetes itself, but it is a useful real-world app for testing storage, networking and hardware capabilities.
+In this homelab, Plex is documented as the **main alternative** to [Jellyfin](../jellyfin), which is the chosen media server. Plex has the more polished client ecosystem, but key features require a Plex account and paid pass — Jellyfin's fully open model fits this repository better. This page stays because Plex vs. Jellyfin is one of the classic homelab decisions.
+
+It belongs under `applications` because it is a user-facing workload. It is not required for Kubernetes itself, but it is a useful real-world app for testing storage, networking and hardware capabilities.
 
 Plex scans a media library, organizes metadata and streams media to clients such as TVs, phones, browsers and media boxes. It is not a database, ingress controller or storage system; it is an application that uses those platform services.
 
@@ -85,7 +87,7 @@ It also forces a practical decision: some workloads are easier to run on Kuberne
 | System | Best at | Tradeoff |
 |---|---|---|
 | Plex | Polished media server ecosystem and clients | Some features depend on Plex account or paid plan |
-| Jellyfin | Fully open-source media server | Less polished client ecosystem for some devices |
+| [Jellyfin](../jellyfin) | Fully open-source media server (chosen for this homelab) | Less polished client ecosystem for some devices |
 | Emby | Media server with commercial features | Licensing model differs |
 
 ---
@@ -121,7 +123,7 @@ First evaluation checklist:
 
 ## Runtime Status
 
-Plex is currently `⚫ Inactive`. Add it only after the storage and networking model for user-facing apps is clear.
+Plex is `⚫ Inactive` and there is no plan to deploy it. [Jellyfin](../jellyfin) is the chosen media server; this page exists for comparison and decision documentation. The Kubernetes considerations below apply to Jellyfin unchanged.
 
 ---
 

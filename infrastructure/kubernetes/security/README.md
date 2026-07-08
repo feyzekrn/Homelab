@@ -48,6 +48,7 @@ In companies, these same ideas become formal controls: identity providers, least
 | [`./external-secrets`](./external-secrets) | Syncs secrets from an external secret backend into Kubernetes |
 | [`./sealed-secrets`](./sealed-secrets) | Encrypts Kubernetes secrets safely for Git storage |
 | [`./rights-management`](./rights-management) | Identity, permissions and application authorization model |
+| [`./password-manager`](./password-manager) | Human password vault for the family (Bitwarden/Vaultwarden) |
 
 ---
 
@@ -65,9 +66,9 @@ Use Sealed Secrets only when the goal is encrypted secrets directly in Git witho
 
 There are three related but different problems:
 
-- Human password management: private accounts, shared accounts, recovery keys and login credentials.
-- Runtime application secrets: API keys, database passwords, tokens and service credentials used by applications.
-- Authorization: deciding which user, service or workload is allowed to read or use which secret.
+- Human password management: private accounts, shared accounts, recovery keys and login credentials — covered by [`./password-manager`](./password-manager).
+- Runtime application secrets: API keys, database passwords, tokens and service credentials used by applications — covered by [`./secret-store`](./secret-store) and [`./external-secrets`](./external-secrets).
+- Authorization: deciding which user, service or workload is allowed to read or use which secret — covered by [`./rights-management`](./rights-management).
 
 The project should connect these worlds carefully, not collapse them into one unrestricted store.
 

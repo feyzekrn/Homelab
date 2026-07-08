@@ -64,7 +64,7 @@ This area should document:
 - Which IP ranges are reserved for nodes, services and management?
 - Which VLAN contains Kubernetes node traffic?
 - Which network can access admin interfaces?
-- Where does DNS live and how are internal names resolved?
+- Where does DNS live and how are internal names resolved? (planned answer: [`../kubernetes/networking/dns`](../kubernetes/networking/dns) — AdGuard Home as LAN resolver, CoreDNS for internal zones, handed out via MikroTik DHCP)
 - Which IP range is reserved for MetalLB?
 - Which services may be exposed outside the trusted LAN?
 

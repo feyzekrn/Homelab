@@ -63,7 +63,10 @@ infrastructure/
     ├── api/
     │   └── graphql/
     ├── applications/
+    │   ├── immich/
+    │   ├── jellyfin/
     │   ├── nextcloud/
+    │   ├── owncloud/
     │   └── plex/
     ├── backup/
     │   └── velero/
@@ -84,6 +87,11 @@ infrastructure/
     ├── networking/
     │   ├── cert-manager/
     │   ├── cilium/
+    │   ├── cloudflare-tunnel/
+    │   ├── dns/
+    │   │   ├── adguard-home/
+    │   │   ├── coredns/
+    │   │   └── pihole/
     │   ├── ingress/
     │   ├── metallb/
     │   └── traefik/
@@ -107,6 +115,8 @@ infrastructure/
     │   └── service-mesh/
     ├── security/
     │   ├── external-secrets/
+    │   ├── password-manager/
+    │   │   └── bitwarden/
     │   ├── rights-management/
     │   │   └── keycloak/
     │   ├── sealed-secrets/

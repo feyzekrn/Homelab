@@ -4,13 +4,13 @@
 
 This directory documents applications that run on the cluster and are used directly by people.
 
-They are different from platform services. PostgreSQL, Traefik, Prometheus and Dapr help the cluster or applications operate. Nextcloud and Plex are end-user applications that consume the platform.
+They are different from platform services. PostgreSQL, Traefik, Prometheus and Dapr help the cluster or applications operate. Nextcloud, Immich and Jellyfin are end-user applications that consume the platform.
 
 User-facing applications are the things a person opens in a browser, mobile app or desktop client. They are the visible reason the platform exists.
 
 Platform services usually support other workloads. A database stores data. An ingress controller routes traffic. A storage system provides persistent volumes. A user-facing application consumes those services to provide an actual experience, such as file sync, media streaming or document management.
 
-This separation matters because not every installed application should become core infrastructure. If Plex is down, media streaming is affected. If Cilium, storage or DNS is down, the platform itself is affected.
+This separation matters because not every installed application should become core infrastructure. If Jellyfin is down, media streaming is affected. If Cilium, storage or DNS is down, the platform itself is affected.
 
 ---
 
@@ -18,7 +18,7 @@ This separation matters because not every installed application should become co
 
 Applications are the reason the platform exists. They are what a user actually opens in a browser, mobile app or desktop client. Unlike infrastructure components, they are not required for Kubernetes to function, but they prove whether the platform is useful.
 
-In a homelab, user-facing apps are practical tests. Nextcloud tests storage, ingress, TLS, database reliability and backups. Plex tests media storage, network access and hardware placement. These apps turn abstract infrastructure into workflows people care about.
+In a homelab, user-facing apps are practical tests. Nextcloud tests storage, ingress, TLS, database reliability and backups. Jellyfin tests media storage, network access and hardware placement. Immich tests multi-service deployments and real data growth. These apps turn abstract infrastructure into workflows people care about.
 
 In companies, the same distinction matters: platform services enable product applications, but they are not the product themselves. Keeping that boundary clear prevents every installed app from being treated like core infrastructure.
 
@@ -40,8 +40,11 @@ In companies, the same distinction matters: platform services enable product app
 
 | Path | Status | Location | Recommendation | Purpose |
 |---|---|---|---|---|
-| [`./nextcloud`](./nextcloud) | ⚫ Inactive | Self-hosted app | Good user-facing homelab app | File sync, sharing and personal cloud features |
-| [`./plex`](./plex) | ⚫ Inactive | Self-hosted app | Optional/lifestyle app | Media library and streaming server |
+| [`./nextcloud`](./nextcloud) | ⚫ Inactive | Self-hosted app | Chosen personal cloud | Files, calendars and contacts as the family's source of truth |
+| [`./owncloud`](./owncloud) | ⚫ Inactive | Self-hosted app | Documented alternative to Nextcloud | Lean file sync platform (oCIS); not planned for deployment |
+| [`./immich`](./immich) | ⚫ Inactive | Self-hosted app | Chosen photo platform | Family photo cloud replacing iCloud/Google Photos |
+| [`./jellyfin`](./jellyfin) | ⚫ Inactive | Self-hosted app | Chosen media server | Fully open-source media library and streaming |
+| [`./plex`](./plex) | ⚫ Inactive | Self-hosted app | Documented alternative to Jellyfin | Polished media server; not planned for deployment |
 
 ---
 
@@ -57,9 +60,9 @@ Put something here when all of these are true:
 Examples:
 
 - Nextcloud
-- Plex
-- Home Assistant
 - Immich
+- Jellyfin
+- Home Assistant
 - Paperless-ngx
 
 Do not put custom code here. Custom APIs, workers and operators written for this homelab belong in [`../../../services`](../../../services).
