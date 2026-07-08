@@ -1,6 +1,6 @@
 # Kubernetes Operators
 
-[<- Back to Kubernetes](../README.md)
+[<- Back to Kubernetes Cluster](../README.md)
 
 Operators extend Kubernetes with application-specific automation. They usually manage lifecycle tasks that would otherwise become scripts or manual runbooks.
 
@@ -108,7 +108,7 @@ Each custom operator should document:
 Operator documentation lives here. Operator Helm charts, values and installation files should be linked from:
 
 ```text
-../../../helm-charts/operators/<operator-name>/
+../../../helm-charts/infrastructure/kubernetes/operators/<operator-name>/
 ```
 
 ---

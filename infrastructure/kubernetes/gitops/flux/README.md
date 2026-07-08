@@ -109,7 +109,7 @@ For this homelab, Flux should not be responsible for raw hardware provisioning, 
 Planned deployment location:
 
 ```text
-../../../../helm-charts/gitops/flux/
+../../../../helm-charts/infrastructure/kubernetes/gitops/flux/
 ```
 
 ---

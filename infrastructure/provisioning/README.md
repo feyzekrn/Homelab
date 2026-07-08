@@ -54,9 +54,9 @@ This area should document:
 
 ## Components
 
-| Path | Status | Location | Recommendation | Role |
-|---|---|---|---|---|
-| [`./ansible`](./ansible) | ⚫ Inactive | Local automation against bare-metal nodes | Ubuntu-phase provisioning standard | Repeatable node setup before Kubernetes |
+| Name | Path | Status | Location | Recommendation | Role |
+|---|---|---|---|---|---|
+| Ansible | [docs](./ansible) | ⚫ Inactive | Local automation against bare-metal nodes | Ubuntu-phase provisioning standard | Repeatable node setup before Kubernetes |
 
 ---
 

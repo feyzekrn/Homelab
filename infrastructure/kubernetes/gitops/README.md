@@ -1,6 +1,6 @@
 # GitOps
 
-[<- Back to Kubernetes](../README.md)
+[<- Back to Kubernetes Cluster](../README.md)
 
 GitOps means the desired state of infrastructure lives in Git, and an automated controller continuously reconciles the real system toward that desired state.
 
@@ -84,10 +84,10 @@ This project should use GitOps for platform services such as Cilium, MetalLB, Tr
 
 ## Components
 
-| Path | Role |
-|---|---|
-| [`./flux`](./flux) | Kubernetes-native GitOps controller with strong HelmRelease and Kustomize support |
-| [`./argocd`](./argocd) | UI-focused GitOps platform with application views, diffs and sync controls |
+| Name | Path | Role |
+|---|---|---|
+| Flux | [docs](./flux) · [chart](../../../helm-charts/infrastructure/kubernetes/gitops/flux) · [config](./flux/terraform) | Kubernetes-native GitOps controller with strong HelmRelease and Kustomize support |
+| Argo CD | [docs](./argocd) · [chart](../../../helm-charts/infrastructure/kubernetes/gitops/argocd) · [config](./argocd/terraform) | UI-focused GitOps platform with application views, diffs and sync controls |
 
 ---
 

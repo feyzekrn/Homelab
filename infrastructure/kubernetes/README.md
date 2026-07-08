@@ -1,282 +1,88 @@
-# Kubernetes Infrastructure
+# Kubernetes Cluster
 
 [<- Back to Infrastructure](../README.md)
 
-This directory is the main catalog for Kubernetes platform components used or evaluated in this homelab.
-
-It covers cluster bootstrap, GitOps, networking, security, storage, databases, messaging, APIs, observability, backups, registries, runtimes, user-facing applications and operators. Deployment manifests do not live here. The future deployment source of truth should live under [`../../helm-charts`](../../helm-charts), while this directory explains why each component exists and how it should be operated.
+This directory documents the Kubernetes cluster itself — only the pieces that make the cluster exist and function.
 
 Kubernetes is a platform for running containers across a group of machines. It schedules workloads, restarts failed containers, exposes services, mounts storage and provides a declarative API for infrastructure automation.
 
-Kubernetes by itself is not the whole platform. A useful cluster also needs networking, ingress, TLS, storage, secrets, databases, observability, backups, registries and deployment workflows. This directory is the map of those platform building blocks.
+The boundary of this directory is deliberately narrow. Everything here answers one question: **what does it take to have a working, manageable cluster?** The services that run *on* the cluster — DNS, ingress, databases, observability, backups — live in [`../platform`](../platform). The apps people actually use live in [`../applications`](../../applications).
 
-For beginners, read this catalog as a set of layers, not as an installation checklist. Cilium and bootstrap are foundational. Kafka, service mesh and OpenSearch are advanced or workload-dependent. The right cluster is the smallest one that teaches the target concepts and supports the real applications.
+That boundary is the reading order of the whole repository:
 
----
-
-## How To Read This Catalog
-
-Each component page should explain the concept first and the project decision second. The docs intentionally include alternatives and weaknesses because a homelab should teach decision-making, not only tool names.
-
-Use the status and recommendation columns as guidance:
-
-- `Unavoidable`: required for the cluster or this repository structure to work.
-- `Standard`: common default in Kubernetes or platform engineering.
-- `Recommended`: strong first choice for this homelab.
-- `Optional`: useful when a workload needs it.
-- `Advanced/later`: valuable learning target, but not an early dependency.
+1. [`../../setup`](../../setup): hardware and node operating systems (incl. [`../../setup/compute/os`](../../setup/compute/os))
+2. [`../../setup/networking`](../../setup/networking): the physical network underneath everything
+3. [`../provisioning`](../provisioning): turning machines into consistent servers
+4. **this directory**: creating and operating the cluster
+5. [`../platform`](../platform): shared services on the cluster
+6. [`../../applications`](../../applications) and [`../../services`](../../services): what the platform is for
 
 ---
 
-## Directory Layout
+## Why This Matters
 
-```text
-kubernetes/
-├── api/
-│   └── graphql/
-├── applications/
-│   ├── immich/
-│   ├── jellyfin/
-│   ├── nextcloud/
-│   ├── owncloud/
-│   └── plex/
-├── backup/
-│   └── velero/
-├── bootstrap/
-├── databases/
-│   ├── influxdb/
-│   ├── mongodb/
-│   ├── mysql/
-│   ├── postgresql/
-│   └── redis/
-├── gitops/
-│   ├── argocd/
-│   └── flux/
-├── messaging/
-│   ├── kafka/
-│   ├── nats/
-│   └── rabbitmq/
-├── networking/
-│   ├── cert-manager/
-│   ├── cilium/
-│   ├── cloudflare-tunnel/
-│   ├── dns/
-│   │   ├── adguard-home/
-│   │   ├── coredns/
-│   │   └── pihole/
-│   ├── ingress/
-│   ├── metallb/
-│   └── traefik/
-├── observability/
-│   ├── logging/
-│   │   ├── fluent-bit/
-│   │   └── opensearch/
-│   ├── metrics/
-│   │   ├── grafana/
-│   │   └── prometheus/
-│   └── tracing/
-│       ├── jaeger/
-│       ├── opentelemetry-collector/
-│       └── zipkin/
-├── operators/
-├── registry/
-│   ├── artifact-repository/
-│   └── harbor/
-├── runtime/
-│   ├── dapr/
-│   └── service-mesh/
-├── security/
-│   ├── external-secrets/
-│   ├── password-manager/
-│   │   └── bitwarden/
-│   ├── rights-management/
-│   │   └── keycloak/
-│   ├── sealed-secrets/
-│   └── secret-store/
-└── storage/
-    ├── longhorn/
-    └── minio/
-```
+A cluster is not installed once; it is operated. Bootstrap decides how nodes become a cluster and how it can be rebuilt. The CNI decides how pods communicate at all. MetalLB decides how anything outside the cluster reaches a Service. GitOps decides how change enters the system. Operators decide how complex software is automated.
+
+In a homelab, keeping these five concerns visible — instead of buried under a pile of app documentation — is exactly the understanding that managed cloud Kubernetes hides.
+
+In companies, this layer is what platform teams own. Everything above it is negotiable per workload; this layer is shared fate.
 
 ---
 
-## Service Catalog
+## Component Catalog
 
 Status meanings:
 
 - `🟢 Active`: currently deployed or actively operated in the cluster
 - `⚫ Inactive`: documented, planned or available for future use, but not currently running
 
-Current state: every component is `⚫ Inactive` until the cluster build starts.
+Each row links up to three locations, following the [Component Layout Convention](../../README.md#component-layout-convention): `docs` (local README), `chart` (planned Helm chart under [`../../helm-charts`](../../helm-charts)) and `config` (optional Terraform next to the docs). Chart and config directories are created when a component becomes active.
 
-Do not read this catalog as an installation checklist. It is a map of possible platform building blocks. Start with the unavoidable cluster pieces, add the recommended standards when they solve a real problem, and keep advanced or specialized systems inactive until there is a workload or learning goal for them.
-
-The first link in each catalog row points to the local documentation. The second link points to the planned Helm chart location. Most chart directories are intentionally still empty or not created yet.
-
-Recommendation meanings:
-
-- `Unavoidable`: needed for the cluster or this repository structure to make sense
-- `Standard`: a common default for this layer
-- `Recommended`: good first choice for this homelab
-- `Optional`: useful only when a workload needs it
-- `Advanced/later`: interesting, but not an early dependency
-
-### Bootstrap
-
-| Path | Status | What it is | Recommendation | Last update |
-|---|---|---|---|---|
-| [./bootstrap](./bootstrap)<br>[../../helm-charts/bootstrap](../../helm-charts/bootstrap) | ⚫ Inactive | The first process that creates the Kubernetes cluster | Unavoidable | 2026-06-17 |
-
-### GitOps
-
-| Path | Status | What it is | Recommendation | Last update |
-|---|---|---|---|---|
-| [./gitops/flux](./gitops/flux)<br>[../../helm-charts/gitops/flux](../../helm-charts/gitops/flux) | ⚫ Inactive | GitOps controller that keeps the cluster synced from Git | Recommended standard | 2026-06-17 |
-| [./gitops/argocd](./gitops/argocd)<br>[../../helm-charts/gitops/argocd](../../helm-charts/gitops/argocd) | ⚫ Inactive | GitOps platform with a strong visual application UI | Optional alternative | 2026-06-17 |
-
-### Networking
-
-| Path | Status | What it is | Recommendation | Last update |
-|---|---|---|---|---|
-| [./networking/cilium](./networking/cilium)<br>[../../helm-charts/networking/cilium](../../helm-charts/networking/cilium) | ⚫ Inactive | The pod network layer for Kubernetes | Unavoidable CNI choice | 2026-06-17 |
-| [./networking/metallb](./networking/metallb)<br>[../../helm-charts/networking/metallb](../../helm-charts/networking/metallb) | ⚫ Inactive | LoadBalancer IP provider for bare-metal clusters | Bare-metal standard | 2026-06-17 |
-| [./networking/traefik](./networking/traefik)<br>[../../helm-charts/networking/traefik](../../helm-charts/networking/traefik) | ⚫ Inactive | Reverse proxy that exposes HTTP(S) services | Homelab standard | 2026-06-17 |
-| [./networking/ingress](./networking/ingress)<br>[../../helm-charts/networking/ingress](../../helm-charts/networking/ingress) | ⚫ Inactive | The general HTTP(S) entrypoint concept | Required once apps are exposed | 2026-06-17 |
-| [./networking/cert-manager](./networking/cert-manager)<br>[../../helm-charts/networking/cert-manager](../../helm-charts/networking/cert-manager) | ⚫ Inactive | Automatic TLS certificate management | Strongly recommended | 2026-06-17 |
-| [./networking/dns/coredns](./networking/dns/coredns)<br>[../../helm-charts/networking/dns/coredns](../../helm-charts/networking/dns/coredns) | ⚫ Inactive | Cluster DNS and authoritative internal zone DNS | Cluster standard | 2026-07-08 |
-| [./networking/dns/adguard-home](./networking/dns/adguard-home)<br>[../../helm-charts/networking/dns/adguard-home](../../helm-charts/networking/dns/adguard-home) | ⚫ Inactive | LAN resolver with network-wide ad/tracker blocking | Chosen LAN resolver | 2026-07-08 |
-| [./networking/dns/pihole](./networking/dns/pihole)<br>[../../helm-charts/networking/dns/pihole](../../helm-charts/networking/dns/pihole) | ⚫ Inactive | Classic filtering DNS resolver | Documented alternative to AdGuard Home | 2026-07-08 |
-| [./networking/cloudflare-tunnel](./networking/cloudflare-tunnel)<br>[../../helm-charts/networking/cloudflare-tunnel](../../helm-charts/networking/cloudflare-tunnel) | ⚫ Inactive | External access to selected apps without VPN or port forwarding | Recommended for remote app access | 2026-07-08 |
-
-### Security
-
-| Path | Status | What it is | Recommendation | Last update |
-|---|---|---|---|---|
-| [./security/secret-store](./security/secret-store)<br>[../../helm-charts/security/secret-store](../../helm-charts/security/secret-store) | ⚫ Inactive | Central vault for app secrets, tokens and accounts | Core before real apps | 2026-06-17 |
-| [./security/external-secrets](./security/external-secrets)<br>[../../helm-charts/security/external-secrets](../../helm-charts/security/external-secrets) | ⚫ Inactive | Syncs selected vault secrets into Kubernetes Secrets | GitOps standard | 2026-06-17 |
-| [./security/sealed-secrets](./security/sealed-secrets)<br>[../../helm-charts/security/sealed-secrets](../../helm-charts/security/sealed-secrets) | ⚫ Inactive | Encrypted Kubernetes Secrets stored in Git | Optional fallback | 2026-06-17 |
-| [./security/rights-management](./security/rights-management)<br>[../../helm-charts/security/rights-management](../../helm-charts/security/rights-management) | ⚫ Inactive | Identity, roles and app permission decisions | Important later | 2026-06-17 |
-| [./security/rights-management/keycloak](./security/rights-management/keycloak)<br>[../../helm-charts/security/rights-management/keycloak](../../helm-charts/security/rights-management/keycloak) | ⚫ Inactive | Identity provider for SSO, OIDC, OAuth2, users, groups and service accounts | Best first rights-management component | 2026-06-17 |
-| [./security/password-manager](./security/password-manager)<br>[../../helm-charts/security/password-manager](../../helm-charts/security/password-manager) | ⚫ Inactive | Human password vault, separate from application secrets | High daily value | 2026-07-08 |
-| [./security/password-manager/bitwarden](./security/password-manager/bitwarden)<br>[../../helm-charts/security/password-manager/bitwarden](../../helm-charts/security/password-manager/bitwarden) | ⚫ Inactive | Family password manager (Vaultwarden server, Bitwarden clients) | Chosen password manager | 2026-07-08 |
-
-### Storage
-
-| Path | Status | What it is | Recommendation | Last update |
-|---|---|---|---|---|
-| [./storage/longhorn](./storage/longhorn)<br>[../../helm-charts/storage/longhorn](../../helm-charts/storage/longhorn) | ⚫ Inactive | Persistent volumes for stateful Kubernetes workloads | Storage standard | 2026-06-17 |
-| [./storage/minio](./storage/minio)<br>[../../helm-charts/storage/minio](../../helm-charts/storage/minio) | ⚫ Inactive | The homelab S3 bucket equivalent for object storage | Homelab S3 standard | 2026-06-17 |
-
-### Databases And Data Stores
-
-| Path | Status | What it is | Recommendation | Last update |
-|---|---|---|---|---|
-| [./databases/postgresql](./databases/postgresql)<br>[../../helm-charts/databases/postgresql](../../helm-charts/databases/postgresql) | ⚫ Inactive | Main SQL database for most custom services | Default database | 2026-06-17 |
-| [./databases/mysql](./databases/mysql)<br>[../../helm-charts/databases/mysql](../../helm-charts/databases/mysql) | ⚫ Inactive | SQL database for MySQL-compatible apps and learning | Useful compatibility | 2026-06-17 |
-| [./databases/mongodb](./databases/mongodb)<br>[../../helm-charts/databases/mongodb](../../helm-charts/databases/mongodb) | ⚫ Inactive | Document database for JSON-shaped data | Useful learning target | 2026-06-17 |
-| [./databases/redis](./databases/redis)<br>[../../helm-charts/databases/redis](../../helm-charts/databases/redis) | ⚫ Inactive | Fast cache, session store and lightweight key-value system | Add when apps need it | 2026-06-17 |
-| [./databases/influxdb](./databases/influxdb)<br>[../../helm-charts/databases/influxdb](../../helm-charts/databases/influxdb) | ⚫ Inactive | Time-series database for sensors and measurements | Optional/specialized | 2026-06-17 |
-
-### Messaging
-
-| Path | Status | What it is | Recommendation | Last update |
-|---|---|---|---|---|
-| [./messaging/nats](./messaging/nats)<br>[../../helm-charts/messaging/nats](../../helm-charts/messaging/nats) | ⚫ Inactive | Lightweight event bus for simple service communication | Best first messaging choice | 2026-06-17 |
-| [./messaging/rabbitmq](./messaging/rabbitmq)<br>[../../helm-charts/messaging/rabbitmq](../../helm-charts/messaging/rabbitmq) | ⚫ Inactive | Message broker for queues, retries and workers | Use for job queues | 2026-06-17 |
-| [./messaging/kafka](./messaging/kafka)<br>[../../helm-charts/messaging/kafka](../../helm-charts/messaging/kafka) | ⚫ Inactive | Durable event log for replayable streams | Advanced/later | 2026-06-17 |
-
-### API Platform
-
-| Path | Status | What it is | Recommendation | Last update |
-|---|---|---|---|---|
-| [./api/graphql](./api/graphql)<br>[../../helm-charts/api/graphql](../../helm-charts/api/graphql) | ⚫ Inactive | API layer that combines data for clients and dashboards | Optional/app-driven | 2026-06-17 |
-
-### Observability
-
-| Path | Status | What it is | Recommendation | Last update |
-|---|---|---|---|---|
-| [./observability/metrics/prometheus](./observability/metrics/prometheus)<br>[../../helm-charts/observability/prometheus](../../helm-charts/observability/prometheus) | ⚫ Inactive | Metrics database and alerting engine | Observability standard | 2026-06-17 |
-| [./observability/metrics/grafana](./observability/metrics/grafana)<br>[../../helm-charts/observability/grafana](../../helm-charts/observability/grafana) | ⚫ Inactive | Dashboard UI for metrics, logs and traces | Observability standard | 2026-06-17 |
-| [./observability/logging/opensearch](./observability/logging/opensearch)<br>[../../helm-charts/observability/opensearch](../../helm-charts/observability/opensearch) | ⚫ Inactive | Search engine for logs and analytics | Optional/heavy | 2026-06-17 |
-| [./observability/logging/fluent-bit](./observability/logging/fluent-bit)<br>[../../helm-charts/observability/fluent-bit](../../helm-charts/observability/fluent-bit) | ⚫ Inactive | Lightweight log collector for Kubernetes nodes | Logging standard | 2026-06-17 |
-| [./observability/tracing/opentelemetry-collector](./observability/tracing/opentelemetry-collector)<br>[../../helm-charts/observability/opentelemetry-collector](../../helm-charts/observability/opentelemetry-collector) | ⚫ Inactive | Neutral pipeline for traces, metrics and logs | Modern standard | 2026-06-17 |
-| [./observability/tracing/jaeger](./observability/tracing/jaeger)<br>[../../helm-charts/observability/jaeger](../../helm-charts/observability/jaeger) | ⚫ Inactive | Trace UI/backend for distributed services | Good first tracing backend | 2026-06-17 |
-| [./observability/tracing/zipkin](./observability/tracing/zipkin)<br>[../../helm-charts/observability/zipkin](../../helm-charts/observability/zipkin) | ⚫ Inactive | Simpler tracing backend and compatibility target | Mostly optional | 2026-06-17 |
-
-### Backup
-
-| Path | Status | What it is | Recommendation | Last update |
-|---|---|---|---|---|
-| [./backup/velero](./backup/velero)<br>[../../helm-charts/backup/velero](../../helm-charts/backup/velero) | ⚫ Inactive | Backup and restore tool for Kubernetes resources and volumes | Important before real data | 2026-06-17 |
-
-### Registry
-
-| Path | Status | What it is | Recommendation | Last update |
-|---|---|---|---|---|
-| [./registry/harbor](./registry/harbor)<br>[../../helm-charts/registry/harbor](../../helm-charts/registry/harbor) | ⚫ Inactive | Private container registry for images and OCI artifacts | Good container standard | 2026-06-17 |
-| [./registry/artifact-repository](./registry/artifact-repository)<br>[../../helm-charts/registry/artifact-repository](../../helm-charts/registry/artifact-repository) | ⚫ Inactive | Private package registry for Docker, npm, NuGet and artifacts | Homelab: Nexus, business: Artifactory | 2026-06-17 |
-
-### Runtime
-
-| Path | Status | What it is | Recommendation | Last update |
-|---|---|---|---|---|
-| [./runtime/dapr](./runtime/dapr)<br>[../../helm-charts/runtime/dapr](../../helm-charts/runtime/dapr) | ⚫ Inactive | App runtime for pub/sub, state, secrets and service calls | Useful after custom services | 2026-06-17 |
-| [./runtime/service-mesh](./runtime/service-mesh)<br>[../../helm-charts/runtime/service-mesh](../../helm-charts/runtime/service-mesh) | ⚫ Inactive | Traffic security and control between services | Usually later | 2026-06-17 |
-
-### Applications
-
-| Path | Status | What it is | Recommendation | Last update |
-|---|---|---|---|---|
-| [./applications/nextcloud](./applications/nextcloud)<br>[../../helm-charts/applications/nextcloud](../../helm-charts/applications/nextcloud) | ⚫ Inactive | Self-hosted files, calendars and contacts — the family's source of truth | Chosen personal cloud | 2026-07-08 |
-| [./applications/owncloud](./applications/owncloud)<br>[../../helm-charts/applications/owncloud](../../helm-charts/applications/owncloud) | ⚫ Inactive | Lean file sync platform, the project Nextcloud was forked from | Documented alternative to Nextcloud | 2026-07-08 |
-| [./applications/immich](./applications/immich)<br>[../../helm-charts/applications/immich](../../helm-charts/applications/immich) | ⚫ Inactive | Self-hosted family photo cloud replacing iCloud/Google Photos | Chosen photo platform | 2026-07-08 |
-| [./applications/jellyfin](./applications/jellyfin)<br>[../../helm-charts/applications/jellyfin](../../helm-charts/applications/jellyfin) | ⚫ Inactive | Fully open-source media server for movies, shows and music | Chosen media server | 2026-07-08 |
-| [./applications/plex](./applications/plex)<br>[../../helm-charts/applications/plex](../../helm-charts/applications/plex) | ⚫ Inactive | Polished commercial media server | Documented alternative to Jellyfin | 2026-07-08 |
-
-### Operators
-
-| Path | Status | What it is | Recommendation | Last update |
-|---|---|---|---|---|
-| [./operators](./operators)<br>[../../helm-charts/operators](../../helm-charts/operators) | ⚫ Inactive | Controllers that automate lifecycle of complex software | Use selectively | 2026-06-17 |
+| Name | Path | Status | What it is | Recommendation | Last update |
+|---|---|---|---|---|---|
+| Bootstrap | [docs](./bootstrap) · [chart](../../helm-charts/infrastructure/kubernetes/bootstrap) · [config](./bootstrap/terraform) | ⚫ Inactive | The first process that creates the Kubernetes cluster | Unavoidable | 2026-06-17 |
+| Cilium | [docs](./cilium) · [chart](../../helm-charts/infrastructure/kubernetes/cilium) · [config](./cilium/terraform) | ⚫ Inactive | The pod network layer (CNI) for Kubernetes | Unavoidable CNI choice | 2026-06-17 |
+| MetalLB | [docs](./metallb) · [chart](../../helm-charts/infrastructure/kubernetes/metallb) · [config](./metallb/terraform) | ⚫ Inactive | LoadBalancer IP provider for bare-metal clusters | Bare-metal standard | 2026-06-17 |
+| Flux | [docs](./gitops/flux) · [chart](../../helm-charts/infrastructure/kubernetes/gitops/flux) · [config](./gitops/flux/terraform) | ⚫ Inactive | GitOps controller that keeps the cluster synced from Git | Recommended standard | 2026-06-17 |
+| Argo CD | [docs](./gitops/argocd) · [chart](../../helm-charts/infrastructure/kubernetes/gitops/argocd) · [config](./gitops/argocd/terraform) | ⚫ Inactive | GitOps platform with a strong visual application UI | Optional alternative | 2026-06-17 |
+| Operators | [docs](./operators) · [chart](../../helm-charts/infrastructure/kubernetes/operators) | ⚫ Inactive | Controllers that automate lifecycle of complex software (category) | Use selectively | 2026-06-17 |
 
 ---
 
-## Recommended Baseline
+## Directory Layout
 
-For the first serious Kubernetes build, keep the always-running baseline small:
+```text
+infrastructure/kubernetes/
+├── bootstrap/
+├── cilium/
+├── metallb/
+├── gitops/
+│   ├── argocd/
+│   └── flux/
+└── operators/
+```
 
-- Cilium for CNI, NetworkPolicy and future eBPF learning
-- MetalLB for bare-metal LoadBalancer services
-- one ingress controller
-- cert-manager for certificate automation
-- Longhorn for distributed block storage
-- Flux or another GitOps controller once deployments become repeatable
-- PostgreSQL, MySQL and MongoDB as the primary learning databases
-- Redis once an application needs caching, sessions or lightweight queue patterns
+---
 
-Everything else can be added when there is a real workload or learning goal. This keeps the cluster understandable and avoids turning the first build into a permanent maintenance queue.
+## Placement Rule
+
+Something belongs in this directory only when all of these are true:
+
+- the cluster cannot exist or cannot be operated without deciding on it
+- it is not a service that workloads consume (that is [`../platform`](../platform))
+- users never interact with it directly (that is [`../applications`](../../applications))
+
+Borderline example: CoreDNS as *cluster DNS* is installed by bootstrap and belongs to the cluster; CoreDNS as *LAN DNS for the homelab* is a platform service and is documented under [`../platform/dns`](../platform/dns).
 
 ---
 
 ## Deployment Rule
 
-This directory answers:
-
-- What is the component?
-- Why does this project care?
-- Should it run all the time?
-- What are the main alternatives?
-- What should be monitored?
-
-Deployment files should be linked from future paths such as:
+This directory answers what a component is and why the cluster needs it. Deployment assets follow the repository convention:
 
 ```text
-../../helm-charts/<component>/
-../../helm-charts/networking/<component>/
-../../helm-charts/applications/<application>/
-../../helm-charts/databases/<component>/
-../../helm-charts/storage/<component>/
-../../helm-charts/security/rights-management/keycloak/
+../../helm-charts/infrastructure/kubernetes/<component>/    # Helm chart / HelmRelease values
+./<component>/terraform/                  # optional Terraform for configuration
 ```
 
 ---
@@ -286,5 +92,4 @@ Deployment files should be linked from future paths such as:
 - [Wikipedia: Kubernetes](https://en.wikipedia.org/wiki/Kubernetes)
 - [Kubernetes concepts documentation](https://kubernetes.io/docs/concepts/)
 - [Wikipedia: Containerization](https://en.wikipedia.org/wiki/OS-level_virtualization)
-- [Wikipedia: Microservices](https://en.wikipedia.org/wiki/Microservices)
 - [Wikipedia: DevOps](https://en.wikipedia.org/wiki/DevOps)

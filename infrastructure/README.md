@@ -2,175 +2,48 @@
 
 [<- Back to Repository Overview](../README.md)
 
-This directory describes the homelab infrastructure layer: network configuration, bare-metal provisioning, Kubernetes platform components, shared services and cluster-hosted applications.
+This directory holds the software infrastructure of the homelab: how machines are provisioned, how the Kubernetes cluster is built, and which shared services run on it.
 
-It is intentionally documentation-first. Actual deployment assets such as Helm charts, HelmRelease files, values files, Kustomize overlays or Argo CD applications should live under [`../helm-charts`](../helm-charts) as that directory is populated. Infrastructure documentation links to those deployment assets instead of duplicating them.
+The physical world lives in [`../setup`](../setup) — hardware, switch, cabling, power and the node operating systems. This directory starts where the hardware ends: everything here is code-defined, rebuildable and documented per component.
 
----
+The boundary between the three areas inside:
 
-## Documentation Goal
-
-The infrastructure documentation should be readable by two very different audiences:
-
-- experienced Kubernetes, platform and SRE users who want to understand the intended architecture quickly
-- beginners who may not know what a CNI, ingress controller, message broker, CI/CD pipeline or GitOps reconciler is yet
-
-Every area should therefore explain both the concept and the project decision. A good component page should answer:
-
-- What is this thing in plain language?
-- What problem does it solve?
-- Why does this project document or recommend it?
-- When should it run and when should it stay inactive?
-- What are its strengths and weaknesses?
-- What alternatives exist?
-- Which Wikipedia or official documentation links help a beginner continue learning?
-
-The goal is not marketing copy. The goal is practical, Wikipedia-like context that helps a reader decide whether a component matters for their use case.
-
----
-
-## Why This Matters
-
-Infrastructure is the foundation that applications rely on. It includes the physical network, node provisioning, Kubernetes platform services, storage, databases, messaging, observability, security and deployment workflows.
-
-In a homelab, infrastructure documentation is especially valuable because the same person is usually the hardware owner, network admin, platform engineer and application developer. Writing decisions down avoids rebuilding the same understanding every time something breaks.
-
-In companies, this layer is often owned by platform, infrastructure or SRE teams. The goals are similar: repeatability, operational clarity, recoverability, security and a clear boundary between platform services and application code.
-
----
-
-## What You Can Do With It
-
-- document network and hardware decisions
-- define repeatable provisioning workflows
-- describe shared Kubernetes platform services
-- explain why tools were chosen
-- keep deployment assets linked but separate
-- create a decision log for future rebuilds
-- make the homelab understandable to other developers
-
----
-
-## Directory Layout
-
-```text
-infrastructure/
-├── network/
-│   └── mikrotik/
-├── provisioning/
-│   └── ansible/
-└── kubernetes/
-    ├── api/
-    │   └── graphql/
-    ├── applications/
-    │   ├── immich/
-    │   ├── jellyfin/
-    │   ├── nextcloud/
-    │   ├── owncloud/
-    │   └── plex/
-    ├── backup/
-    │   └── velero/
-    ├── bootstrap/
-    ├── databases/
-    │   ├── influxdb/
-    │   ├── mongodb/
-    │   ├── mysql/
-    │   ├── postgresql/
-    │   └── redis/
-    ├── gitops/
-    │   ├── argocd/
-    │   └── flux/
-    ├── messaging/
-    │   ├── kafka/
-    │   ├── nats/
-    │   └── rabbitmq/
-    ├── networking/
-    │   ├── cert-manager/
-    │   ├── cilium/
-    │   ├── cloudflare-tunnel/
-    │   ├── dns/
-    │   │   ├── adguard-home/
-    │   │   ├── coredns/
-    │   │   └── pihole/
-    │   ├── ingress/
-    │   ├── metallb/
-    │   └── traefik/
-    ├── observability/
-    │   ├── logging/
-    │   │   ├── fluent-bit/
-    │   │   └── opensearch/
-    │   ├── metrics/
-    │   │   ├── grafana/
-    │   │   └── prometheus/
-    │   └── tracing/
-    │       ├── jaeger/
-    │       ├── opentelemetry-collector/
-    │       └── zipkin/
-    ├── operators/
-    ├── registry/
-    │   ├── artifact-repository/
-    │   └── harbor/
-    ├── runtime/
-    │   ├── dapr/
-    │   └── service-mesh/
-    ├── security/
-    │   ├── external-secrets/
-    │   ├── password-manager/
-    │   │   └── bitwarden/
-    │   ├── rights-management/
-    │   │   └── keycloak/
-    │   ├── sealed-secrets/
-    │   └── secret-store/
-    └── storage/
-        ├── longhorn/
-        └── minio/
-```
-
----
-
-## What Belongs Here
-
-Use this directory for shared infrastructure decisions:
-
-- why a component exists in the homelab
-- what problem it solves
-- what alternatives were considered
-- whether it should run permanently or only when needed
-- operational notes, risks and upgrade considerations
-- links to deployment assets in `helm-charts`
-
-Do not put application source code here. Application and service code belongs under `services`, `apps` or a dedicated external repository.
-
----
-
-## Main Areas
-
-| Path | Purpose |
+| Area | Question it answers |
 |---|---|
-| [`./network`](./network) | Physical and logical network configuration, especially MikroTik and VLAN planning |
-| [`./provisioning`](./provisioning) | Repeatable node setup, mainly Ansible and bootstrap workflows |
-| [`./kubernetes`](./kubernetes) | Cluster components, platform services, databases, messaging, observability, user-facing applications and operators |
+| [`./provisioning`](./provisioning) | How does a freshly installed machine become a consistent server? |
+| [`./kubernetes`](./kubernetes) | What makes the cluster exist and function? (bootstrap, CNI, MetalLB, GitOps, operators) |
+| [`./platform`](./platform) | Which shared services run on the cluster? (DNS, ingress, storage, databases, security, observability, ...) |
+
+User-facing apps deliberately live outside this directory in [`../applications`](../applications) — they consume the platform, they are not part of it. Custom code lives in [`../services`](../services).
+
+---
+
+## Reading Order
+
+For a first read, follow the build order:
+
+1. [`../setup`](../setup): hardware, network device configuration and node OS
+2. [`./provisioning`](./provisioning): turning machines into consistent servers
+3. [`./kubernetes`](./kubernetes): creating and operating the cluster
+4. [`./platform`](./platform): the shared services on top
+5. [`../applications`](../applications): what all of it is for
 
 ---
 
 ## Documentation Rule
 
-Every component gets a local `README.md` next to its future configuration.
-
-Example:
+Every component gets a local `README.md` and follows the [Component Layout Convention](../README.md#component-layout-convention): documentation here, the Helm chart under [`../helm-charts`](../helm-charts) at the mirrored path, and optional Terraform in a `terraform/` folder next to the docs.
 
 ```text
-infrastructure/kubernetes/messaging/nats/README.md
+infrastructure/platform/dns/coredns/README.md        # docs
+helm-charts/infrastructure/platform/dns/coredns/     # chart
+infrastructure/platform/dns/coredns/terraform/       # config
 ```
-
-That file explains what NATS is, why it exists in this project, when it should run, what alternatives exist and where the future Helm deployment will live.
 
 ---
 
 ## Learning Links
 
-- [Wikipedia: Infrastructure](https://en.wikipedia.org/wiki/Infrastructure)
 - [Wikipedia: Infrastructure as code](https://en.wikipedia.org/wiki/Infrastructure_as_code)
-- [Wikipedia: Computer network](https://en.wikipedia.org/wiki/Computer_network)
 - [Wikipedia: Kubernetes](https://en.wikipedia.org/wiki/Kubernetes)
-- [Wikipedia: Self-hosting](https://en.wikipedia.org/wiki/Self-hosting_(web_services))
+- [Wikipedia: Platform engineering](https://en.wikipedia.org/wiki/Platform_engineering)

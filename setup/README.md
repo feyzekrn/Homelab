@@ -14,13 +14,13 @@ Everything reusable was taken from old hardware first. Only what was actually mi
 
 ## Sections
 
-### [🖥️ Compute — Nodes, CPU, RAM & Storage](./compute.md)
-The three Lenovo ThinkCentre M910q Tiny nodes that form the cluster. What was bought, what came from old hardware, why this platform was chosen and what the upgrade path looks like for CPU, RAM and storage.
+### [🖥️ Compute — Nodes, CPU, RAM & Storage](./compute)
+The three Lenovo ThinkCentre M910q Tiny nodes that form the cluster. What was bought, what came from old hardware, why this platform was chosen and what the upgrade path looks like for CPU, RAM and storage. The [operating system running on these nodes](./compute/os) lives in the same folder — hardware and its OS in one place. The [operating system running on these nodes](./compute/os) lives in the same folder — hardware and its OS in one place.
 
-### [🌐 Networking — Switches & Physical Topology](./networking.md)
-The MikroTik CRS310 as the central 2.5G data switch and why Layer 3 routing on the switch level matters for Kubernetes. Also covers the planned 1G management extension and how the dual-cable setup works.
+### [🌐 Networking — Switches & Physical Topology](./networking)
+The MikroTik CRS310 as the central 2.5G data switch and why Layer 3 routing on the switch level matters for Kubernetes. Also covers the planned 1G management extension and how the dual-cable setup works. The [network design](./networking/design.md) (VLANs, DHCP, firewall zones) and the [MikroTik configuration](./networking/mikrotik) with its Terraform live in the same folder — the purchase decision and the living config side by side.
 
-### [🔋 Power Supply — PSU, DC/DC Converter & Fuse Box](./power-supply.md)
+### [🔋 Power Supply — PSU, DC/DC Converter & Fuse Box](./power-supply)
 How the cluster is powered cleanly and safely. Covers the power supply unit, DC/DC conversion for the nodes, fuse box setup and the reasoning behind centralising power distribution instead of running individual adapters per device.
 
 ---

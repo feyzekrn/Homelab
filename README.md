@@ -46,23 +46,63 @@ This repository is not only a codebase — it also serves as the primary documen
 
 Where a section grows large enough to justify its own repository, it moves out and gets linked back from here. The same applies to third-party tools and open source projects in use — they get a reference entry rather than being copied in.
 
+The top level is split into two big halves plus the things built on top: `setup/` is the physical world (hardware with its OS and network config in one place), `infrastructure/` is the software world (provisioning, cluster, platform services) — followed by the applications people use and the custom code written for this homelab.
+
+```text
+Homelab/
+├── setup/                # The physical world
+│   ├── compute/          #   Nodes: hardware decisions + the OS running on them
+│   │   └── os/           #     Ubuntu Server now, Talos later
+│   ├── networking/       #   Switch purchase, network design + MikroTik config
+│   │   └── mikrotik/     #     Switch docs + Terraform
+│   └── power-supply/     #   PSU, DC/DC conversion, fuse box
+├── infrastructure/       # The software infrastructure
+│   ├── provisioning/     #   Ansible: machines become consistent servers
+│   ├── kubernetes/       #   Cluster core: bootstrap, Cilium, MetalLB, GitOps, operators
+│   └── platform/         #   Shared services: DNS, ingress, storage, databases,
+│                         #   messaging, security, observability, backup, ...
+├── applications/         # User-facing apps: Nextcloud, Immich, Jellyfin, ...
+├── services/             # Custom code: APIs, workers, operators
+├── helm-charts/          # All Helm charts — mirrors the docs tree 1:1
+├── automation/           # (planned) Cluster automation: Intel vPro, health triggers
+├── dashboards/           # (planned) Monitoring panels and admin interfaces
+└── apps/                 # (planned) Mobile and desktop companion apps
+```
+
 ---
 
-### 🔧 Hardware & Operating System
+### 🔧 Setup — The Physical World
 
-| Path                       | Status | Content |
-|----------------------------|---|---|
-| [`/setup`](/setup)         | ✅ Active | Hardware decisions, shopping list, specs, costs and reasoning |
-| [`/os`](/os)               | ✅ Active | Operating system strategy, installation media and node OS decisions |
-
-### 🏗️ Infrastructure
-
-IaC for everything below the application layer — network, provisioning and core cluster components.
+Hardware decisions and everything attached to them: each hardware area is a folder that also holds its living configuration — the compute nodes with their operating system, the network hardware with its design and Terraform.
 
 | Path | Status | Content |
 |---|---|---|
-| [`/infrastructure`](/infrastructure) | ✅ Active | Terraform (MikroTik), Ansible (bare-metal provisioning), Kubernetes platform components and service documentation |
-| [`/helm-charts`](/helm-charts) | 🔜 Planned | Open source Helm charts in use and any custom charts created for this cluster |
+| [`/setup`](/setup) | ✅ Active | Shopping list, costs and reasoning across all hardware |
+| [`/setup/compute`](/setup/compute) | ✅ Active | The nodes (CPU, RAM, storage) and the [OS running on them](/setup/compute/os) |
+| [`/setup/networking`](/setup/networking) | ✅ Active | Switch purchase, [network design](/setup/networking/design.md) and [MikroTik config + Terraform](/setup/networking/mikrotik) |
+| [`/setup/power-supply`](/setup/power-supply) | ✅ Active | PSU, DC/DC conversion and fuse box |
+
+### 🏗️ Infrastructure — The Software World
+
+Everything code-defined between the hardware and the apps: provisioning, the cluster itself and the shared services on it.
+
+| Path | Status | Content |
+|---|---|---|
+| [`/infrastructure/provisioning`](/infrastructure/provisioning) | ✅ Active | Ansible-based bare-metal node provisioning |
+| [`/infrastructure/kubernetes`](/infrastructure/kubernetes) | ✅ Active | The cluster core only: bootstrap, Cilium (CNI), MetalLB, GitOps, operators |
+| [`/infrastructure/platform`](/infrastructure/platform) | ✅ Active | Shared services on the cluster: DNS, ingress, storage, databases, messaging, security, observability, backup, registry, runtime |
+
+### 📦 Applications
+
+| Path | Status | Content |
+|---|---|---|
+| [`/applications`](/applications) | ✅ Active | User-facing apps: Nextcloud, Immich, Jellyfin and documented alternatives |
+
+### 🚀 Deployment Assets
+
+| Path | Status | Content |
+|---|---|---|
+| [`/helm-charts`](/helm-charts) | 🔜 Planned | All Helm charts, mirroring the docs tree — kept at top level so they can be referenced by Argo CD/Flux or moved to a dedicated repo later |
 | [`/db-designs`](/db-designs) | 🔜 Planned | ER diagrams and design patterns for the hosted databases |
 
 ### ⚙️ Services
@@ -96,6 +136,34 @@ Mobile and desktop companion apps. If an app grows into a serious project it get
 | Path | Status | Content |
 |---|---|---|
 | [`/apps`](/apps) | 🔜 Planned | Mobile and desktop interfaces — may link to external repos |
+
+---
+
+## Component Layout Convention
+
+Every component in this repository follows the same three-part layout, so both readers and future automation can find everything deterministically:
+
+```text
+<domain>/<...>/<component>/README.md       # 1. Documentation: what it is, why, alternatives
+helm-charts/<domain>/<...>/<component>/    # 2. Helm chart / values — mirrors the docs path exactly
+<domain>/<...>/<component>/terraform/      # 3. Optional Terraform for configuration
+```
+
+Catalog tables across the repository link these three locations as `docs` · `chart` · `config`. Chart and config directories are created when a component becomes active — a dead link there simply means "not deployed yet". Documented alternatives that will never be deployed get a `docs` link only.
+
+Example for CoreDNS:
+
+```text
+infrastructure/platform/dns/coredns/README.md        # concept and decision
+helm-charts/infrastructure/platform/dns/coredns/     # how it gets deployed
+infrastructure/platform/dns/coredns/terraform/       # optional config IaC (zones, records)
+```
+
+The rules behind this:
+
+- **Docs explain, charts deploy.** A README never contains manifests; a chart directory never explains concepts.
+- **`helm-charts/` mirrors the docs tree 1:1.** Given any docs path, the chart path is derivable without lookup — which is what a one-click rebuild script or Argo CD/Flux needs. Keeping charts in one top-level tree also allows extracting them into a dedicated repo later without touching the documentation.
+- **Terraform lives next to the component it configures** (`setup/networking/mikrotik/terraform/`, `infrastructure/platform/dns/coredns/terraform/`). Terraform here is configuration extras, not the deployment mechanism — so it stays close to the docs where a reader looks first. Automation checks one known location per component: if `terraform/` exists, apply it after the chart.
 
 ---
 

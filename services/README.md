@@ -4,7 +4,7 @@
 
 This directory is for custom services built specifically for this homelab.
 
-It is intentionally separate from [`../infrastructure`](../infrastructure). Infrastructure documents the platform this project runs on. Services are the applications, APIs, workers and operators that run on top of that platform.
+It is intentionally separate from [`../infrastructure/kubernetes`](../infrastructure/kubernetes) and [`../infrastructure/platform`](../infrastructure/platform). Those directories document the cluster and the shared services this project runs on. Services are the custom applications, APIs, workers and operators built for this homelab on top of that platform.
 
 ---
 
@@ -28,7 +28,7 @@ Use this directory for code and service-level documentation such as:
 
 Do not put shared platform products here.
 
-These belong under [`../infrastructure`](../infrastructure):
+These belong under [`../infrastructure/platform`](../infrastructure/platform):
 
 - PostgreSQL
 - MySQL
@@ -66,10 +66,10 @@ services/hardware-event-api/
 If that service publishes events to NATS, its README should link to:
 
 ```text
-../infrastructure/kubernetes/messaging/nats/
+../infrastructure/platform/messaging/nats/
 ```
 
-The NATS documentation stays in infrastructure because NATS is a shared platform component.
+The NATS documentation stays under `platform` because NATS is a shared platform component.
 
 ---
 

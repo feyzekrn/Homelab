@@ -1,6 +1,6 @@
 # Kubernetes Bootstrap
 
-[<- Back to Kubernetes](../README.md)
+[<- Back to Kubernetes Cluster](../README.md)
 
 Bootstrap covers the first steps required to turn prepared nodes into a working cluster.
 

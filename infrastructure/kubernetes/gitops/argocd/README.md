@@ -78,7 +78,7 @@ Argo CD is currently `⚫ Inactive`. It should be evaluated later if a visual Gi
 Planned deployment location:
 
 ```text
-../../../../helm-charts/gitops/argocd/
+../../../../helm-charts/infrastructure/kubernetes/gitops/argocd/
 ```
 
 ---
