@@ -58,10 +58,12 @@ infrastructure/platform/
 ├── dns/
 │   ├── adguard-home/
 │   ├── coredns/
+│   ├── duckdns/
 │   └── pihole/
 ├── ingress/
 │   ├── cert-manager/
 │   ├── cloudflare-tunnel/
+│   ├── netbird/
 │   └── traefik/
 ├── messaging/
 │   ├── kafka/
@@ -107,7 +109,8 @@ infrastructure/platform/
 |---|---|---|---|---|---|
 | CoreDNS | [docs](./dns/coredns) · [chart](../../helm-charts/infrastructure/platform/dns/coredns) · [config](./dns/coredns/terraform) | ⚫ Inactive | Cluster DNS and authoritative internal zone DNS | Cluster standard | 2026-07-08 |
 | AdGuard Home | [docs](./dns/adguard-home) · [chart](../../helm-charts/infrastructure/platform/dns/adguard-home) · [config](./dns/adguard-home/terraform) | ⚫ Inactive | LAN resolver with network-wide ad/tracker blocking | Chosen LAN resolver | 2026-07-08 |
-| Pi-hole | [docs](./dns/pihole) · [chart](../../helm-charts/infrastructure/platform/dns/pihole) · [config](./dns/pihole/terraform) | ⚫ Inactive | Classic filtering DNS resolver | Documented alternative to AdGuard Home | 2026-07-08 |
+| Pi-hole | [docs](./dns/pihole) | ⚫ Inactive | Classic filtering DNS resolver | Documented alternative to AdGuard Home | 2026-07-08 |
+| DuckDNS | [docs](./dns/duckdns) | ⚫ Inactive | Free dynamic DNS for a changing home IP | Free entry path for readers without a domain | 2026-07-09 |
 
 ### Ingress And External Access
 
@@ -116,6 +119,7 @@ infrastructure/platform/
 | Traefik | [docs](./ingress/traefik) · [chart](../../helm-charts/infrastructure/platform/ingress/traefik) · [config](./ingress/traefik/terraform) | ⚫ Inactive | Reverse proxy that exposes HTTP(S) services | Homelab standard | 2026-06-17 |
 | cert-manager | [docs](./ingress/cert-manager) · [chart](../../helm-charts/infrastructure/platform/ingress/cert-manager) · [config](./ingress/cert-manager/terraform) | ⚫ Inactive | Automatic TLS certificate management | Strongly recommended | 2026-06-17 |
 | Cloudflare Tunnel | [docs](./ingress/cloudflare-tunnel) · [chart](../../helm-charts/infrastructure/platform/ingress/cloudflare-tunnel) · [config](./ingress/cloudflare-tunnel/terraform) | ⚫ Inactive | External access to selected apps without VPN or port forwarding | Recommended for remote app access | 2026-07-08 |
+| NetBird | [docs](./ingress/netbird) · [chart](../../helm-charts/infrastructure/platform/ingress/netbird) · [config](./ingress/netbird/terraform) | ⚫ Inactive | WireGuard mesh VPN with built-in reverse proxy for public exposure | Candidate for private/admin access, may replace Cloudflare Tunnel | 2026-07-09 |
 
 ### Security
 

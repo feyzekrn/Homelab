@@ -93,11 +93,12 @@ Publishing a service through the tunnel means trusting Cloudflare with that traf
 |---|---|---|
 | Cloudflare Tunnel | Zero-port public access to HTTP apps | Third party in the traffic path |
 | WireGuard VPN | Full private network access | Client setup on every device, always-on toggling |
+| [NetBird](../netbird) | Open-source mesh VPN with built-in reverse proxy | Self-hosting the public entry point is your job |
 | Tailscale | Mesh VPN with minimal setup | Also third-party coordinated; per-device install |
 | Port forwarding + DynDNS | No middleman | Exposes home IP and router attack surface |
 | ngrok | Quick temporary tunnels | Not meant for permanent self-hosting |
 
-A realistic end state combines two of these: Cloudflare Tunnel for user-facing convenience, WireGuard or Tailscale for administrative access.
+A realistic end state combines two of these: Cloudflare Tunnel for user-facing convenience and a mesh VPN for administrative access. [NetBird](../netbird) is the interesting special case — its built-in reverse proxy covers the public-exposure job too, so it could replace this component entirely. The comparison lives in the [NetBird docs page](../netbird/README.md#the-reverse-proxy-feature-vs-cloudflare-tunnel).
 
 ---
 

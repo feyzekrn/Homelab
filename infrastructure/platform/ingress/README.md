@@ -9,6 +9,7 @@ Three concerns live here because they are decided together:
 - **Ingress routing**: which request reaches which service ([Traefik](./traefik))
 - **TLS**: how HTTPS certificates are created and renewed ([cert-manager](./cert-manager))
 - **External access**: how devices outside the LAN reach selected apps without VPN or port forwarding ([Cloudflare Tunnel](./cloudflare-tunnel))
+- **Private access**: how admin devices reach everything else, mesh-VPN style ([NetBird](./netbird))
 
 An ingress controller is a Kubernetes-aware reverse proxy. A browser sends a request to a hostname such as `grafana.home.example.com`. The ingress controller receives that request, checks the configured routing rules and forwards it to the right Kubernetes Service.
 
@@ -35,6 +36,7 @@ External access is documented in the same place because it is the same decision 
 | Traefik | [docs](./traefik) · [chart](../../../helm-charts/infrastructure/platform/ingress/traefik) · [config](./traefik/terraform) | ⚫ Inactive | Homelab standard | Ingress controller and reverse proxy |
 | cert-manager | [docs](./cert-manager) · [chart](../../../helm-charts/infrastructure/platform/ingress/cert-manager) · [config](./cert-manager/terraform) | ⚫ Inactive | Strongly recommended | Automatic TLS certificate management |
 | Cloudflare Tunnel | [docs](./cloudflare-tunnel) · [chart](../../../helm-charts/infrastructure/platform/ingress/cloudflare-tunnel) · [config](./cloudflare-tunnel/terraform) | ⚫ Inactive | Recommended for remote app access | Publish selected apps externally without port forwarding |
+| NetBird | [docs](./netbird) · [chart](../../../helm-charts/infrastructure/platform/ingress/netbird) · [config](./netbird/terraform) | ⚫ Inactive | Candidate for private/admin access | WireGuard mesh with built-in reverse proxy — may replace Cloudflare Tunnel |
 
 ---
 
