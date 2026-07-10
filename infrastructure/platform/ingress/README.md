@@ -37,6 +37,7 @@ External access is documented in the same place because it is the same decision 
 | cert-manager | [docs](./cert-manager) · [chart](../../../helm-charts/infrastructure/platform/ingress/cert-manager) · [config](./cert-manager/terraform) | ⚫ Inactive | Strongly recommended | Automatic TLS certificate management |
 | Cloudflare Tunnel | [docs](./cloudflare-tunnel) · [chart](../../../helm-charts/infrastructure/platform/ingress/cloudflare-tunnel) · [config](./cloudflare-tunnel/terraform) | ⚫ Inactive | Recommended for remote app access | Publish selected apps externally without port forwarding |
 | NetBird | [docs](./netbird) · [chart](../../../helm-charts/infrastructure/platform/ingress/netbird) · [config](./netbird/terraform) | ⚫ Inactive | Candidate for private/admin access | WireGuard mesh with built-in reverse proxy — may replace Cloudflare Tunnel |
+| Caddy | [docs](./caddy) | ⚫ Inactive | Documented alternative to Traefik | Reverse proxy with automatic HTTPS; best outside Kubernetes |
 
 ---
 
@@ -50,6 +51,7 @@ For this homelab, [Traefik](./traefik) is the first candidate because it is easy
 |---|---|
 | Traefik | Good UX, simple operations, strong homelab fit |
 | ingress-nginx | Very common, huge ecosystem, predictable behavior |
+| [Caddy](./caddy) | Simplest automatic-HTTPS proxy; shines outside Kubernetes |
 | HAProxy Ingress | Powerful, less beginner-friendly |
 | Gateway API controllers | Future-facing, worth evaluating later |
 

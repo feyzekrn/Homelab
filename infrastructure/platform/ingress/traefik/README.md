@@ -69,6 +69,7 @@ Traefik is also beginner-friendly because its dashboard helps reveal what routin
 |---|---|---|---|---|
 | Traefik | Self-hosted | Recommended | Good, depending on requirements | Good UX and simple operations |
 | ingress-nginx | Self-hosted | Good | Very common standard | Huge ecosystem and predictable behavior |
+| [Caddy](../caddy) | Self-hosted | Great outside Kubernetes | Niche for k8s ingress | Automatic HTTPS pioneer, weak ingress-controller story |
 | HAProxy Ingress | Self-hosted | Advanced | Good | Powerful, less beginner-friendly |
 | Gateway API controllers | Self-hosted | Research | Growing standard | Worth revisiting later |
 

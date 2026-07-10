@@ -61,6 +61,7 @@ infrastructure/platform/
 │   ├── duckdns/
 │   └── pihole/
 ├── ingress/
+│   ├── caddy/
 │   ├── cert-manager/
 │   ├── cloudflare-tunnel/
 │   ├── netbird/
@@ -120,6 +121,7 @@ infrastructure/platform/
 | cert-manager | [docs](./ingress/cert-manager) · [chart](../../helm-charts/infrastructure/platform/ingress/cert-manager) · [config](./ingress/cert-manager/terraform) | ⚫ Inactive | Automatic TLS certificate management | Strongly recommended | 2026-06-17 |
 | Cloudflare Tunnel | [docs](./ingress/cloudflare-tunnel) · [chart](../../helm-charts/infrastructure/platform/ingress/cloudflare-tunnel) · [config](./ingress/cloudflare-tunnel/terraform) | ⚫ Inactive | External access to selected apps without VPN or port forwarding | Recommended for remote app access | 2026-07-08 |
 | NetBird | [docs](./ingress/netbird) · [chart](../../helm-charts/infrastructure/platform/ingress/netbird) · [config](./ingress/netbird/terraform) | ⚫ Inactive | WireGuard mesh VPN with built-in reverse proxy for public exposure | Candidate for private/admin access, may replace Cloudflare Tunnel | 2026-07-09 |
+| Caddy | [docs](./ingress/caddy) | ⚫ Inactive | Reverse proxy with automatic HTTPS by default | Documented alternative to Traefik; best outside Kubernetes | 2026-07-10 |
 
 ### Security
 
