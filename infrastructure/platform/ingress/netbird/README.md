@@ -4,9 +4,9 @@
 
 NetBird is an open-source, WireGuard-based overlay network: all devices join a private mesh with a central management plane, SSO login, access policies and routing — self-hostable or as a managed cloud.
 
-In this homelab, NetBird is the **candidate for the private access path**: the "VPN side" of the trust rule documented in [Cloudflare Tunnel](../cloudflare-tunnel#trust-decision). Admin interfaces (Kubernetes API, SSH, MikroTik, Grafana) stay off any public tunnel — NetBird is how personal devices reach them securely from anywhere.
+In this homelab, NetBird is the **chosen private access path**: the "VPN side" of the trust rule documented in [Cloudflare Tunnel](../cloudflare-tunnel#trust-decision). Admin interfaces (Kubernetes API, SSH, MikroTik, Grafana) stay off any public tunnel — NetBird is how personal devices reach them securely from anywhere.
 
-What makes NetBird more than a VPN is its **built-in reverse proxy** (since v0.65): selected internal services can be exposed to the public internet with automatic Let's Encrypt TLS, custom domains and optional authentication (SSO/OIDC, password or PIN) — traffic enters at a NetBird ingress point and travels through the encrypted mesh to the target, with no open ports on the homelab. That is exactly the job [Cloudflare Tunnel](../cloudflare-tunnel) does here, which means NetBird could potentially **consolidate both tools into one**: private mesh access *and* public app exposure from a single, open-source system.
+What makes NetBird more than a VPN is its **built-in reverse proxy** (since v0.65): selected internal services can be exposed to the public internet with automatic Let's Encrypt TLS, custom domains and optional authentication (SSO/OIDC, password or PIN) — traffic enters at a NetBird ingress point and travels through the encrypted mesh to the target, with no open ports on the homelab. That is exactly the job [Cloudflare Tunnel](../cloudflare-tunnel) does here. The decision for this homelab: **NetBird handles private/admin access, Cloudflare Tunnel handles public app exposure** — with the reverse proxy documented as the consolidation option if one system should ever do both.
 
 ---
 
@@ -39,7 +39,7 @@ The overlap deserves its own decision note:
 | Self-hosted requirement | Traefik with TLS passthrough as external proxy; L4 services need dedicated ports | Only outbound `cloudflared` |
 | DDoS protection | None built in (self-hosted) | Included |
 
-The honest summary: **with NetBird Cloud, Cloudflare Tunnel becomes largely redundant** — one system handles VPN and public exposure with better privacy (no third party terminating TLS mid-path in the same way). **Fully self-hosted**, the public entry point must itself be reachable from the internet (typically a small VPS running the NetBird server), so "no port forwarding at home" still holds, but the edge, availability and DDoS story become your responsibility. This repository documents both; the final choice is an open decision to make when remote access is actually built.
+The honest summary: **with NetBird Cloud, Cloudflare Tunnel becomes largely redundant** — one system handles VPN and public exposure with better privacy (no third party terminating TLS mid-path in the same way). **Fully self-hosted**, the public entry point must itself be reachable from the internet (typically a small VPS running the NetBird server), so "no port forwarding at home" still holds, but the edge, availability and DDoS story become your responsibility. This repository uses both — NetBird for private access, Cloudflare Tunnel for public exposure — and revisits consolidation once both run in practice.
 
 ---
 
@@ -107,13 +107,13 @@ First evaluation checklist:
 4. Define access groups: `admins` see everything, `family` sees app services only.
 5. Test reaching the Kubernetes API over the mesh, then close any other admin path.
 6. Evaluate the reverse proxy against Cloudflare Tunnel for one public app.
-7. Decide: NetBird-only, Cloudflare-only, or NetBird for private + Cloudflare for public.
+7. Revisit the split (NetBird private + Cloudflare public) once both run — consolidation onto NetBird's reverse proxy stays an option.
 
 ---
 
 ## Runtime Status
 
-NetBird is currently `⚫ Inactive`. It is the leading candidate for the private/admin access path and a possible replacement for Cloudflare Tunnel once remote access is built.
+NetBird is currently `⚫ Inactive`. It is the chosen private/admin access path and becomes active as the first piece of the remote-access build.
 
 ---
 

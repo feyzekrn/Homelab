@@ -33,10 +33,10 @@ External access is documented in the same place because it is the same decision 
 
 | Name | Path | Status | Recommendation | Role |
 |---|---|---|---|---|
-| Traefik | [docs](./traefik) · [chart](../../../helm-charts/infrastructure/platform/ingress/traefik) · [config](./traefik/terraform) | ⚫ Inactive | Homelab standard | Ingress controller and reverse proxy |
+| Traefik | [docs](./traefik) · [chart](../../../helm-charts/infrastructure/platform/ingress/traefik) · [config](./traefik/terraform) | ⚫ Inactive | Chosen ingress controller | Ingress controller and reverse proxy |
 | cert-manager | [docs](./cert-manager) · [chart](../../../helm-charts/infrastructure/platform/ingress/cert-manager) · [config](./cert-manager/terraform) | ⚫ Inactive | Strongly recommended | Automatic TLS certificate management |
-| Cloudflare Tunnel | [docs](./cloudflare-tunnel) · [chart](../../../helm-charts/infrastructure/platform/ingress/cloudflare-tunnel) · [config](./cloudflare-tunnel/terraform) | ⚫ Inactive | Recommended for remote app access | Publish selected apps externally without port forwarding |
-| NetBird | [docs](./netbird) · [chart](../../../helm-charts/infrastructure/platform/ingress/netbird) · [config](./netbird/terraform) | ⚫ Inactive | Candidate for private/admin access | WireGuard mesh with built-in reverse proxy — may replace Cloudflare Tunnel |
+| Cloudflare Tunnel | [docs](./cloudflare-tunnel) · [chart](../../../helm-charts/infrastructure/platform/ingress/cloudflare-tunnel) · [config](./cloudflare-tunnel/terraform) | ⚫ Inactive | Chosen for public app exposure | Publish selected apps externally without port forwarding |
+| NetBird | [docs](./netbird) · [chart](../../../helm-charts/infrastructure/platform/ingress/netbird) · [config](./netbird/terraform) | ⚫ Inactive | Chosen for private/admin access | WireGuard mesh with built-in reverse proxy |
 | Caddy | [docs](./caddy) | ⚫ Inactive | Documented alternative to Traefik | Reverse proxy with automatic HTTPS; best outside Kubernetes |
 
 ---

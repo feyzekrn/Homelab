@@ -54,10 +54,10 @@ In companies, DNS is one of the most critical shared services. Split-horizon DNS
 
 | Name | Path | Status | Recommendation | Purpose |
 |---|---|---|---|---|
-| CoreDNS | [docs](./coredns) · [chart](../../../helm-charts/infrastructure/platform/dns/coredns) · [config](./coredns/terraform) | ⚫ Inactive | Cluster standard, also good for internal zones | Cluster DNS and authoritative internal DNS |
+| CoreDNS | [docs](./coredns) · [chart](../../../helm-charts/infrastructure/platform/dns/coredns) · [config](./coredns/terraform) | ⚫ Inactive | Chosen: cluster DNS and internal zones | Cluster DNS and authoritative internal DNS |
 | AdGuard Home | [docs](./adguard-home) · [chart](../../../helm-charts/infrastructure/platform/dns/adguard-home) · [config](./adguard-home/terraform) | ⚫ Inactive | Chosen LAN resolver for this homelab | Network-wide filtering and forwarding resolver |
 | Pi-hole | [docs](./pihole) | ⚫ Inactive | Documented alternative | Classic network-wide ad-blocking resolver |
-| DuckDNS | [docs](./duckdns) | ⚫ Inactive | Free entry path for readers without a domain | Dynamic public DNS for a changing home IP |
+| DuckDNS | [docs](./duckdns) · [chart](../../../helm-charts/infrastructure/platform/dns/duckdns) · [config](./duckdns/terraform) | ⚫ Inactive | Chosen: free public name for entry points | Dynamic public DNS for a changing home IP |
 
 ---
 

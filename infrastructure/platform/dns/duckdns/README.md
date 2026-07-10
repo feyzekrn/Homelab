@@ -4,22 +4,22 @@
 
 DuckDNS is a free dynamic DNS service: it gives you a public subdomain (`yourname.duckdns.org`) that always points at your home IP address, even when the ISP changes it.
 
-In this homelab, DuckDNS is documented as the **free entry path** for readers who do not own a domain. This project itself plans a real domain managed at Cloudflare (see [Cloudflare Tunnel](../../ingress/cloudflare-tunnel)), so DuckDNS is not on the deployment plan — but for a first homelab, "reachable from outside without buying anything" is exactly the problem DuckDNS solves.
+In this homelab, DuckDNS is **part of the chosen stack**: it provides the free, always-current public name for entry points that need one — for example the public reachability of a self-hosted [NetBird](../../ingress/netbird) server — while the Cloudflare-managed domain (see [Cloudflare Tunnel](../../ingress/cloudflare-tunnel)) covers the user-facing app names. For readers who own no domain at all, DuckDNS alone is also the free entry path into remote access.
 
 Dynamic DNS exists because most home connections have changing IP addresses. A small updater — a cron job or Kubernetes CronJob calling the DuckDNS token API — reports the current IP every few minutes, and the DNS record follows. Combined with a router port forward, services become reachable at a stable name; combined with a DNS-01 webhook, even Let's Encrypt certificates work without any open port.
 
 ---
 
-## Why It Is Documented
+## Why It Fits
 
-DuckDNS earns a page even though it is not the chosen tool:
+DuckDNS earns its place in the stack:
 
 - it is the classic zero-cost answer to "how do I reach my homelab from outside?"
 - it teaches the dynamic-DNS concept that also underlies paid DynDNS offerings
 - cert-manager can issue real TLS certificates for `*.duckdns.org` names via a community DNS-01 webhook — free valid HTTPS without a domain
 - it is the natural stepping stone before buying a domain and moving to Cloudflare or deSEC
 
-The reason it is not chosen here: the target architecture avoids exposing the home IP at all (tunnel/mesh instead of port forwarding), uses an owned domain, and DuckDNS as a free service comes with no availability guarantees.
+Its role here is deliberately narrow: a free, stable name for the few entry points that need direct reachability. User-facing apps get real names on the owned Cloudflare domain; DuckDNS covers the plumbing underneath and costs nothing.
 
 ---
 
@@ -52,7 +52,7 @@ The reason it is not chosen here: the target architecture avoids exposing the ho
 
 ## Infrastructure Dependencies
 
-If a reader deploys it, the typical homelab shape is:
+The planned shape here (and the typical homelab shape):
 
 | Dependency | Purpose |
 |---|---|
@@ -71,19 +71,19 @@ If a reader deploys it, the typical homelab shape is:
 | dynv6 / deSEC | Free dynamic DNS with more DNS features | Smaller communities |
 | No-IP / DynDNS | Long-established commercial DynDNS | Free tiers with renewal nagging |
 
-The short version: start with DuckDNS if you own nothing; buy a domain the moment the homelab becomes serious — everything in this repository's external-access design assumes an owned domain.
+The short version: DuckDNS for free plumbing names and as the everything-for-zero-cost entry path; the owned Cloudflare domain for user-facing app names. This repository uses both, each for its layer.
 
 ---
 
 ## Runtime Status
 
-DuckDNS is `⚫ Inactive` and not planned for this homelab (an owned domain at Cloudflare is). This page exists as the documented free alternative for readers starting from zero.
+DuckDNS is currently `⚫ Inactive`. It is part of the chosen access stack and becomes active together with the first externally reachable entry point (typically alongside NetBird).
 
 ---
 
 ## Future Deployment Link
 
-If it were deployed, the updater CronJob would live at:
+The updater CronJob will live at:
 
 ```text
 ../../../../helm-charts/infrastructure/platform/dns/duckdns/

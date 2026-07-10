@@ -98,7 +98,7 @@ Publishing a service through the tunnel means trusting Cloudflare with that traf
 | Port forwarding + DynDNS | No middleman | Exposes home IP and router attack surface |
 | ngrok | Quick temporary tunnels | Not meant for permanent self-hosting |
 
-A realistic end state combines two of these: Cloudflare Tunnel for user-facing convenience and a mesh VPN for administrative access. [NetBird](../netbird) is the interesting special case — its built-in reverse proxy covers the public-exposure job too, so it could replace this component entirely. The comparison lives in the [NetBird docs page](../netbird/README.md#the-reverse-proxy-feature-vs-cloudflare-tunnel).
+This homelab combines two of these: **Cloudflare Tunnel for public app exposure and [NetBird](../netbird) for administrative access**. NetBird's built-in reverse proxy covers the public-exposure job too, so consolidating everything onto NetBird remains a documented option — the comparison lives in the [NetBird docs page](../netbird/README.md#the-reverse-proxy-feature-vs-cloudflare-tunnel).
 
 ---
 
