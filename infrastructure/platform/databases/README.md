@@ -38,13 +38,13 @@ In companies, database operation is usually treated with strict ownership. Teams
 
 ## Database And Data Store Catalog
 
-| Name | Path | Status | Purpose |
-|---|---|---|---|
-| PostgreSQL | [docs](./postgresql) · [chart](../../../helm-charts/infrastructure/platform/databases/postgresql) · [config](./postgresql/terraform) | ⚫ Inactive | Primary relational database and default choice for new services |
-| MySQL | [docs](./mysql) · [chart](../../../helm-charts/infrastructure/platform/databases/mysql) · [config](./mysql/terraform) | ⚫ Inactive | Compatibility with common web stacks and MySQL-specific tooling |
-| MongoDB | [docs](./mongodb) · [chart](../../../helm-charts/infrastructure/platform/databases/mongodb) · [config](./mongodb/terraform) | ⚫ Inactive | Document database for JSON-heavy workloads and experiments |
-| Redis | [docs](./redis) · [chart](../../../helm-charts/infrastructure/platform/databases/redis) · [config](./redis/terraform) | ⚫ Inactive | Cache, key-value store, session storage and lightweight queues |
-| InfluxDB | [docs](./influxdb) · [chart](../../../helm-charts/infrastructure/platform/databases/influxdb) · [config](./influxdb/terraform) | ⚫ Inactive | Time-series data and sensor-style measurements |
+| Name | Path | Status | Idle RAM | Purpose |
+|---|---|---|---|---|
+| PostgreSQL | [docs](./postgresql) · [chart](../../../helm-charts/infrastructure/platform/databases/postgresql) · [config](./postgresql/terraform) | ⚫ Inactive | ~0.1–0.3 GB | Primary relational database and default choice for new services |
+| MySQL | [docs](./mysql) · [chart](../../../helm-charts/infrastructure/platform/databases/mysql) · [config](./mysql/terraform) | ⚫ Inactive | ~0.3–0.5 GB | Compatibility with common web stacks and MySQL-specific tooling |
+| MongoDB | [docs](./mongodb) · [chart](../../../helm-charts/infrastructure/platform/databases/mongodb) · [config](./mongodb/terraform) | ⚫ Inactive | ~0.3–1 GB | Document database for JSON-heavy workloads and experiments |
+| Redis | [docs](./redis) · [chart](../../../helm-charts/infrastructure/platform/databases/redis) · [config](./redis/terraform) | ⚫ Inactive | ~30–100 MB | Cache, key-value store, session storage and lightweight queues |
+| InfluxDB | [docs](./influxdb) · [chart](../../../helm-charts/infrastructure/platform/databases/influxdb) · [config](./influxdb/terraform) | ⚫ Inactive | ~0.2–0.5 GB | Time-series data and sensor-style measurements |
 
 ---
 

@@ -33,10 +33,10 @@ In a homelab, metrics help you learn how workloads behave under load and how muc
 
 ## Components
 
-| Name | Path | Role |
-|---|---|---|
-| Prometheus | [docs](./prometheus) · [chart](../../../../helm-charts/infrastructure/platform/observability/metrics/prometheus) · [config](./prometheus/terraform) | Metrics collection and alerting |
-| Grafana | [docs](./grafana) · [chart](../../../../helm-charts/infrastructure/platform/observability/metrics/grafana) · [config](./grafana/terraform) | Dashboards and visualization |
+| Name | Path | Idle RAM | Role |
+|---|---|---|---|
+| Prometheus | [docs](./prometheus) · [chart](../../../../helm-charts/infrastructure/platform/observability/metrics/prometheus) · [config](./prometheus/terraform) | ~0.5–1 GB+ | Metrics collection and alerting |
+| Grafana | [docs](./grafana) · [chart](../../../../helm-charts/infrastructure/platform/observability/metrics/grafana) · [config](./grafana/terraform) | ~0.15–0.3 GB | Dashboards and visualization |
 
 ---
 

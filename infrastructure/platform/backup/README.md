@@ -58,9 +58,9 @@ In a homelab, backup work teaches what data is actually important and how painfu
 
 ## Components
 
-| Name | Path | Role |
-|---|---|---|
-| Velero | [docs](./velero) · [chart](../../../helm-charts/infrastructure/platform/backup/velero) · [config](./velero/terraform) | Kubernetes resource and volume backup orchestration |
+| Name | Path | Idle RAM | Role |
+|---|---|---|---|
+| Velero | [docs](./velero) · [chart](../../../helm-charts/infrastructure/platform/backup/velero) · [config](./velero/terraform) | ~0.1–0.2 GB | Kubernetes resource and volume backup orchestration |
 
 ---
 

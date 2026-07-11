@@ -57,11 +57,11 @@ For this homelab, good real use cases include hardware power events, dashboard l
 
 ## Messaging Catalog
 
-| Name | Path | Status | Best fit |
-|---|---|---|---|
-| NATS | [docs](./nats) · [chart](../../../helm-charts/infrastructure/platform/messaging/nats) · [config](./nats/terraform) | ⚫ Inactive | Lightweight eventing, internal service communication, JetStream |
-| RabbitMQ | [docs](./rabbitmq) · [chart](../../../helm-charts/infrastructure/platform/messaging/rabbitmq) · [config](./rabbitmq/terraform) | ⚫ Inactive | Queues, routing patterns, job processing, AMQP ecosystem |
-| Kafka | [docs](./kafka) · [chart](../../../helm-charts/infrastructure/platform/messaging/kafka) · [config](./kafka/terraform) | ⚫ Inactive | Durable event logs, replayable streams, stream processing |
+| Name | Path | Status | Idle RAM | Best fit |
+|---|---|---|---|---|
+| NATS | [docs](./nats) · [chart](../../../helm-charts/infrastructure/platform/messaging/nats) · [config](./nats/terraform) | ⚫ Inactive | ~20–50 MB | Lightweight eventing, internal service communication, JetStream |
+| RabbitMQ | [docs](./rabbitmq) · [chart](../../../helm-charts/infrastructure/platform/messaging/rabbitmq) · [config](./rabbitmq/terraform) | ⚫ Inactive | ~0.15–0.3 GB | Queues, routing patterns, job processing, AMQP ecosystem |
+| Kafka | [docs](./kafka) · [chart](../../../helm-charts/infrastructure/platform/messaging/kafka) · [config](./kafka/terraform) | ⚫ Inactive | ~1–2 GB+ | Durable event logs, replayable streams, stream processing |
 
 ---
 

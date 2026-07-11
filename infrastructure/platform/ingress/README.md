@@ -31,13 +31,13 @@ External access is documented in the same place because it is the same decision 
 
 ## Components
 
-| Name | Path | Status | Recommendation | Role |
-|---|---|---|---|---|
-| Traefik | [docs](./traefik) · [chart](../../../helm-charts/infrastructure/platform/ingress/traefik) · [config](./traefik/terraform) | ⚫ Inactive | Chosen ingress controller | Ingress controller and reverse proxy |
-| cert-manager | [docs](./cert-manager) · [chart](../../../helm-charts/infrastructure/platform/ingress/cert-manager) · [config](./cert-manager/terraform) | ⚫ Inactive | Strongly recommended | Automatic TLS certificate management |
-| Cloudflare Tunnel | [docs](./cloudflare-tunnel) · [chart](../../../helm-charts/infrastructure/platform/ingress/cloudflare-tunnel) · [config](./cloudflare-tunnel/terraform) | ⚫ Inactive | Chosen for public app exposure | Publish selected apps externally without port forwarding |
-| NetBird | [docs](./netbird) · [chart](../../../helm-charts/infrastructure/platform/ingress/netbird) · [config](./netbird/terraform) | ⚫ Inactive | Chosen for private/admin access | WireGuard mesh with built-in reverse proxy |
-| Caddy | [docs](./caddy) | ⚫ Inactive | Documented alternative to Traefik | Reverse proxy with automatic HTTPS; best outside Kubernetes |
+| Name | Path | Status | Idle RAM | Recommendation | Role |
+|---|---|---|---|---|---|
+| Traefik | [docs](./traefik) · [chart](../../../helm-charts/infrastructure/platform/ingress/traefik) · [config](./traefik/terraform) | ⚫ Inactive | ~100–150 MB | Chosen ingress controller | Ingress controller and reverse proxy |
+| cert-manager | [docs](./cert-manager) · [chart](../../../helm-charts/infrastructure/platform/ingress/cert-manager) · [config](./cert-manager/terraform) | ⚫ Inactive | ~50–100 MB | Strongly recommended | Automatic TLS certificate management |
+| Cloudflare Tunnel | [docs](./cloudflare-tunnel) · [chart](../../../helm-charts/infrastructure/platform/ingress/cloudflare-tunnel) · [config](./cloudflare-tunnel/terraform) | ⚫ Inactive | ~20–50 MB | Chosen for public app exposure | Publish selected apps externally without port forwarding |
+| NetBird | [docs](./netbird) · [chart](../../../helm-charts/infrastructure/platform/ingress/netbird) · [config](./netbird/terraform) | ⚫ Inactive | ~50 MB peer / ~0.5 GB self-hosted stack | Chosen for private/admin access | WireGuard mesh with built-in reverse proxy |
+| Caddy | [docs](./caddy) | ⚫ Inactive | ~30–50 MB | Documented alternative to Traefik | Reverse proxy with automatic HTTPS; best outside Kubernetes |
 
 ---
 

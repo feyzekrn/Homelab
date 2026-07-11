@@ -35,10 +35,10 @@ In a homelab, logging is useful once there are enough services that `kubectl log
 
 ## Components
 
-| Name | Path | Role |
-|---|---|---|
-| Fluent Bit | [docs](./fluent-bit) · [chart](../../../../helm-charts/infrastructure/platform/observability/logging/fluent-bit) · [config](./fluent-bit/terraform) | Lightweight log collector on nodes |
-| OpenSearch | [docs](./opensearch) · [chart](../../../../helm-charts/infrastructure/platform/observability/logging/opensearch) · [config](./opensearch/terraform) | Search and analytics backend similar to Elasticsearch |
+| Name | Path | Idle RAM | Role |
+|---|---|---|---|
+| Fluent Bit | [docs](./fluent-bit) · [chart](../../../../helm-charts/infrastructure/platform/observability/logging/fluent-bit) · [config](./fluent-bit/terraform) | ~30–50 MB / node | Lightweight log collector on nodes |
+| OpenSearch | [docs](./opensearch) · [chart](../../../../helm-charts/infrastructure/platform/observability/logging/opensearch) · [config](./opensearch/terraform) | ~2–4 GB+ | Search and analytics backend similar to Elasticsearch |
 
 ---
 

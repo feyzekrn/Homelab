@@ -35,11 +35,11 @@ In a homelab, tracing is mainly useful after custom services exist. In companies
 
 ## Components
 
-| Name | Path | Role |
-|---|---|---|
-| OpenTelemetry Collector | [docs](./opentelemetry-collector) · [chart](../../../../helm-charts/infrastructure/platform/observability/tracing/opentelemetry-collector) · [config](./opentelemetry-collector/terraform) | Vendor-neutral telemetry pipeline |
-| Jaeger | [docs](./jaeger) · [chart](../../../../helm-charts/infrastructure/platform/observability/tracing/jaeger) · [config](./jaeger/terraform) | Trace storage and UI |
-| Zipkin | [docs](./zipkin) · [chart](../../../../helm-charts/infrastructure/platform/observability/tracing/zipkin) · [config](./zipkin/terraform) | Simpler tracing backend and compatibility target |
+| Name | Path | Idle RAM | Role |
+|---|---|---|---|
+| OpenTelemetry Collector | [docs](./opentelemetry-collector) · [chart](../../../../helm-charts/infrastructure/platform/observability/tracing/opentelemetry-collector) · [config](./opentelemetry-collector/terraform) | ~0.1–0.2 GB | Vendor-neutral telemetry pipeline |
+| Jaeger | [docs](./jaeger) · [chart](../../../../helm-charts/infrastructure/platform/observability/tracing/jaeger) · [config](./jaeger/terraform) | ~0.2–0.5 GB | Trace storage and UI |
+| Zipkin | [docs](./zipkin) · [chart](../../../../helm-charts/infrastructure/platform/observability/tracing/zipkin) · [config](./zipkin/terraform) | ~0.3–0.5 GB | Simpler tracing backend and compatibility target |
 
 ---
 

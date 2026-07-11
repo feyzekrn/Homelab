@@ -30,14 +30,14 @@ Both are needed.
 
 ## Candidate Systems
 
-| Name | Path | Category | Best fit | Recommendation |
-|---|---|---|---|---|
-| Keycloak | [docs](./keycloak) · [chart](../../../../helm-charts/infrastructure/platform/security/rights-management/keycloak) · [config](./keycloak/terraform) | Identity provider | OIDC, OAuth2, SSO, realms, clients, users and roles | Best first choice |
-| Authentik | [Authentik docs](https://docs.goauthentik.io/docs/) | Identity provider | Modern self-hosted identity with strong UX | Good alternative |
-| Zitadel | [Zitadel docs](https://zitadel.com/docs) | Identity provider | Cloud-native identity provider and OIDC/OAuth2 learning | Good alternative |
-| OpenFGA | [OpenFGA docs](https://openfga.dev/docs) | Authorization | Relationship-based authorization for app permissions | Later if needed |
-| SpiceDB | [SpiceDB docs](https://authzed.com/docs/spicedb) | Authorization | Zanzibar-style permission graph | Advanced/later |
-| Casbin | [Casbin docs](https://casbin.org/docs/overview) | Authorization library | Embedded authorization inside application code | Lightweight fallback |
+| Name | Path | Idle RAM | Category | Best fit | Recommendation |
+|---|---|---|---|---|---|
+| Keycloak | [docs](./keycloak) · [chart](../../../../helm-charts/infrastructure/platform/security/rights-management/keycloak) · [config](./keycloak/terraform) | ~0.7–1 GB | Identity provider | OIDC, OAuth2, SSO, realms, clients, users and roles | Best first choice |
+| Authentik | [Authentik docs](https://docs.goauthentik.io/docs/) | ~0.5–1 GB | Identity provider | Modern self-hosted identity with strong UX | Good alternative |
+| Zitadel | [Zitadel docs](https://zitadel.com/docs) | ~0.3–0.5 GB | Identity provider | Cloud-native identity provider and OIDC/OAuth2 learning | Good alternative |
+| OpenFGA | [OpenFGA docs](https://openfga.dev/docs) | ~0.1 GB | Authorization | Relationship-based authorization for app permissions | Later if needed |
+| SpiceDB | [SpiceDB docs](https://authzed.com/docs/spicedb) | ~0.1–0.3 GB | Authorization | Zanzibar-style permission graph | Advanced/later |
+| Casbin | [Casbin docs](https://casbin.org/docs/overview) | — (library) | Authorization library | Embedded authorization inside application code | Lightweight fallback |
 
 ---
 

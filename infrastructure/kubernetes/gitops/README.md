@@ -84,10 +84,10 @@ This project should use GitOps for platform services such as Cilium, MetalLB, Tr
 
 ## Components
 
-| Name | Path | Role |
-|---|---|---|
-| Flux | [docs](./flux) · [chart](../../../helm-charts/infrastructure/kubernetes/gitops/flux) · [config](./flux/terraform) | Kubernetes-native GitOps controller with strong HelmRelease and Kustomize support |
-| Argo CD | [docs](./argocd) · [chart](../../../helm-charts/infrastructure/kubernetes/gitops/argocd) · [config](./argocd/terraform) | UI-focused GitOps platform with application views, diffs and sync controls |
+| Name | Path | Idle RAM | Role |
+|---|---|---|---|
+| Flux | [docs](./flux) · [chart](../../../helm-charts/infrastructure/kubernetes/gitops/flux) · [config](./flux/terraform) | ~200–300 MB | Kubernetes-native GitOps controller with strong HelmRelease and Kustomize support |
+| Argo CD | [docs](./argocd) · [chart](../../../helm-charts/infrastructure/kubernetes/gitops/argocd) · [config](./argocd/terraform) | ~0.5–1 GB | UI-focused GitOps platform with application views, diffs and sync controls |
 
 ---
 

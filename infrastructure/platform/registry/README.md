@@ -38,12 +38,12 @@ In a company, artifact management is a core supply-chain concern. Registries are
 
 ## Components
 
-| Name | Path | Status | Location | Recommendation | Role |
-|---|---|---|---|---|---|
-| Harbor | [docs](./harbor) · [chart](../../../helm-charts/infrastructure/platform/registry/harbor) · [config](./harbor/terraform) | ⚫ Inactive | Self-hosted | Homelab container registry | Full-featured container registry |
-| Nexus Repository | [docs](./artifact-repository) · [chart](../../../helm-charts/infrastructure/platform/registry/artifact-repository) · [config](./artifact-repository/terraform) | ⚫ Inactive | Self-hosted | Homelab artifact standard | Docker, npm, NuGet and generic repositories |
-| JFrog Artifactory | [docs](./artifact-repository) | ⚫ Inactive | Self-hosted or external | Business artifact standard | Enterprise-grade artifact management |
-| GitHub Packages | [docs](./artifact-repository) | ⚫ Inactive | External | Optional hosted alternative | Hosted container and package registry |
+| Name | Path | Status | Idle RAM | Location | Recommendation | Role |
+|---|---|---|---|---|---|---|
+| Harbor | [docs](./harbor) · [chart](../../../helm-charts/infrastructure/platform/registry/harbor) · [config](./harbor/terraform) | ⚫ Inactive | ~1–2 GB | Self-hosted | Homelab container registry | Full-featured container registry |
+| Nexus Repository | [docs](./artifact-repository) · [chart](../../../helm-charts/infrastructure/platform/registry/artifact-repository) · [config](./artifact-repository/terraform) | ⚫ Inactive | ~1.5–2.5 GB | Self-hosted | Homelab artifact standard | Docker, npm, NuGet and generic repositories |
+| JFrog Artifactory | [docs](./artifact-repository) | ⚫ Inactive | ~2–4 GB | Self-hosted or external | Business artifact standard | Enterprise-grade artifact management |
+| GitHub Packages | [docs](./artifact-repository) | ⚫ Inactive | — (external) | External | Optional hosted alternative | Hosted container and package registry |
 
 ---
 

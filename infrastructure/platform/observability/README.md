@@ -40,11 +40,11 @@ In companies, observability supports incident response, service-level objectives
 
 ## Areas
 
-| Name | Path | Purpose |
-|---|---|---|
-| Metrics | [docs](./metrics) | Numeric time-series about systems and services |
-| Logging | [docs](./logging) | Structured and searchable logs |
-| Tracing | [docs](./tracing) | Request flow across services |
+| Name | Path | Idle RAM | Purpose |
+|---|---|---|---|
+| Metrics | [docs](./metrics) | ~0.7–1.3 GB total | Numeric time-series about systems and services |
+| Logging | [docs](./logging) | ~50 MB / node; +2–4 GB with OpenSearch | Structured and searchable logs |
+| Tracing | [docs](./tracing) | ~0.3–0.7 GB total | Request flow across services |
 
 ---
 

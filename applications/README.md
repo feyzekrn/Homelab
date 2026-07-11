@@ -40,13 +40,15 @@ In companies, the same distinction matters: platform services enable product app
 
 Each row links up to three locations, following the [Component Layout Convention](../README.md#component-layout-convention): `docs` (local README), `chart` (planned Helm chart under [`../helm-charts`](../helm-charts)) and `config` (optional Terraform next to the docs). Chart and config directories are created when an application becomes active; documented alternatives get docs only.
 
-| Name | Path | Status | Recommendation | Purpose |
-|---|---|---|---|---|
-| Nextcloud | [docs](./nextcloud) · [chart](../helm-charts/applications/nextcloud) · [config](./nextcloud/terraform) | ⚫ Inactive | Chosen personal cloud | Files, calendars and contacts as the family's source of truth |
-| ownCloud | [docs](./owncloud) | ⚫ Inactive | Documented alternative to Nextcloud | Lean file sync platform (oCIS); not planned for deployment |
-| Immich | [docs](./immich) · [chart](../helm-charts/applications/immich) · [config](./immich/terraform) | ⚫ Inactive | Chosen photo platform | Family photo cloud replacing iCloud/Google Photos |
-| Jellyfin | [docs](./jellyfin) · [chart](../helm-charts/applications/jellyfin) · [config](./jellyfin/terraform) | ⚫ Inactive | Chosen media server | Fully open-source media library and streaming |
-| Plex | [docs](./plex) | ⚫ Inactive | Documented alternative to Jellyfin | Polished media server; not planned for deployment |
+`Idle RAM` is a rough ballpark for the app itself — databases, caches and storage it depends on are counted in the [platform catalog](../infrastructure/platform/README.md). Note that the apps, not the infrastructure glue, are where the real memory goes: Immich's machine learning alone outweighs the entire ingress and DNS stack many times over.
+
+| Name | Path | Status | Idle RAM | Recommendation | Purpose |
+|---|---|---|---|---|---|
+| Nextcloud | [docs](./nextcloud) · [chart](../helm-charts/applications/nextcloud) · [config](./nextcloud/terraform) | ⚫ Inactive | ~0.5–1 GB | Chosen personal cloud | Files, calendars and contacts as the family's source of truth |
+| ownCloud | [docs](./owncloud) | ⚫ Inactive | ~0.2 GB (oCIS) | Documented alternative to Nextcloud | Lean file sync platform (oCIS); not planned for deployment |
+| Immich | [docs](./immich) · [chart](../helm-charts/applications/immich) · [config](./immich/terraform) | ⚫ Inactive | ~2–4 GB | Chosen photo platform | Family photo cloud replacing iCloud/Google Photos |
+| Jellyfin | [docs](./jellyfin) · [chart](../helm-charts/applications/jellyfin) · [config](./jellyfin/terraform) | ⚫ Inactive | ~0.5–1 GB | Chosen media server | Fully open-source media library and streaming |
+| Plex | [docs](./plex) | ⚫ Inactive | ~0.5–1 GB | Documented alternative to Jellyfin | Polished media server; not planned for deployment |
 
 ---
 

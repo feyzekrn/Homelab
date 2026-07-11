@@ -37,10 +37,10 @@ In a homelab, runtime tools should come after plain Kubernetes services are unde
 
 ## Components
 
-| Name | Path | Role |
-|---|---|---|
-| Dapr | [docs](./dapr) · [chart](../../../helm-charts/infrastructure/platform/runtime/dapr) · [config](./dapr/terraform) | Distributed application runtime |
-| Service Mesh | [docs](./service-mesh) · [chart](../../../helm-charts/infrastructure/platform/runtime/service-mesh) · [config](./service-mesh/terraform) | Traffic management and service-to-service security |
+| Name | Path | Idle RAM | Role |
+|---|---|---|---|
+| Dapr | [docs](./dapr) · [chart](../../../helm-charts/infrastructure/platform/runtime/dapr) · [config](./dapr/terraform) | ~0.3 GB + ~50 MB sidecar / app | Distributed application runtime |
+| Service Mesh | [docs](./service-mesh) · [chart](../../../helm-charts/infrastructure/platform/runtime/service-mesh) · [config](./service-mesh/terraform) | ~0.5–1 GB + sidecars | Traffic management and service-to-service security |
 
 ---
 

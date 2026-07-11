@@ -36,10 +36,10 @@ In companies, storage is treated as a reliability layer. Teams care about perfor
 
 ## Components
 
-| Name | Path | Status | Recommendation | Role |
-|---|---|---|---|---|
-| Longhorn | [docs](./longhorn) · [chart](../../../helm-charts/infrastructure/platform/storage/longhorn) · [config](./longhorn/terraform) | ⚫ Inactive | Homelab standard | Distributed block storage |
-| MinIO | [docs](./minio) · [chart](../../../helm-charts/infrastructure/platform/storage/minio) · [config](./minio/terraform) | ⚫ Inactive | Homelab S3 standard | S3-compatible object storage |
+| Name | Path | Status | Idle RAM | Recommendation | Role |
+|---|---|---|---|---|---|
+| Longhorn | [docs](./longhorn) · [chart](../../../helm-charts/infrastructure/platform/storage/longhorn) · [config](./longhorn/terraform) | ⚫ Inactive | ~0.3–0.5 GB / node | Homelab standard | Distributed block storage |
+| MinIO | [docs](./minio) · [chart](../../../helm-charts/infrastructure/platform/storage/minio) · [config](./minio/terraform) | ⚫ Inactive | ~0.2–0.5 GB | Homelab S3 standard | S3-compatible object storage |
 
 ---
 

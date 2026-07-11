@@ -42,13 +42,13 @@ In companies, these same ideas become formal controls: identity providers, least
 
 ## Components
 
-| Name | Path | Role |
-|---|---|---|
-| Secret Store | [docs](./secret-store) · [chart](../../../helm-charts/infrastructure/platform/security/secret-store) · [config](./secret-store/terraform) | Runtime secret access for applications and infrastructure integrations |
-| External Secrets Operator | [docs](./external-secrets) · [chart](../../../helm-charts/infrastructure/platform/security/external-secrets) · [config](./external-secrets/terraform) | Syncs secrets from an external secret backend into Kubernetes |
-| Sealed Secrets | [docs](./sealed-secrets) · [chart](../../../helm-charts/infrastructure/platform/security/sealed-secrets) · [config](./sealed-secrets/terraform) | Encrypts Kubernetes secrets safely for Git storage |
-| Rights Management | [docs](./rights-management) | Identity, permissions and application authorization model (category) |
-| Password Manager | [docs](./password-manager) | Human password vault for the family (category, chosen: Bitwarden/Vaultwarden) |
+| Name | Path | Idle RAM | Role |
+|---|---|---|---|
+| Secret Store | [docs](./secret-store) · [chart](../../../helm-charts/infrastructure/platform/security/secret-store) · [config](./secret-store/terraform) | ~0.2–0.5 GB | Runtime secret access for applications and infrastructure integrations |
+| External Secrets Operator | [docs](./external-secrets) · [chart](../../../helm-charts/infrastructure/platform/security/external-secrets) · [config](./external-secrets/terraform) | ~50–100 MB | Syncs secrets from an external secret backend into Kubernetes |
+| Sealed Secrets | [docs](./sealed-secrets) · [chart](../../../helm-charts/infrastructure/platform/security/sealed-secrets) · [config](./sealed-secrets/terraform) | ~50 MB | Encrypts Kubernetes secrets safely for Git storage |
+| Rights Management | [docs](./rights-management) | — | Identity, permissions and application authorization model (category) |
+| Password Manager | [docs](./password-manager) | — | Human password vault for the family (category, chosen: Bitwarden/Vaultwarden) |
 
 ---
 

@@ -33,9 +33,9 @@ In companies, the same split exists: a workforce password manager for humans, an
 
 ## Component Catalog
 
-| Name | Path | Status | Recommendation | Purpose |
-|---|---|---|---|---|
-| Bitwarden (Vaultwarden) | [docs](./bitwarden) · [chart](../../../../helm-charts/infrastructure/platform/security/password-manager/bitwarden) · [config](./bitwarden/terraform) | ⚫ Inactive | Chosen password manager (via Vaultwarden server) | Family password vault with clients on every platform |
+| Name | Path | Status | Idle RAM | Recommendation | Purpose |
+|---|---|---|---|---|---|
+| Bitwarden (Vaultwarden) | [docs](./bitwarden) · [chart](../../../../helm-charts/infrastructure/platform/security/password-manager/bitwarden) · [config](./bitwarden/terraform) | ⚫ Inactive | ~50–100 MB | Chosen password manager (via Vaultwarden server) | Family password vault with clients on every platform |
 
 ---
 

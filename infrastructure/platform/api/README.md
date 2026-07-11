@@ -55,9 +55,9 @@ The API layer should not become a dumping ground for all business logic. It shou
 
 ## Components
 
-| Name | Path | Role |
-|---|---|---|
-| GraphQL | [docs](./graphql) · [chart](../../../helm-charts/infrastructure/platform/api/graphql) · [config](./graphql/terraform) | GraphQL gateway and schema design experiments |
+| Name | Path | Idle RAM | Role |
+|---|---|---|---|
+| GraphQL | [docs](./graphql) · [chart](../../../helm-charts/infrastructure/platform/api/graphql) · [config](./graphql/terraform) | ~0.1–0.3 GB | GraphQL gateway and schema design experiments |
 
 ---
 
