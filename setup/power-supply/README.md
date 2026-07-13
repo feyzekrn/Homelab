@@ -105,11 +105,12 @@ The Lenovo M910q Tiny with an i5-6500T:
 
 | State | Voltage | Current | Power |
 |---|---:|---:|---:|
-| Idle | 20V | ~0.5 A | ~10 W |
-| Typical load | 20V | ~1.75 A | ~35 W |
+| Idle | 20V | ~0.25–0.4 A | ~5–8 W |
+| Typical load | 20V | ~0.5–0.75 A | ~10–15 W |
+| Full load | 20V | ~1.75–2 A | ~35–40 W |
 | **Cold-start peak** | 20V | **~3.25 A** | **~65 W** |
 
-The **65W cold-start peak** is the number that sizes the system. When a node powers on, the i5-6500T plus capacitor inrush briefly pulls up to the full 3.25A the OEM 65W adapter is rated for — well above its ~35W steady-state. This is a real, measured spec (the Lenovo OEM brick is 20V / 3.25A / 65W), not a multiplied estimate.
+The **65W cold-start peak** is the number that sizes the system. When a node powers on, the i5-6500T plus capacitor inrush briefly pulls up to the full 3.25A the OEM 65W adapter is rated for — well above the ~35–40W full-load draw. This is a real, measured spec (the Lenovo OEM brick is 20V / 3.25A / 65W), not a multiplied estimate.
 
 ### Total system load (current 3-node config)
 
