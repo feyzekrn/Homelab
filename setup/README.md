@@ -61,25 +61,32 @@ How the cluster is powered cleanly and safely. Covers the power supply unit, DC/
 
 ## 🔌 Running Costs (24/7, €0.35/kWh)
 
+**Ø Average** = realistic 24/7 mix, since the cluster is never permanently idle or at full load: ~50% idle (nights, low activity), ~45% default operation, ~5% full load.
+
 | Device           | Scenario  |        Watt |       Per month |    Per year |
 | ---------------- | --------- | ----------: | --------------: | ----------: |
 | 1× Node          | Idle      |     ~ 5–8 W |   ~ 1.28–2.04 € |   ~ 15–25 € |
 | 1× Node          | Default   |   ~ 10–15 W |   ~ 2.56–3.83 € |   ~ 31–46 € |
 | 1× Node          | Full load |   ~ 35–40 W |  ~ 8.94–10.22 € |  ~ 107–123 € |
+| 1× Node          | Ø Average |    ~ 9–13 W |   ~ 2.24–3.26 € |   ~ 27–39 € |
 |                  |           |             |                 |             |
 | MikroTik CRS310  | Idle      |      ~ 21 W |        ~ 5.37 € |      ~ 64 € |
 | MikroTik CRS310  | Default   |      ~ 27 W |        ~ 6.90 € |      ~ 83 € |
 | MikroTik CRS310  | Full load |      ~ 34 W |        ~ 8.69 € |     ~ 104 € |
+| MikroTik CRS310  | Ø Average |      ~ 24 W |        ~ 6.22 € |      ~ 75 € |
 |                  |           |             |                 |             |
 |                  |           |             |                 |             |
 | 3 nodes + switch | Idle      |   ~ 36–45 W |  ~ 9.20–11.50 € | ~ 110–138 € |
 | 3 nodes + switch | Default   |   ~ 57–72 W | ~ 14.56–18.40 € | ~ 175–221 € |
 | 3 nodes + switch | Full load | ~ 139–154 W | ~ 35.51–39.35 € | ~ 426–472 € |
+| 3 nodes + switch | Ø Average |   ~ 51–63 W | ~ 12.93–16.00 € | ~ 155–192 € |
 |                  |           |             |                 |             |
 | 5 nodes + switch | Idle      |   ~ 46–61 W | ~ 11.75–15.59 € | ~ 141–187 € |
 | 5 nodes + switch | Default   |  ~ 77–102 W | ~ 19.67–26.06 € | ~ 236–313 € |
 | 5 nodes + switch | Full load | ~ 209–234 W | ~ 53.40–59.79 € | ~ 641–717 € |
+| 5 nodes + switch | Ø Average |   ~ 68–88 W | ~ 17.40–22.51 € | ~ 209–270 € |
 |                  |           |             |                 |             |
 | 7 nodes + switch | Idle      |   ~ 56–77 W | ~ 14.31–19.67 € | ~ 172–236 € |
 | 7 nodes + switch | Default   |  ~ 97–132 W | ~ 24.78–33.73 € | ~ 297–405 € |
 | 7 nodes + switch | Full load | ~ 279–314 W | ~ 71.28–80.23 € | ~ 855–963 € |
+| 7 nodes + switch | Ø Average |  ~ 86–114 W | ~ 21.87–29.02 € | ~ 262–348 € |
