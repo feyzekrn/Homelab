@@ -16,7 +16,7 @@ Everything reusable was taken from old hardware first. Only what was actually mi
 
 ### [🖥️ Compute — Nodes, CPU, RAM & Storage](./compute)
 
-The three Lenovo ThinkCentre M910q Tiny nodes that form the cluster. What was bought, what came from old hardware, why this platform was chosen and what the upgrade path looks like for CPU, RAM and storage. The [operating system running on these nodes](./compute/os) lives in the same folder — hardware and its OS in one place. The [operating system running on these nodes](./compute/os) lives in the same folder — hardware and its OS in one place.
+The three Lenovo ThinkCentre M910q Tiny nodes that form the cluster. What was bought, what came from old hardware, why this platform was chosen and what the upgrade path looks like for CPU, RAM and storage. The [operating system running on these nodes](./compute/os) lives in the same folder — hardware and its OS in one place.
 
 ### [🌐 Networking — Switches & Physical Topology](./networking)
 

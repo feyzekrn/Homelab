@@ -55,7 +55,7 @@ This area should document:
 
 | Name | Path | Status | Location | Recommendation | Role |
 |---|---|---|---|---|---|
-| MikroTik CRS310 | [docs](./mikrotik) · [config](./mikrotik/terraform) | ⚫ Inactive | Self-hosted hardware | Homelab network standard | Managed switch, VLANs, routing and service exposure |
+| MikroTik CRS310 | [docs](./mikrotik) · config (planned, `./mikrotik/terraform`) | ⚫ Inactive | Self-hosted hardware | Homelab network standard | Managed switch, VLANs, routing and service exposure |
 
 ---
 
