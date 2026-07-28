@@ -70,17 +70,20 @@ The MS-01 block is **optional** — see [the compute overview](./compute#-the-pr
 |   ⬜   | KFZ Fuse Box 6-Port                |   1 |       ~ 8 € |       ~ 8 € |
 |   ⬜   | Kill Switch + fuses + cable        |   1 |      ~ 20 € |      ~ 20 € |
 |   ⬜   | Fritz!Box 7490 (used)              |   1 |      ~ 40 € |      ~ 40 € |
+|   ⬜   | WiFi access point, VLAN-capable    |   1 |      ~ 60 € |      ~ 60 € |
 
-The Fritz!Box replaces the ISP router for the transition phase: it can do static routes and hand out a custom DNS server, [neither of which the Speedport can](./networking/router#the-isp-router-problem). Afterwards it continues as modem and WiFi access point behind OPNsense.
+The **Fritz!Box** replaces the ISP router for the transition phase: it can do static routes and hand out a custom DNS server, [neither of which the Speedport can](./networking/router#the-isp-router-problem). Afterwards it stays at the WAN edge as the DSL modem.
+
+The **access point** is what carries the household WLAN once OPNsense becomes the gateway. It has to support multiple SSIDs with a VLAN tag each (802.1Q) so that family and IoT devices land in different zones — a cheap repeater cannot do this, and the Fritz!Box cannot take the role because as the modem it sits on the untrusted side of the firewall.
 
 **Totals**
 
 | | |
 | --- | ----------: |
-| **Total (all listed parts)** | **~ 1206 €** |
+| **Total (all listed parts)** | **~ 1266 €** |
 | **Already spent** ✅ | **~ 778 €** |
-| **Still outstanding** ⬜ | **~ 428 €** |
-| *Without the optional MS-01 block* | *~ 706 €* |
+| **Still outstanding** ⬜ | **~ 488 €** |
+| *Without the optional MS-01 block* | *~ 766 €* |
 
 ---
 

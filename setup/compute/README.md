@@ -45,6 +45,34 @@ Everything the Proxmox host does can be done differently:
 
 The reverse is also true, and worth saying: a Proxmox host alone, without the cluster, is a perfectly reasonable homelab too. It just teaches virtualization and self-hosting rather than Kubernetes.
 
+### What actually justifies it — and what does not
+
+**Not the router.** OPNsense uses 2 vCPU and 2–4 GB of a 14-core, 32 GB machine. Nobody needs a 500 € workstation to route a household's packets, and the network would work without it: a [Fritz!Box](../networking/router) handles the home network, and the CRS310 could route between zones in hardware if it had to. The router is a *tenant* on this machine, not the reason it was bought.
+
+**The apps and their storage are the reason** — and specifically, the three Tiny nodes cannot host them:
+
+| Constraint on the Tiny nodes | Why it blocks the family apps |
+|---|---|
+| **256 GB SATA SSD per node** | 768 GB raw across the cluster, roughly 250 GB usable after Longhorn's three-way replication. A photo library and a media collection are measured in terabytes, not gigabytes |
+| **Only 2.5" and M.2 slots** | Cheap bulk storage comes from 3.5" HDDs — 4 TB for around 90 €. The same capacity as a 2.5" SSD costs roughly 250 €, and the Tiny cannot fit anything else |
+| **8–16 GB RAM per node** | Immich's machine learning alone wants 2–4 GB, and the cluster components already take their share. Adding Nextcloud, PostgreSQL and Jellyfin on top leaves nothing for the experiments the cluster exists for |
+| **Skylake-era iGPU (i5-6500T)** | Transcoding works for older codecs, but modern libraries (HEVC 10-bit, AV1) fall back to CPU — on four cores without hyper-threading that is a stuttering stream |
+
+Put plainly: **the cluster is fine as a cluster.** It fails as a media and storage server, and that is the gap the MS-01 fills.
+
+### The honest cheap alternatives
+
+If the goal is only "somewhere for the files and the family apps", these are the paths worth comparing before spending 500 €:
+
+| Path | Cost | Reality check |
+|---|--:|---|
+| **Another Tiny node** | ~ 50 € | Cheapest by far — but it has the exact same limits: no 3.5" bay, no bulk storage. It solves compute, never storage |
+| **Raspberry Pi 5 as a NAS** | ~ 150–180 € | Board, PSU, cooling, SD card and a SATA/NVMe HAT add up to **three times the price of a Tiny**, and it is still 1 Gbit, 8 GB RAM and USB- or single-lane-attached disks. Fine as a pure file server; it will not transcode Jellyfin and will not run Immich's ML |
+| **Used office desktop** (OptiPlex/ProDesk SFF) | ~ 60–120 € | **The genuinely sensible budget answer.** Takes 2–4 disks including 3.5" HDDs, has free RAM slots and a PCIe slot, and runs Proxmox or TrueNAS perfectly well. Costs are ~30–50 €/year higher in electricity, and it is bulky and louder |
+| **MS-01** *(chosen)* | ~ 500 € | Everything above in one small, quiet, low-power box — plus 10G, plus 14 cores for reserve cluster nodes, plus a PCIe slot for a future GPU |
+
+The honest conclusion: **a used desktop for around 100 € would have covered the actual requirement.** The MS-01 was chosen for the things beyond it — the 10G trunk, the compact silent form factor, modern transcoding, and headroom for AI workloads later. That is a comfort and future-proofing decision, and it should be read as one. The Raspberry Pi, meanwhile, is the option that looks cheap and is not: at 150–180 € it costs three Tiny nodes' worth of money for less capability than a 100 € desktop.
+
 ---
 
 ## Sections

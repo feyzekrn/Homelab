@@ -8,6 +8,51 @@ The network is built by two devices with a clean division of labour: the **switc
 
 ---
 
+## The Whole Picture
+
+Every cable and every zone of the target design in one view:
+
+```text
+                      ┌──────────────────────────┐
+   Internet ──────────┤  ISP router / Fritz!Box  │   modem + WAN edge
+                      └────────────┬─────────────┘
+                                   │  1× RJ45 — the only internet cable
+                                   ▼
+        ┌──────────────────────────────────────────────────┐
+        │  pve0 — Minisforum MS-01 (Proxmox VE)            │
+        │                                                  │
+        │   [OPNsense VM]  gateway + firewall of all zones  │
+        │   [NAS/shares]   ZFS pool: media, photos, backups │
+        │   [Caddy]  [AdGuard]  [cloudflared]  [Vaultwarden]│
+        │   [family apps: Jellyfin · Immich · Nextcloud]    │
+        └────────────────────────┬─────────────────────────┘
+                                 │  SFP+ 1 — 10G trunk, all VLANs tagged
+                                 ▼
+        ┌──────────────────────────────────────────────────┐
+        │  MikroTik CRS310  —  pure Layer 2, VLAN tagging   │
+        └──┬────────┬────────┬────────┬───────┬────────┬───┘
+           │1,2,3   │4,5,6   │  7     │  8    │ SFP+2  │
+           ▼        ▼        ▼        ▼       ▼        
+      node0–2   node0–2   WiFi AP   free    free
+      (2.5G)    (1G mgmt) (tagged)
+      VLAN 10   VLAN 30   VLAN 1+40
+         │
+         └── bare-metal Kubernetes: apps, Home Assistant, Longhorn, Traefik
+```
+
+| Zone | VLAN | Who lives there | Reachable from |
+|---|---|---|---|
+| Home | 1 (untagged) | Family phones, laptops, TVs | Internet; apps via 80/443 only |
+| Kubernetes | 10 | The three nodes, MetalLB range | Home (apps), management |
+| Services | 20 | NAS shares, family app containers | Home (apps), k8s (storage paths) |
+| Management | 30 | Proxmox UI, switch, vPro, OPNsense GUI | Admin laptop and NetBird only |
+| IoT | 40 | Plugs, sensors, cameras | Nothing — may only reach the MQTT broker |
+| DMZ | 50 | Anything exposed to the internet | Tunnel only; may reach its own dataset |
+
+The rule behind the zones: **traffic is filtered where a decision is needed and switched where only throughput is needed.** Cluster-to-cluster and cluster-to-storage traffic stays inside a VLAN and never touches the router; anything crossing a trust boundary goes through OPNsense. Details and firewall rules live in [`design.md`](./design.md).
+
+---
+
 ## Core Switch: MikroTik CRS310-8G+2S+IN
 
 The central switch for the whole cluster. Bought new, because this switch brings real features that actually matter for Kubernetes.
@@ -60,14 +105,37 @@ Even if you own a high-end Layer 3 router, pairing it with a cheap unmanaged swi
 [  node2   ]── 1G onboard ──┘
 ```
 
-| Port type | Used | Free | By what |
-|---|--:|--:|---|
-| 2.5G RJ45 | 6 of 8 | 2 | 3× node data (2.5G M.2) + 3× node management (1G onboard) |
-| SFP+ | 1 of 2 | 1 | MS-01 trunk — the second stays free for a WiFi AP, a bonded second link or a future NAS |
-
 **Why the WAN bypasses the switch.** Untrusted internet traffic never becomes a VLAN on the switch at all, which removes an entire class of mistakes: no WAN VLAN to misconfigure, no chance of a tagging error putting the raw internet next to the cluster. The MS-01 has two spare RJ45 ports, so it costs nothing — and it frees a switch port as a side effect.
 
 The only price is a physical dependency: the cable from the ISP router has to reach the MS-01. Since both live next to each other, that is not a real constraint.
+
+### Port Assignment — Every Port On The CRS310
+
+This is the full target wiring once [OPNsense](./router) is the router. `Untagged` means the connected device knows nothing about VLANs and the switch attaches the tag; `tagged` means the device speaks 802.1Q itself and several VLANs share the cable.
+
+| Port | Connected to | Mode | VLAN | Speed |
+|---|---|---|---|---|
+| **1** | `node0` — 2.5G M.2 adapter | untagged, PVID 10 | 10 — k8s | 2.5G |
+| **2** | `node1` — 2.5G M.2 adapter | untagged, PVID 10 | 10 — k8s | 2.5G |
+| **3** | `node2` — 2.5G M.2 adapter | untagged, PVID 10 | 10 — k8s | 2.5G |
+| **4** | `node0` — onboard NIC | untagged, PVID 30 | 30 — management | 1G |
+| **5** | `node1` — onboard NIC | untagged, PVID 30 | 30 — management | 1G |
+| **6** | `node2` — onboard NIC | untagged, PVID 30 | 30 — management | 1G |
+| **7** | WiFi access point | **tagged** | 1 (home), 40 (IoT) — one SSID per VLAN | 2.5G |
+| **8** | *free* | — | reserve: `node3` data, or a wired device in any zone | 2.5G |
+| **SFP+ 1** | `pve0` (MS-01) | **tagged trunk** | 10, 20, 30, 40, 50 — all zones | 10G |
+| **SFP+ 2** | *free* | — | reserve: second trunk (LACP), dedicated NAS link, second switch | 10G |
+| *(none)* | ISP router / modem | — | **not on the switch** — goes directly into a `pve0` RJ45 port as WAN | — |
+
+Three things are worth reading out of that table:
+
+- **The two tagged ports carry the whole design.** SFP+ 1 is what lets OPNsense have a leg in every zone over one cable, and port 7 is what lets one access point serve the family WLAN and a separate IoT WLAN as genuinely different networks.
+
+> ⚠️ **Port 7 dictates what kind of access point can be bought.** Serving two zones from one device requires an AP that supports **multiple SSIDs with a VLAN tag per SSID** (802.1Q). A cheap repeater or a consumer router in bridge mode cannot do this — it would put every wireless device into a single network, and the IoT zone would exist on paper only. Devices that can: TP-Link Omada EAP series (~50–70 €), Ubiquiti UniFi (~100 €+), or any OpenWrt-capable router used as an AP. This is a planned purchase, not something already owned.
+- **Node cabling is split by purpose, not by speed.** The fast M.2 adapters carry cluster traffic in VLAN 10; the onboard ports carry management in VLAN 30. If a cluster experiment saturates the data path, SSH and monitoring still work.
+- **The switch itself lives in VLAN 30.** Its management IP belongs in the same zone as the node management ports and the Proxmox web UI — reachable from the admin laptop and through NetBird, from nowhere else.
+
+Interim state, before OPNsense exists: everything runs untagged in one flat network and the ISP router remains the gateway. The port assignment above only becomes real when the router does.
 
 ### Maxed Switch Setup
 
@@ -77,16 +145,14 @@ Without a management switch, the RJ45 ports run out at four nodes: 8 ports = 4×
 [  node0   ]──  2.5G M.2  ──┐
 [  node0   ]── 1G onboard ──┤
 [  node1   ]──  2.5G M.2  ──┤
-[  node1   ]── 1G onboard ──┤
-[  node2   ]──  2.5G M.2  ──┤── MikroTik CRS310
+[  node1   ]── 1G onboard ──┤── MikroTik CRS310 ──┬── SFP+ 1: pve0 (trunk)
+[  node2   ]──  2.5G M.2  ──┤                     └── SFP+ 2: free
 [  node2   ]── 1G onboard ──┤
 [  node3   ]──  2.5G M.2  ──┤
 [  node3   ]── 1G onboard ──┘
-[ pve0 (MS-01) ]── 10G SFP+ ──┤
-[     WiFi AP  ]── 10G SFP+ ──┘
 ```
 
-Beyond four nodes, management traffic has to move to a dedicated switch — the setup described below.
+All eight RJ45 ports are then taken by nodes — which means the WiFi access point has to move to SFP+ 2 (via a media converter or an AP with an SFP+ uplink) or the management network has to move to its own switch. Beyond four nodes, the second option is the only sensible one.
 
 ---
  
@@ -110,7 +176,7 @@ Short slim patch cables connect the patch panel front to the switch ports direct
 |---|---|---:|---|
 | 0.25m Slim Patch Cable Cat.6 | Short run from patch panel to switch, per cable | ~ 1.50–2.50 € | [Amazon](https://www.amazon.de/s?k=0.25m+patchkabel+slim+cat6) |
  
-For the current 3-node setup with dual cables: 6 node connections + 1 router uplink = **7 cables minimum**. Buying 10 leaves a few spares for future nodes or replacements.
+For the current 3-node setup with dual cables: 6 node connections, plus one for the WiFi access point = **7 cables minimum**. The internet uplink is not among them — it goes straight into the MS-01, not through the patch panel. Buying 10 leaves a few spares for future nodes or replacements.
 
 ---
 
@@ -129,23 +195,12 @@ The GS308 would serve as a simple 1G extension switch. Its only job is to connec
 Management traffic moves to a dedicated Netgear GS308, freeing all 8× 2.5G ports on the MikroTik for cluster data. With the MS-01 on SFP+ and the WAN going directly into it, this scales to **8 nodes** with a dedicated management path.
 
 ```text
-[      node0       ]──  2.5G M.2 ──┐
-[      node1       ]──  2.5G M.2 ──┤
-[      node2       ]──  2.5G M.2 ──┤
-[      node3       ]──  2.5G M.2 ──┤
-[      node4       ]──  2.5G M.2 ──┤── MikroTik CRS310
-[      node5       ]──  2.5G M.2 ──┤
-[      node6       ]──  2.5G M.2 ──┤
-[      node7       ]──  2.5G M.2 ──┤
-[  pve0 (MS-01)    ]──  10G SFP+ ──┤   trunk, all VLANs
-[   GS308 / WiFi   ]──  10G SFP+ ──┘
-
-[      node0       ]── 1G onboard ──┐
-[      node1       ]── 1G onboard ──┤
-[      node2       ]── 1G onboard ──┤
-[      node3       ]── 1G onboard ──┤── Netgear GS308 ──── MikroTik (VLAN 30 trunk)
-[   … up to node7  ]── 1G onboard ──┤
-[ MikroTik CRS310  ]── 1G onboard ──┘
+Ports 1–8 (2.5G)                      SFP+ 1 ── pve0 (MS-01), trunk: all VLANs
+[  node0 … node7  ]──  2.5G M.2 ──── MikroTik CRS310
+                                      SFP+ 2 ── Netgear GS308 (VLAN 30 trunk)
+                                                      │
+[  node0 … node7  ]── 1G onboard ─────────────────────┘
+[ MikroTik CRS310 ]── 1G onboard ─────────────────────┘
 ```
 
 The MS-01 keeps its second SFP+ port free throughout — reserve for a bonded second trunk link (LACP) if storage traffic ever justifies it, or for a direct link to a future dedicated NAS.
@@ -156,9 +211,66 @@ Unlike using a cheap switch for the main cluster data, using it purely for the 1
 
 ---
 
-## Alternative Paths (For Budgets Under 200 €)
+## "Wait — Three Routers?"
 
-If you don't have the spare cash for a premium Layer 3 switch like the MikroTik CRS310, you can still protect your home network from collapsing. Here are two budget-friendly architecture alternatives:
+Count the devices in the target design that can route IP traffic, and the result looks absurd for a home network:
+
+| Device | Can route? | What it actually is here |
+|---|---|---|
+| Fritz!Box 7490 | yes | **The modem.** Routing the home network is a side job it does for free |
+| OPNsense VM | yes | **The actual router** of the homelab — the only one enforcing zones |
+| MikroTik CRS310 | yes (RouterOS 7) | **The switch.** Layer 3 is a capability it happens to have |
+
+Nobody needs three routers. What is being bought is **one modem and one switch** — both of which happen to be able to route, because that is how such devices are built today. The only real router is OPNsense, and it costs nothing because it runs on hardware that already exists.
+
+### Why the Fritz!Box is bought anyway
+
+Two reasons, and neither is "another router":
+
+1. **The DSL line needs a modem, and a modem alone is more expensive.** A standalone VDSL modem (Draytek Vigor 165, Zyxel VMG series) costs 60–100 €. A used Fritz!Box 7490 costs **20–40 €** — and includes the modem, a router, WiFi and a telephone system. Buying the cheaper device and ignoring half its features is the rational choice.
+2. **The family should not depend on the hypervisor.** Since the Fritz!Box is there anyway, it keeps serving the home network: phones, TVs and laptops route through it, not through OPNsense. That means `pve0` can be rebooted, upgraded or broken at 22:00 without anyone losing Netflix. The lab pays for its own outages; the household does not.
+
+The interim benefit on top: static routes and a configurable DNS handout, [neither of which the Speedport offers](./router#the-isp-router-problem).
+
+### Could the switch be cheaper — or unmanaged?
+
+This is the decision worth taking seriously, because the switch is the single most expensive part of the network.
+
+| Setup | Cost | What you get | What you give up |
+|---|--:|---|---|
+| **Unmanaged 2.5G switch** + OPNsense | ~ 40–60 € | Full 2.5G cluster speed, working cluster, apps reachable | **No VLANs at all.** One flat network — the IoT plug sits next to the NAS, no management zone, no DMZ. OPNsense can route nothing because there is nothing to route between |
+| **Cheap managed 2.5G switch** (with SFP+) + OPNsense | ~ 100–130 € | Everything the design needs: VLANs, zones, a 10G trunk | RouterOS: no REST API for Terraform, weaker build quality, no Layer 3 in reserve |
+| **MikroTik CRS310** + OPNsense *(chosen)* | ~ 180 € | The above, plus RouterOS 7 with a REST API, two SFP+ ports, hardware L3 as reserve | ~ 50–80 € more than the cheap managed option |
+
+The one thing that is **not** negotiable is `managed`. VLAN tags are attached by the switch — OPNsense can route between zones, but it cannot create them. An unmanaged switch means one flat network no matter how capable the firewall is, and with it the entire zone model, the IoT cage and the DMZ disappear. That is not a budget version of this design; it is a different design.
+
+What the extra ~50–80 € for the CRS310 actually buys, honestly:
+
+- **A 10G SFP+ trunk.** Every VLAN, all NAS traffic, all family apps and all cluster backups share this one link to the MS-01. At 2.5G that single cable would be the bottleneck of the entire Proxmox world at once; at 10G the question never comes up again.
+- **The REST API.** This project wants network configuration as code — RouterOS makes that possible with Terraform, cheap managed switches usually offer a web UI and nothing else.
+- **Layer 3 in reserve**, which is also the rescue path when the hypervisor hosting OPNsense is the thing that failed.
+
+### The cheapest sensible build
+
+For anyone rebuilding this without the premium parts — full function, no luxury, a little comfort:
+
+| Part | Cost |
+|---|--:|
+| Used Fritz!Box 7490 (modem + home network during the transition) | ~ 25 € |
+| Managed 2.5G switch, 8 ports, with SFP+ | ~ 110 € |
+| VLAN-capable WiFi access point | ~ 50 € |
+| OPNsense on existing hardware | 0 € |
+| **Total** | **~ 185 €** |
+
+The access point can be skipped at first — as long as the Fritz!Box still routes the home network, its own WiFi does the job. It becomes necessary at the moment OPNsense takes over as the gateway, because the Fritz!Box then sits in front of the firewall and its WiFi with it.
+
+That delivers roughly 90 % of the documented design: real VLANs, real firewall zones, 2.5G to every node and a fast trunk. What is missing is network-as-code and the reserve capacity — worth the surcharge in this project because both are explicit learning goals, and not worth it if they are not.
+
+---
+
+## Alternative Paths (Without OPNsense)
+
+If a separate firewall is not on the table at all, these two paths keep the home network from collapsing under cluster traffic:
 
 ### Alternative A: The "Old Router" Trick (0 €)
 If you have an old, unused router (e.g., an old Fritz!Box or TP-Link) gathering dust in your basement, you can repurpose it as a dedicated Tier-2 gateway for your Kubernetes nodes.
@@ -167,6 +279,8 @@ If you have an old, unused router (e.g., an old Fritz!Box or TP-Link) gathering 
 * **The Trade-off:** You will be limited to 1 Gbit/s node-to-node speeds, but your primary network remains entirely safe.
 
 ### Alternative B: Cheap Unmanaged 2.5G Switch + Single Subnet (~ 30 € – 50 €)
+
+*This is the same option listed as the first row in the cost comparison above — fast and cheap, but it rules out the entire zone model.*
 You can purchase an affordable, unmanaged 2.5G switch (such as a budget YuanLey or MokerLink) to get high-speed networking on a budget.
 * **The Golden Rule:** You **must** keep all mini-PCs in the exact same IP subnet and completely avoid using VLANs or cross-subnet routing on the cluster nodes.
 * **Why it works:** Because all nodes reside within the same Layer 2 broadcast domain, the unmanaged switch forwards all packets directly from MAC address to MAC address. The cluster traffic never leaves the switch to hit your home router. You get full 2.5G speeds for a fraction of the cost, and your home router stays perfectly relaxed.

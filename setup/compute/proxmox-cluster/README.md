@@ -37,6 +37,16 @@ The MS-01 is built for exactly this role — a small workstation with server-gra
 
 The role split against the Tiny nodes is deliberate: this machine is a **pet, not cattle**. It is allowed to be unique, it holds state (family data, router config) and it is not part of any experiment. Everything that must survive tinkering lives here; everything that benefits from replication lives on the cluster.
 
+### What it was actually bought for
+
+Honesty about the purchase, because the feature list above makes it sound more necessary than it is:
+
+- **It was not bought to be a router.** OPNsense occupies 2 vCPU and a few gigabytes here. A 25 € Fritz!Box plus the switch would carry the household's routing without complaint — that part is pure convenience.
+- **It was bought because the cluster cannot hold data.** Three nodes with 256 GB SATA SSDs leave roughly 250 GB usable after replication, the Tiny chassis has no room for a 3.5" HDD, and 8–16 GB of RAM per node disappears quickly once Immich's machine learning and a few databases join the cluster components. A photo and media library simply does not fit.
+- **A used office desktop for ~100 € would have met that requirement.** The surcharge for this machine buys 10G networking, a silent 20 W idle box instead of a bulky one, modern transcoding, and a PCIe slot for a future GPU.
+
+The full comparison — including why a Raspberry Pi NAS is the expensive-looking-cheap option — is in the [compute overview](../README.md#the-honest-cheap-alternatives).
+
 > ⚠️ **GPU compatibility:** The PCIe slot takes **low-profile, max. dual-slot** cards only — and the MS-01 PSU is external (DC-in), so power-hungry GPUs are out. Plan for cards in the RTX A2000 / RTX 4000 SFF class.
 
 ---

@@ -16,7 +16,7 @@ Everything the [network design](../../design.md) describes on paper is implement
 - **It virtualizes well.** A modest VM (2 vCPU, 2–4 GB RAM) routes far more than this network will ever carry, and snapshots make risky rule changes reversible.
 - **Active, community-driven development** with a predictable release cadence and no feature paywall.
 
-Against the alternatives: [pfSense](../pfsense) is the closest relative and equally capable, but its community edition has drifted behind a more commercial product strategy. OpenWrt shines on small routers and weak hardware, but its firewall and VLAN management get awkward at this number of zones. RouterOS as a virtual machine would keep everything in the MikroTik ecosystem, but its learning curve is steep and its firewall ergonomics are unfriendly for a first serious zone model.
+Against the alternatives: [pfSense](../pfsense) is the closest relative and equally capable, but its community edition has drifted behind a more commercial product strategy. OpenWrt shines on small routers and weak hardware, but its firewall and VLAN management get awkward at this number of zones. And the CRS310 — which already runs RouterOS 7 and could route and filter by itself — is deliberately left as a switch, so that the network path and the security boundary can fail and be rebuilt independently; that reasoning is spelled out in the [router overview](../README.md#the-switch-is-already-a-router--so-why-add-another-one).
 
 ---
 
