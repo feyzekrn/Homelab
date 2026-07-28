@@ -11,7 +11,7 @@ The goal is to keep the exact installer versions documented while avoiding large
 ## Directory Layout
 
 ```text
-setup/compute/os/installations/
+setup/compute/k8s-cluster/os/installations/
 ├── ubuntu-server-24.04/
 │   └── README.md
 └── talos/

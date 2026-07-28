@@ -1,6 +1,6 @@
 # Operating System Strategy
 
-[← Back to Compute](../README.md)
+[← Back to k8s-cluster](../README.md)
 
 This section documents which operating system is used for which stage of the homelab and why. The decision is intentionally split into two phases: first a learning-heavy Linux phase, then a stricter bare-metal Kubernetes phase.
 

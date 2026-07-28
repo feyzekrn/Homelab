@@ -13,6 +13,7 @@ The boundary between the three areas inside:
 | [`./provisioning`](./provisioning) | How does a freshly installed machine become a consistent server? |
 | [`./kubernetes`](./kubernetes) | What makes the cluster exist and function? (bootstrap, CNI, MetalLB, GitOps, operators) |
 | [`./platform`](./platform) | Which shared services run on the cluster? (DNS, ingress, storage, databases, security, observability, ...) |
+| `./proxmox` 🔜 | Which guests run on the Proxmox host and how are they defined? (OPNsense, NAS, LXCs — planned once the first guests are built) |
 
 User-facing apps deliberately live outside this directory in [`../applications`](../applications) — they consume the platform, they are not part of it. Custom code lives in [`../services`](../services).
 

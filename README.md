@@ -1,4 +1,4 @@
-# Bare-Metal Kubernetes Homelab Cluster
+# All-in-One Homelab — Bare-Metal Kubernetes + Proxmox
 
 **A living documentation of building, breaking and rebuilding a self-hosted infrastructure — from raw hardware to production-grade services.**
 
@@ -6,7 +6,9 @@
 
 ## What is this?
 
-Three budget mini PCs. One managed switch. A Kubernetes cluster running on a shelf at home.
+Three budget mini PCs running bare-metal Kubernetes. One workstation running Proxmox. One managed switch. A complete homelab on a shelf at home.
+
+The setup is deliberately split into **two worlds**: the Kubernetes cluster is the experimentation field where things get deployed, broken and rebuilt — and the Proxmox side is the stable infrastructure that carries what the family relies on: NAS, router/firewall, DNS and the self-hosted apps. Each world can fail without taking the other one down.
 
 This repository documents everything: the hardware decisions, the network design, the software stack and every problem I ran into along the way. It is not a polished tutorial and it is not meant to be. Things will break here, get rebuilt differently and evolve over time. If you are looking for a clean, finished reference — this is not that. If you are interested in watching something grow from scratch and seeing the real reasoning behind every decision, stick around.
 
@@ -30,6 +32,8 @@ The cluster is the foundation, but it is not the goal. It is the environment whe
 
 **Kubernetes on bare metal** — not managed, not abstracted. Custom CNI configuration, distributed block storage with Longhorn, real multi-node failure scenarios and the debugging that comes with them. Databases and message brokers — PostgreSQL, MongoDB, Redis, RabbitMQ — self-hosted and actually maintained.
 
+**Virtualization with Proxmox** — the second world: a Minisforum MS-01 running Proxmox VE as the infrastructure anchor. OPNsense as router and firewall, a ZFS-backed NAS, DNS and the family-facing apps as VMs and LXC containers — plus reserve VMs that can join the Kubernetes cluster as extra nodes when needed.
+
 **Go** is the language I have never used professionally and want to change that. The plan is to learn it by building things that run on the cluster itself: custom Kubernetes operators and cloud-native microservices.
 
 **Python for hardware automation** — the nodes support Intel vPro, which is a hardware management interface that works independently of the operating system. The idea is to write tooling that talks to this layer: automated reboots, node isolation based on cluster health and power-triggered events from temperature or load metrics.
@@ -51,8 +55,11 @@ The top level is split into two big halves plus the things built on top: `setup/
 ```text
 Homelab/
 ├── setup/                # The physical world
-│   ├── compute/          #   Nodes: hardware decisions + the OS running on them
-│   │   └── os/           #     Ubuntu Server now, Talos later
+│   ├── compute/          #   The two compute worlds
+│   │   ├── k8s-cluster/      # 3× Lenovo Tiny: bare-metal Kubernetes nodes
+│   │   │   └── os/           #   Ubuntu Server now, Talos later
+│   │   └── proxmox-cluster/  # 1× Minisforum MS-01: Proxmox VE host
+│   │       └── os/           #   Proxmox VE + macOS USB workflow
 │   ├── networking/       #   Switch purchase, network design + MikroTik config
 │   │   └── mikrotik/     #     Switch docs + Terraform
 │   └── power-supply/     #   PSU, DC/DC conversion, fuse box
@@ -78,7 +85,9 @@ Hardware decisions and everything attached to them: each hardware area is a fold
 | Path | Status | Content |
 |---|---|---|
 | [`/setup`](/setup) | ✅ Active | Shopping list, costs and reasoning across all hardware |
-| [`/setup/compute`](/setup/compute) | ✅ Active | The nodes (CPU, RAM, storage) and the [OS running on them](/setup/compute/os) |
+| [`/setup/compute`](/setup/compute) | ✅ Active | The two compute worlds and their operating systems |
+| [`/setup/compute/k8s-cluster`](/setup/compute/k8s-cluster) | ✅ Active | The 3 Kubernetes nodes (CPU, RAM, storage) and the [OS running on them](/setup/compute/k8s-cluster/os) |
+| [`/setup/compute/proxmox-cluster`](/setup/compute/proxmox-cluster) | ✅ Active | The MS-01 Proxmox host and its [Proxmox VE installation](/setup/compute/proxmox-cluster/os) |
 | [`/setup/networking`](/setup/networking) | ✅ Active | Switch purchase, [network design](/setup/networking/design.md) and [MikroTik config + Terraform](/setup/networking/mikrotik) |
 | [`/setup/power-supply`](/setup/power-supply) | ✅ Active | PSU, DC/DC conversion and fuse box |
 
@@ -169,7 +178,7 @@ The rules behind this:
 
 ## The physical setup
 
-Three Lenovo Tiny nodes sit side by side in 3D-printed 1U mounts with custom Keystone slots. A matte-black 1U patch panel with 0.25m slim patch cables keeps the dual network lines — management and data — routed cleanly to the switches. The goal was a setup that looks deliberate, not like a pile of hardware on a desk.
+Three Lenovo Tiny nodes sit side by side in 3D-printed 1U mounts with custom Keystone slots. A matte-black 1U patch panel with 0.25m slim patch cables keeps the dual network lines — management and data — routed cleanly to the switches. Next to them, the Minisforum MS-01 runs the Proxmox world. The goal was a setup that looks deliberate, not like a pile of hardware on a desk.
 
 ---
 

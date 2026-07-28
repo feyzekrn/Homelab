@@ -40,7 +40,7 @@ Use the latest available 24.04 LTS point-release ISO when preparing the USB stic
 Place the downloaded ISO here locally:
 
 ```text
-setup/compute/os/installations/ubuntu-server-24.04/ubuntu-24.04.x-live-server-amd64.iso
+setup/compute/k8s-cluster/os/installations/ubuntu-server-24.04/ubuntu-24.04.x-live-server-amd64.iso
 ```
 
 The ISO itself should not be committed to Git.

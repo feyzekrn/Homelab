@@ -1,82 +1,38 @@
-# 🖥️ Compute — Nodes, CPU, RAM & Storage
+# 🖥️ Compute — Two Worlds, One Homelab
 
 [← Back to Setup Overview](../README.md)
 
-**In this folder:** [`./os`](./os) — the operating system strategy and installations for these nodes (Ubuntu Server now, Talos later).
+The compute layer is split into **two deliberately separate worlds**. The split is not about hardware — it is about availability classes and blast radius:
+
+- The **Kubernetes cluster** is the experimentation field. Things get deployed, broken and rebuilt here. Anything that must survive a node failure lives here, because only Kubernetes can heal dead hardware by rescheduling workloads.
+- The **Proxmox cluster** is the stable infrastructure world. It carries the services the family relies on — NAS, router/firewall, DNS, media and cloud apps. It heals process failures (systemd restarts, `onboot=1`), gets reproduced through code and is not touched by cluster experiments.
+
+Each world can die without taking the other one down: the k8s cluster can be wiped and rebuilt while the family still reaches their photos — and the Proxmox box can be in maintenance while every cluster app keeps its ingress.
 
 ---
 
-## The Platform: Lenovo ThinkCentre M910q Tiny × 3
+## The Two Worlds
 
-The foundation of the cluster. Three identical mini PCs, bought as **barebones on eBay** — meaning they came with a weak Pentium CPU and no RAM. That is completely fine because both get replaced anyway.
+| | [☸️ k8s-cluster](./k8s-cluster) | [🐙 proxmox-cluster](./proxmox-cluster) |
+|---|---|---|
+| **Hardware** | 3× Lenovo ThinkCentre M910q Tiny | 1× Minisforum MS-01 Workstation |
+| **Node names** | `node0`, `node1`, `node2` | `pve0` |
+| **OS** | [Ubuntu Server → Talos](./k8s-cluster/os) | [Proxmox VE](./proxmox-cluster/os) |
+| **Role** | Bare-metal Kubernetes: custom apps, HA workloads, learning | Hypervisor: NAS, OPNsense, DNS, family apps, VMs & LXCs |
+| **Availability class** | High availability through replication | Stable single node, self-healing processes |
+| **Naming philosophy** | Cattle — numbered, replaceable | Pet — unique, load-bearing |
+| **Failure handling** | Cluster reschedules workloads | systemd restarts, `onboot=1`, config as code |
 
-| Part                                     | Qty | Details                                                        |    What I paid | Where to find it                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
-| ---------------------------------------- | --: | -------------------------------------------------------------- | -------------: | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Lenovo ThinkCentre M910q Tiny (barebone) |   3 | Pentium, no RAM — both get replaced                            |    ~ 32 € each | [eBay](https://www.ebay.de/sch/i.html?_nkw=Lenovo+ThinkCentre+M910q+Tiny)                                                                                                                                                                                                                                                                                                                                                                                           |
-| Intel Core i5-6500T (CPU)                |   3 | Quad-core, 35 W TDP, fits the M910q                            |    ~ 16 € each | [eBay](https://www.ebay.de/sch/i.html?_nkw=Intel+i5-6500T)                                                                                                                                                                                                                                                                                                                                                                                                                                |
-| 8 GB DDR4 SODIMM                         |   1 | Gerenal compunting power                                       |    ~ 18 € each | [eBay](https://www.ebay.de/sch/i.html?_nkw=ddr4+8gb+sodimm&_sacat=0&_from=R40&_trksid=p2332490.m570.l1313)                                                                                                                                                                                                                                                                                                                                                                                |
-| 256 GB Samsung 850 Pro SATA SSD          |   2 | For OS, container images and Longhorn storage                  | ~ 29.90 € each | [Amazon](https://www.amazon.de/s?k=Samsung+870+256GB+SSD)                                                                                                                                                                                                                                                                                                                                                                                                                                 |
-| 2.5G M.2 A+E I226-V Ethernet Adapter     |   3 | Extra NIC via the M.2 WiFi slot                                |    ~ 18 € each | [Amazon](https://www.amazon.de/s?k=2.5g+m.2+ethernet+adapter)                                                                                                                                                                                                                                                                                                                                                                                                                             |
-| ARCTIC MX-4 (4g) Thermalpaste            |   1 | Needed for replacing the CPU ( you can get something cheaper ) |     ~ 5 € each | [Amazon](https://www.amazon.de/ARCTIC-MX-4-Gramm-Hochleistungs-W%C3%A4rmeleitpaste-W%C3%A4rmeleitf%C3%A4higkeit-niedrigem-thermischen-Widerstand/dp/B07L9BDY3T/ref=asc_df_B07L9BDY3T?mcid=25a894fac819387b9f1f191652defc8b&th=1&psc=1&tag=googshopde-21&linkCode=df0&hvadid=697141436093&hvpos=&hvnetw=g&hvrand=946606344809581304&hvpone=&hvptwo=&hvqmt=&hvdev=c&hvdvcmdl=&hvlocint=&hvlocphy=9042486&hvtargid=pla-600861085163&psc=1&hvocijid=946606344809581304-B07L9BDY3T-&hvexpln=0) |
-
-> **eBay tip:** Listings with a Pentium or Celeron and no RAM are usually the cheapest — and that is perfectly fine since you replace both anyway. Just check the condition of the chassis and power supply.
-
----
-
-### Why the Lenovo ThinkCentre M910q Tiny?
-
-The M910q Tiny hits a very specific sweet spot for a homelab cluster. The machine supports **Intel vPro**, which means the hardware is designed for managed business environments — better stability and longer driver support than typical consumer hardware.
-
-It takes **6th and 7th generation Intel CPUs** (Skylake / Kaby Lake), which means you can start cheap with an i5-6500T and later upgrade to an **i7-7700T** when you actually need the extra headroom. The i7-7700T is still a T-chip, so it stays within the same 35 W TDP — you get a meaningful CPU upgrade without any increase in power consumption or thermal load.
-
-The form factor is also a deliberate choice. These machines are silent, compact and realistic for 24/7 operation at home. Electricity cost and noise matter much more over a full year than raw peak performance.
-
-> ⚠️ **CPU compatibility:**
->
-> - The M910q Tiny supports **Intel 6th gen (Skylake) and 7th gen (Kaby Lake) only**. Newer or older generations are not compatible, regardless of socket appearance.
+Both worlds watch each other: a responder service on each side monitors the health of the other and can revive dead machines through Intel vPro/AMT — documented in the automation section once built.
 
 ---
 
-### Why the M.2 2.5G Network Adapter?
+## Sections
 
-The M910q Tiny has an M.2 slot that sits unused in the default configuration. Adding a 2.5G adapter there gives each node a second physical network interface. The plan is to use **both ports separately**: the onboard 1G port for management traffic — SSH, monitoring, fallback — and the 2.5G M.2 adapter for actual cluster traffic. Kubernetes inter-node communication, Longhorn replication, databases and message brokers all go over the fast 2.5G path. This way the two traffic types never compete for bandwidth on the same cable.
+### [☸️ k8s-cluster — The Bare-Metal Kubernetes Nodes](./k8s-cluster)
 
-If you use the exact same setup make sure to use the M.2 A+E 2.5GbE I226-V from Intel. They are some Euros more expensive but are more plug and play then the Realtek RTL8125B which are running quite OK on linux but are making issues on VMs or specially on Talos.
-I am going to plug those into the Wifi-modem slot since it is already empty, make sure to buy the 2230 version of the size not the 2260 (2260 is the bigger SSD slot). You can also buy one for a SSD NVME slot but for my Lenovo Tiny's those slots are on the backside not comfortable to reach.
+The three Lenovo M910q Tiny nodes: hardware decisions, CPU/RAM/storage choices, salvaged parts and the upgrade path — plus the [OS strategy](./k8s-cluster/os) (Ubuntu Server for the learning phase, Talos for the rebuild).
 
----
+### [🐙 proxmox-cluster — The Infrastructure Workstation](./proxmox-cluster)
 
-## Parts From Old Hardware — What You Can Reuse
-
-Before buying everything new it is worth checking what you already have at home. Old laptops and desktop PCs often contain usable components. I pulled parts from two different machines.
-
-| Part                            | Qty | Where it came from                | Approx. value |
-| ------------------------------- | --: | --------------------------------- | ------------: |
-| 16 GB DDR4 SODIMM               |   1 | Had a spare stick from another PC | ~ 25 € – 35 € |
-| 8 GB DDR4 SODIMM                |   1 | Pulled from a second unused PC    |  ~ 15 € –20 € |
-| 256 GB Samsung 850 Pro SATA SSD |   1 | Already had one                   | ~ 25 € – 30 € |
-
-If you have old laptops or desktop PCs sitting unused, check whether they contain DDR4 SODIMM RAM or a SATA SSD before spending money on new parts.
-
-> ⚠️ **RAM compatibility — check these three things before pulling anything:**
->
-> - It must be **SODIMM** form factor. Full-size DIMMs from desktop PCs will not fit.
-> - It must be **DDR4**. The M910q Tiny only works with DDR4. DDR3 SODIMMs will not fit physically and DDR3L will not work either.
-
----
-
-## Upgrade Path
-
-**Short term**
-
-- Upgrade Node 2 & 3 RAM to 16 GB when workloads actually demand it
-
-**Mid term**
-
-- Add a fourth and fifth node — the MikroTik still has 5 free 2.5G ports
-
-**Long term**
-
-- Upgrade CPUs to **Intel Core i7-7700T** for a meaningful performance jump without touching power draw. The i5-6500T runs 4 cores and 4 threads. The i7-7700T adds **Hyper-Threading**, giving 8 threads instead — which noticeably helps with parallel Kubernetes workloads. Both are T-chips with the same 35 W TDP.
-- Upgrade RAM up to **64 GB per node** (2× 32 GB DDR4 SODIMM). The M910q Tiny only has **2 RAM slots**, so the maximum is reached with two sticks. Keep this in mind from the start: if you run a single 16 GB stick now, leave the second slot free — that way you can add a second stick later without throwing anything away. Going to 64 GB means replacing both sticks entirely.
-- Swap SSDs for larger ones if storage becomes the bottleneck
+The Minisforum MS-01 running Proxmox VE (currently a single node): what is inside, why this machine, what it will host — and the [Proxmox VE installation](./proxmox-cluster/os) including the macOS bootable-USB workflow.

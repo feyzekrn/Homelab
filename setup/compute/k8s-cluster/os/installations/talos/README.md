@@ -40,7 +40,7 @@ The exact Talos version should be chosen when the rebuild starts, not during the
 Place the downloaded or generated Talos image here locally:
 
 ```text
-setup/compute/os/installations/talos/talos-metal-amd64-<version>.raw.xz
+setup/compute/k8s-cluster/os/installations/talos/talos-metal-amd64-<version>.raw.xz
 ```
 
 The image itself should not be committed to Git.

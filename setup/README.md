@@ -1,12 +1,12 @@
 # Setup & Hardware
 
-This section covers every hardware decision made for this cluster — what was bought, what was salvaged from old machines, what it costs to run and why each component was chosen. The goal is that anyone reading this can understand the full reasoning and replicate or adapt it for their own build.
+This section covers every hardware decision made for this homelab — what was bought, what was salvaged from old machines, what it costs to run and why each component was chosen. The goal is that anyone reading this can understand the full reasoning and replicate or adapt it for their own build.
 
 ---
 
 ## Plan Overview
 
-The cluster consists of three identical mini PCs connected through a single managed switch. Each node runs a dual-cable setup: one port for management traffic, one for cluster data. The hardware was chosen to be affordable enough to start immediately, efficient enough to run 24/7 at home without noise or significant electricity cost, and upgradeable enough to grow without replacing the base platform.
+The homelab consists of **two compute worlds** connected through a single managed switch: three identical mini PCs forming a bare-metal Kubernetes cluster, and one Minisforum MS-01 workstation running Proxmox VE as the stable infrastructure host (NAS, router/firewall, DNS, family apps). Each Kubernetes node runs a dual-cable setup: one port for management traffic, one for cluster data. The hardware was chosen to be affordable enough to start immediately, efficient enough to run 24/7 at home without noise or significant electricity cost, and upgradeable enough to grow without replacing the base platform.
 
 Everything reusable was taken from old hardware first. Only what was actually missing got purchased new or used from eBay.
 
@@ -14,9 +14,9 @@ Everything reusable was taken from old hardware first. Only what was actually mi
 
 ## Sections
 
-### [🖥️ Compute — Nodes, CPU, RAM & Storage](./compute)
+### [🖥️ Compute — The Two Worlds](./compute)
 
-The three Lenovo ThinkCentre M910q Tiny nodes that form the cluster. What was bought, what came from old hardware, why this platform was chosen and what the upgrade path looks like for CPU, RAM and storage. The [operating system running on these nodes](./compute/os) lives in the same folder — hardware and its OS in one place.
+The compute layer, split by availability class: the [k8s-cluster](./compute/k8s-cluster) — three Lenovo ThinkCentre M910q Tiny nodes with their [OS strategy](./compute/k8s-cluster/os) (Ubuntu Server now, Talos later) — and the [proxmox-cluster](./compute/proxmox-cluster) — the Minisforum MS-01 running [Proxmox VE](./compute/proxmox-cluster/os), currently a single node. Hardware and its OS live together in each folder.
 
 ### [🌐 Networking — Switches & Physical Topology](./networking)
 
@@ -32,6 +32,8 @@ How the cluster is powered cleanly and safely. Covers the power supply unit, DC/
 
 ✅ = purchased · ⬜ = still needed
 
+**k8s-cluster (3× Lenovo M910q Tiny)**
+
 | Status | Item                               | Qty |  Unit price |       Total |
 | :----: | ---------------------------------- | --: | ----------: | ----------: |
 |   ✅   | M910q Tiny barebone                |   3 |      ~ 32 € |      ~ 96 € |
@@ -43,7 +45,20 @@ How the cluster is powered cleanly and safely. Covers the power supply unit, DC/
 |   ✅   | 8 GB DDR4 SODIMM (Node 3)          |   1 |      ~ 15 € |      ~ 15 € |
 |   ✅   | ARCTIC MX-4 (4g) Thermal Paste     |   1 |       ~ 5 € |       ~ 5 € |
 |   ✅   | 2.5G M.2 network adapter           |   3 |      ~ 18 € |      ~ 54 € |
-|        |                                    |     |             |             |
+
+**proxmox-cluster (1× Minisforum MS-01)**
+
+| Status | Item                                     | Qty |  Unit price |       Total |
+| :----: | ---------------------------------------- | --: | ----------: | ----------: |
+|   ✅   | Minisforum MS-01 (i9-12900H) bundle      |   1 |     ~ 500 € |     ~ 500 € |
+|   ✅   | Corsair Vengeance 32 GB DDR5-4800 SODIMM |   1 |   in bundle |         0 € |
+|   ✅   | fanxiang S880 1 TB NVMe SSD              |   1 |   in bundle |         0 € |
+|   ✅   | WiFi module                              |   1 | from old PC |         0 € |
+
+**Networking & Power**
+
+| Status | Item                               | Qty |  Unit price |       Total |
+| :----: | ---------------------------------- | --: | ----------: | ----------: |
 |   ⬜   | MikroTik CRS310                    |   1 |     ~ 180 € |     ~ 180 € |
 |   ⬜   | Patch Panel 12-Port Cat.6a 10" 1HE |   1 |      ~ 35 € |      ~ 35 € |
 |   ⬜   | 0.25m Slim Patch Cables            |  10 |       ~ 2 € |      ~ 20 € |
@@ -51,17 +66,22 @@ How the cluster is powered cleanly and safely. Covers the power supply unit, DC/
 |   ⬜   | DC-DC Step-Down Converter 20A      |   1 |      ~ 25 € |      ~ 25 € |
 |   ⬜   | KFZ Fuse Box 6-Port                |   1 |       ~ 8 € |       ~ 8 € |
 |   ⬜   | Kill Switch + fuses + cable        |   1 |      ~ 20 € |      ~ 20 € |
-|        |                                    |     |             |             |
-|        |                                    |     |             |             |
-|        | **Total (all listed parts)**       |     |             | **~ 641 €** |
-|        | **Already spent** ✅               |     |             | **~ 278 €** |
-|        | **Still outstanding** ⬜           |     |             |  **~ 363€** |
+
+**Totals**
+
+| | |
+| --- | ----------: |
+| **Total (all listed parts)** | **~ 1141 €** |
+| **Already spent** ✅ | **~ 778 €** |
+| **Still outstanding** ⬜ | **~ 363 €** |
 
 ---
 
 ## 🔌 Running Costs (24/7, €0.35/kWh)
 
-**Ø Average** = realistic 24/7 mix, since the cluster is never permanently idle or at full load: ~50% idle (nights, low activity), ~45% default operation, ~5% full load.
+**Ø Average** = realistic 24/7 mix, since the machines are never permanently idle or at full load: ~50% idle (nights, low activity), ~45% default operation, ~5% full load.
+
+**\* MS-01 values are estimated** from typical i9-12900H MS-01 reports — not yet measured on the actual machine. They will be replaced with real measurements.
 
 | Device           | Scenario  |        Watt |       Per month |    Per year |
 | ---------------- | --------- | ----------: | --------------: | ----------: |
@@ -74,6 +94,11 @@ How the cluster is powered cleanly and safely. Covers the power supply unit, DC/
 | MikroTik CRS310  | Default   |      ~ 27 W |        ~ 6.90 € |      ~ 83 € |
 | MikroTik CRS310  | Full load |      ~ 34 W |        ~ 8.69 € |     ~ 104 € |
 | MikroTik CRS310  | Ø Average |      ~ 24 W |        ~ 6.22 € |      ~ 75 € |
+|                  |           |             |                 |             |
+| MS-01 (pve0) *   | Idle      |   ~ 20–28 W |   ~ 5.11–7.15 € |   ~ 61–86 € |
+| MS-01 (pve0) *   | Default   |   ~ 35–50 W |  ~ 8.94–12.78 € |  ~ 107–153 € |
+| MS-01 (pve0) *   | Full load |  ~ 90–120 W | ~ 23.00–30.66 € | ~ 276–368 € |
+| MS-01 (pve0) *   | Ø Average |   ~ 30–43 W |  ~ 7.67–10.99 € |  ~ 92–132 € |
 |                  |           |             |                 |             |
 |                  |           |             |                 |             |
 | 3 nodes + switch | Idle      |   ~ 36–45 W |  ~ 9.20–11.50 € | ~ 110–138 € |

@@ -10,7 +10,7 @@ The boundary of this directory is deliberately narrow. Everything here answers o
 
 That boundary is the reading order of the whole repository:
 
-1. [`../../setup`](../../setup): hardware and node operating systems (incl. [`../../setup/compute/os`](../../setup/compute/os))
+1. [`../../setup`](../../setup): hardware and node operating systems (incl. [`../../setup/compute/k8s-cluster/os`](../../setup/compute/k8s-cluster/os))
 2. [`../../setup/networking`](../../setup/networking): the physical network underneath everything
 3. [`../provisioning`](../provisioning): turning machines into consistent servers
 4. **this directory**: creating and operating the cluster
