@@ -64,9 +64,9 @@ It also forces a practical decision: some workloads are easier to run on Kuberne
 
 | Dependency | Purpose |
 |---|---|
-| [`../../infrastructure/platform/storage/longhorn`](../../infrastructure/platform/storage/longhorn) | Metadata or configuration volume if suitable |
+| [`longhorn`](../../infrastructure/platform/storage/longhorn) | Metadata or configuration volume if suitable |
 | External media storage | Large media files usually belong on dedicated storage |
-| [`../../infrastructure/platform/ingress/traefik`](../../infrastructure/platform/ingress/traefik) | Optional HTTP(S) exposure |
+| [`traefik`](../../infrastructure/platform/ingress/traefik) | Optional HTTP(S) exposure |
 | MetalLB / LAN networking | Stable LAN access to Plex |
 | Node labels / affinity | Pin Plex to a node with media access or hardware transcoding |
 

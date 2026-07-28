@@ -71,10 +71,10 @@ Publishing a service through the tunnel means trusting Cloudflare with that traf
 | Dependency | Purpose |
 |---|---|
 | Cloudflare account + domain | DNS zone and tunnel management |
-| [`../traefik`](../traefik) | Tunnel targets the ingress, one entrypoint for all apps |
-| [`../cert-manager`](../cert-manager) | Internal TLS between ingress and apps |
-| [`../../security/secret-store`](../../security/secret-store) | Tunnel credentials must not live in Git |
-| [`../../security/rights-management/keycloak`](../../security/rights-management/keycloak) | App-level login behind the tunnel |
+| [`traefik`](../traefik) | Tunnel targets the ingress, one entrypoint for all apps |
+| [`cert-manager`](../cert-manager) | Internal TLS between ingress and apps |
+| [`secret-store`](../../security/secret-store) | Tunnel credentials must not live in Git |
+| [`keycloak`](../../security/rights-management/keycloak) | App-level login behind the tunnel |
 
 ---
 

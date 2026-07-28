@@ -72,14 +72,14 @@ The phones keep using their native camera apps. The Immich app syncs the camera 
 
 | Dependency | Purpose |
 |---|---|
-| [`../../infrastructure/platform/databases/postgresql`](../../infrastructure/platform/databases/postgresql) | Metadata database (requires the pgvecto.rs/vector extension) |
-| [`../../infrastructure/platform/databases/redis`](../../infrastructure/platform/databases/redis) | Job queue and caching |
-| [`../../infrastructure/platform/storage/longhorn`](../../infrastructure/platform/storage/longhorn) | Photo/video storage volumes |
-| [`../../infrastructure/platform/ingress/traefik`](../../infrastructure/platform/ingress/traefik) | HTTP(S) ingress |
-| [`../../infrastructure/platform/ingress/cert-manager`](../../infrastructure/platform/ingress/cert-manager) | TLS certificates |
-| [`../../infrastructure/platform/ingress/cloudflare-tunnel`](../../infrastructure/platform/ingress/cloudflare-tunnel) | Mobile upload from outside the LAN |
-| [`../../infrastructure/platform/security/rights-management/keycloak`](../../infrastructure/platform/security/rights-management/keycloak) | Family SSO via OIDC |
-| [`../../infrastructure/platform/backup/velero`](../../infrastructure/platform/backup/velero) | Backups — irreplaceable data lives here |
+| [`postgresql`](../../infrastructure/platform/databases/postgresql) | Metadata database (requires the pgvecto.rs/vector extension) |
+| [`redis`](../../infrastructure/platform/databases/redis) | Job queue and caching |
+| [`longhorn`](../../infrastructure/platform/storage/longhorn) | Photo/video storage volumes |
+| [`traefik`](../../infrastructure/platform/ingress/traefik) | HTTP(S) ingress |
+| [`cert-manager`](../../infrastructure/platform/ingress/cert-manager) | TLS certificates |
+| [`cloudflare-tunnel`](../../infrastructure/platform/ingress/cloudflare-tunnel) | Mobile upload from outside the LAN |
+| [`keycloak`](../../infrastructure/platform/security/rights-management/keycloak) | Family SSO via OIDC |
+| [`velero`](../../infrastructure/platform/backup/velero) | Backups — irreplaceable data lives here |
 
 ---
 

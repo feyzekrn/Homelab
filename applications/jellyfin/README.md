@@ -58,13 +58,13 @@ The decision against Plex is not about quality. Plex has the more polished ecosy
 
 | Dependency | Purpose |
 |---|---|
-| [`../../infrastructure/platform/storage/longhorn`](../../infrastructure/platform/storage/longhorn) | Metadata and configuration volume |
+| [`longhorn`](../../infrastructure/platform/storage/longhorn) | Metadata and configuration volume |
 | External media storage | Large media files usually belong on dedicated storage |
-| [`../../infrastructure/platform/ingress/traefik`](../../infrastructure/platform/ingress/traefik) | HTTP(S) exposure |
-| [`../../infrastructure/kubernetes/metallb`](../../infrastructure/kubernetes/metallb) | Stable LAN access |
-| [`../../infrastructure/platform/ingress/cloudflare-tunnel`](../../infrastructure/platform/ingress/cloudflare-tunnel) | Optional remote access without port forwarding |
+| [`traefik`](../../infrastructure/platform/ingress/traefik) | HTTP(S) exposure |
+| [`metallb`](../../infrastructure/kubernetes/metallb) | Stable LAN access |
+| [`cloudflare-tunnel`](../../infrastructure/platform/ingress/cloudflare-tunnel) | Optional remote access without port forwarding |
 | Node labels / affinity | Pin Jellyfin to the node with media access or iGPU |
-| [`../../infrastructure/platform/security/rights-management/keycloak`](../../infrastructure/platform/security/rights-management/keycloak) | Optional SSO via plugin (LDAP/OIDC) |
+| [`keycloak`](../../infrastructure/platform/security/rights-management/keycloak) | Optional SSO via plugin (LDAP/OIDC) |
 
 ---
 

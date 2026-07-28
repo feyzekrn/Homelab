@@ -23,6 +23,10 @@ Installer images and version notes live under [`./installations`](./installation
 
 Large ISO files stay out of Git — the repository tracks version, source URL and checksum only.
 
+## After the Installation
+
+- [First Steps](./first-steps.md) — repositories, first update, reboot: the mandatory post-install routine
+
 ---
 
 ## Decision Log

@@ -85,7 +85,7 @@ MongoDB is currently `⚫ Inactive`. It should run when document modeling or Mon
 
 Evaluate MongoDB Community Kubernetes Operator before building the deployment by hand.
 
-See also: [`../../operators`](../../../kubernetes/operators)
+See also: [`operators`](../../../kubernetes/operators)
 
 ---
 

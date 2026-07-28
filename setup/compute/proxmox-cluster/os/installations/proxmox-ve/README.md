@@ -11,9 +11,9 @@ Proxmox VE is the hypervisor OS for the MS-01 (`pve0`). This page tracks the exa
 | Field | Value |
 |---|---|
 | OS | Proxmox VE |
-| Version | TBD *(check with `pveversion` on the host)* |
+| Version | 9.2 (web UI reports 9.2.2 after first update) |
 | Architecture | amd64 |
-| Filename | `proxmox-ve_x.y-z.iso` |
+| Filename | `proxmox-ve_9.2-x.iso` |
 | Source | <https://www.proxmox.com/en/downloads> |
 | Checksum source | shown next to the download link |
 | Downloaded | 2026-07 |

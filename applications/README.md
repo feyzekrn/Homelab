@@ -38,7 +38,7 @@ In companies, the same distinction matters: platform services enable product app
 
 ## Application Catalog
 
-Each row links up to three locations, following the [Component Layout Convention](../README.md#component-layout-convention): `docs` (local README), `chart` (planned Helm chart under [`../helm-charts`](../helm-charts)) and `config` (optional Terraform next to the docs). Chart and config directories are created when an application becomes active; documented alternatives get docs only.
+Each row links up to three locations, following the [Component Layout Convention](../README.md#component-layout-convention): `docs` (local README), `chart` (planned Helm chart under [`helm-charts`](../helm-charts)) and `config` (optional Terraform next to the docs). Chart and config directories are created when an application becomes active; documented alternatives get docs only.
 
 `Idle RAM` is a rough ballpark for the app itself — databases, caches and storage it depends on are counted in the [platform catalog](../infrastructure/platform/README.md). Note that the apps, not the infrastructure glue, are where the real memory goes: Immich's machine learning alone outweighs the entire ingress and DNS stack many times over.
 
@@ -69,7 +69,7 @@ Examples:
 - Home Assistant
 - Paperless-ngx
 
-Do not put custom code here. Custom APIs, workers and operators written for this homelab belong in [`../services`](../services).
+Do not put custom code here. Custom APIs, workers and operators written for this homelab belong in [`services`](../services).
 
 ---
 

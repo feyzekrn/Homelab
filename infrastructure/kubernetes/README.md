@@ -6,16 +6,16 @@ This directory documents the Kubernetes cluster itself — only the pieces that 
 
 Kubernetes is a platform for running containers across a group of machines. It schedules workloads, restarts failed containers, exposes services, mounts storage and provides a declarative API for infrastructure automation.
 
-The boundary of this directory is deliberately narrow. Everything here answers one question: **what does it take to have a working, manageable cluster?** The services that run *on* the cluster — DNS, ingress, databases, observability, backups — live in [`../platform`](../platform). The apps people actually use live in [`../applications`](../../applications).
+The boundary of this directory is deliberately narrow. Everything here answers one question: **what does it take to have a working, manageable cluster?** The services that run *on* the cluster — DNS, ingress, databases, observability, backups — live in [`platform`](../platform). The apps people actually use live in [`applications`](../../applications).
 
 That boundary is the reading order of the whole repository:
 
-1. [`../../setup`](../../setup): hardware and node operating systems (incl. [`../../setup/compute/k8s-cluster/os`](../../setup/compute/k8s-cluster/os))
-2. [`../../setup/networking`](../../setup/networking): the physical network underneath everything
-3. [`../provisioning`](../provisioning): turning machines into consistent servers
+1. [`setup`](../../setup): hardware and node operating systems (incl. [`k8s-cluster/os`](../../setup/compute/k8s-cluster/os))
+2. [`networking`](../../setup/networking): the physical network underneath everything
+3. [`provisioning`](../provisioning): turning machines into consistent servers
 4. **this directory**: creating and operating the cluster
-5. [`../platform`](../platform): shared services on the cluster
-6. [`../../applications`](../../applications) and [`../../services`](../../services): what the platform is for
+5. [`platform`](../platform): shared services on the cluster
+6. [`applications`](../../applications) and [`services`](../../services): what the platform is for
 
 ---
 
@@ -36,7 +36,7 @@ Status meanings:
 - `🟢 Active`: currently deployed or actively operated in the cluster
 - `⚫ Inactive`: documented, planned or available for future use, but not currently running
 
-Each row links up to three locations, following the [Component Layout Convention](../../README.md#component-layout-convention): `docs` (local README), `chart` (planned Helm chart under [`../../helm-charts`](../../helm-charts)) and `config` (optional Terraform next to the docs). Chart and config directories are created when a component becomes active.
+Each row links up to three locations, following the [Component Layout Convention](../../README.md#component-layout-convention): `docs` (local README), `chart` (planned Helm chart under [`helm-charts`](../../helm-charts)) and `config` (optional Terraform next to the docs). Chart and config directories are created when a component becomes active.
 
 `Idle RAM` is a rough per-instance ballpark at homelab scale; `/ node` values run on every node. The whole cluster core (Cilium, MetalLB, Flux) costs roughly 1 GB across three nodes — see the [platform catalog](../platform/README.md#how-to-read-this-catalog) for how to read the column.
 
@@ -71,10 +71,10 @@ infrastructure/kubernetes/
 Something belongs in this directory only when all of these are true:
 
 - the cluster cannot exist or cannot be operated without deciding on it
-- it is not a service that workloads consume (that is [`../platform`](../platform))
-- users never interact with it directly (that is [`../applications`](../../applications))
+- it is not a service that workloads consume (that is [`platform`](../platform))
+- users never interact with it directly (that is [`applications`](../../applications))
 
-Borderline example: CoreDNS as *cluster DNS* is installed by bootstrap and belongs to the cluster; CoreDNS as *LAN DNS for the homelab* is a platform service and is documented under [`../platform/dns`](../platform/dns).
+Borderline example: CoreDNS as *cluster DNS* is installed by bootstrap and belongs to the cluster; CoreDNS as *LAN DNS for the homelab* is a platform service and is documented under [`dns`](../platform/dns).
 
 ---
 

@@ -88,7 +88,7 @@ RabbitMQ is currently `⚫ Inactive`. Add it when a workload needs classic broke
 
 Evaluate RabbitMQ Cluster Kubernetes Operator for production-style deployment.
 
-See also: [`../../operators`](../../../kubernetes/operators)
+See also: [`operators`](../../../kubernetes/operators)
 
 ---
 

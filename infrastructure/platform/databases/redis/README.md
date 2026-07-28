@@ -92,7 +92,7 @@ Redis is currently `⚫ Inactive`. Add it when a real application needs caching,
 
 Evaluate the Redis Operator or Bitnami Redis chart before deciding on a long-term deployment pattern. For learning, start simple before adding clustering.
 
-See also: [`../../operators`](../../../kubernetes/operators)
+See also: [`operators`](../../../kubernetes/operators)
 
 ---
 

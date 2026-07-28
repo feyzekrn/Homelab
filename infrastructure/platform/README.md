@@ -4,7 +4,7 @@
 
 This directory is the catalog of shared services that run **on** the Kubernetes cluster and that other workloads depend on: DNS, ingress, TLS, storage, databases, messaging, security, observability, backups, registries, runtimes and API tooling.
 
-The cluster itself — bootstrap, CNI, LoadBalancer IPs, GitOps, operators — is documented separately in [`../kubernetes`](../kubernetes). User-facing apps such as Nextcloud or Jellyfin live in [`../../applications`](../../applications). This directory is the layer in between: not the engine, not the destination, but everything a real platform provides to its workloads.
+The cluster itself — bootstrap, CNI, LoadBalancer IPs, GitOps, operators — is documented separately in [`kubernetes`](../kubernetes). User-facing apps such as Nextcloud or Jellyfin live in [`applications`](../../applications). This directory is the layer in between: not the engine, not the destination, but everything a real platform provides to its workloads.
 
 A useful cluster is never just Kubernetes. Applications need names, routes, certificates, volumes, databases, queues, secrets, dashboards and restore paths. This directory is the map of those building blocks.
 
@@ -19,7 +19,7 @@ Each component page explains the concept first and the project decision second. 
 Every component row links up to three locations, following the [Component Layout Convention](../../README.md#component-layout-convention):
 
 - `docs`: the local README explaining what the component is and why it exists here
-- `chart`: the planned Helm chart location under [`../../helm-charts`](../../helm-charts), mirroring this tree
+- `chart`: the planned Helm chart location under [`helm-charts`](../../helm-charts), mirroring this tree
 - `config`: the optional Terraform directory next to the docs, for configuration IaC
 
 Chart and config directories are created when a component becomes active — most do not exist yet, by design.

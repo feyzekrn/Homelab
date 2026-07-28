@@ -46,7 +46,7 @@ In companies, DNS is one of the most critical shared services. Split-horizon DNS
 | Internal zones | How does `*.home.example.com` resolve on the LAN? | [`./coredns`](./coredns) or AdGuard Home DNS rewrites |
 | Filtering resolver | Which DNS server do household devices use? | [`./adguard-home`](./adguard-home) |
 | Filtering alternative | What is the classic homelab choice for this? | [`./pihole`](./pihole) |
-| DHCP handout | How do devices learn which resolver to use? | [`../../../setup/networking`](../../../setup/networking) (MikroTik DHCP) |
+| DHCP handout | How do devices learn which resolver to use? | [`networking`](../../../setup/networking) (MikroTik DHCP) |
 
 ---
 

@@ -90,7 +90,7 @@ Kafka is currently `⚫ Inactive`. Do not run it by default. Add it when stream 
 
 Evaluate Strimzi before deploying Kafka manually. Kafka has enough moving parts that an operator is usually the better learning path.
 
-See also: [`../../operators`](../../../kubernetes/operators)
+See also: [`operators`](../../../kubernetes/operators)
 
 ---
 

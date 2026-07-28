@@ -75,12 +75,12 @@ Rules:
 
 | Dependency | Purpose |
 |---|---|
-| [`../../../storage/longhorn`](../../../storage/longhorn) | Persistent volume for the vault database |
-| [`../../../databases/postgresql`](../../../databases/postgresql) | Optional; SQLite is fine at family scale |
-| [`../../../ingress/traefik`](../../../ingress/traefik) | HTTPS ingress — clients require valid TLS |
-| [`../../../ingress/cert-manager`](../../../ingress/cert-manager) | TLS certificates |
-| [`../../../ingress/cloudflare-tunnel`](../../../ingress/cloudflare-tunnel) | Sync away from home without port forwarding |
-| [`../../../backup/velero`](../../../backup/velero) | Backups of the most critical small dataset in the lab |
+| [`longhorn`](../../../storage/longhorn) | Persistent volume for the vault database |
+| [`postgresql`](../../../databases/postgresql) | Optional; SQLite is fine at family scale |
+| [`traefik`](../../../ingress/traefik) | HTTPS ingress — clients require valid TLS |
+| [`cert-manager`](../../../ingress/cert-manager) | TLS certificates |
+| [`cloudflare-tunnel`](../../../ingress/cloudflare-tunnel) | Sync away from home without port forwarding |
+| [`velero`](../../../backup/velero) | Backups of the most critical small dataset in the lab |
 
 ---
 

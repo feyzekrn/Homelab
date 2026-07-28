@@ -88,7 +88,7 @@ PostgreSQL is currently `⚫ Inactive`. It should become one of the first databa
 
 Evaluate CloudNativePG before hand-writing StatefulSets. Operators usually provide better backup, failover and maintenance workflows.
 
-See also: [`../../operators`](../../../kubernetes/operators)
+See also: [`operators`](../../../kubernetes/operators)
 
 ---
 

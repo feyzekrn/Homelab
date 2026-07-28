@@ -61,11 +61,11 @@ If it were deployed, the profile matches Nextcloud's:
 
 | Dependency | Purpose |
 |---|---|
-| [`../../infrastructure/platform/storage/longhorn`](../../infrastructure/platform/storage/longhorn) | Persistent data volumes |
-| [`../../infrastructure/platform/databases/postgresql`](../../infrastructure/platform/databases/postgresql) | Database (classic server only; oCIS needs none) |
-| [`../../infrastructure/platform/ingress/traefik`](../../infrastructure/platform/ingress/traefik) | HTTP(S) ingress |
-| [`../../infrastructure/platform/ingress/cert-manager`](../../infrastructure/platform/ingress/cert-manager) | TLS certificates |
-| [`../../infrastructure/platform/security/rights-management/keycloak`](../../infrastructure/platform/security/rights-management/keycloak) | External OIDC identity (oCIS integrates natively) |
+| [`longhorn`](../../infrastructure/platform/storage/longhorn) | Persistent data volumes |
+| [`postgresql`](../../infrastructure/platform/databases/postgresql) | Database (classic server only; oCIS needs none) |
+| [`traefik`](../../infrastructure/platform/ingress/traefik) | HTTP(S) ingress |
+| [`cert-manager`](../../infrastructure/platform/ingress/cert-manager) | TLS certificates |
+| [`keycloak`](../../infrastructure/platform/security/rights-management/keycloak) | External OIDC identity (oCIS integrates natively) |
 
 ---
 

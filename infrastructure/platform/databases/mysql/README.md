@@ -81,7 +81,7 @@ MySQL is currently `⚫ Inactive`. It should run when compatibility testing or M
 
 Evaluate the Oracle MySQL Operator or Percona Operator before deciding on a long-term deployment model.
 
-See also: [`../../operators`](../../../kubernetes/operators)
+See also: [`operators`](../../../kubernetes/operators)
 
 ---
 

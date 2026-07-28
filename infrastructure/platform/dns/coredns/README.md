@@ -61,10 +61,10 @@ Understanding CoreDNS also demystifies a whole class of cluster problems: failed
 
 | Dependency | Purpose |
 |---|---|
-| [`../../../kubernetes/metallb`](../../../kubernetes/metallb) | Stable LAN IP for a LAN-facing CoreDNS instance |
-| [`../../../kubernetes/cilium`](../../../kubernetes/cilium) | Pod networking for the cluster DNS role |
-| [`../../observability/metrics/prometheus`](../../observability/metrics/prometheus) | Scraping CoreDNS metrics |
-| [`../../../../setup/networking`](../../../../setup/networking) | DHCP/router integration so clients can reach the resolver |
+| [`metallb`](../../../kubernetes/metallb) | Stable LAN IP for a LAN-facing CoreDNS instance |
+| [`cilium`](../../../kubernetes/cilium) | Pod networking for the cluster DNS role |
+| [`prometheus`](../../observability/metrics/prometheus) | Scraping CoreDNS metrics |
+| [`networking`](../../../../setup/networking) | DHCP/router integration so clients can reach the resolver |
 
 ---
 

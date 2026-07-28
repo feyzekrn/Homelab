@@ -76,11 +76,11 @@ The honest summary: **with NetBird Cloud, Cloudflare Tunnel becomes largely redu
 
 | Dependency | Purpose |
 |---|---|
-| [`../../security/rights-management/keycloak`](../../security/rights-management/keycloak) | OIDC identity provider for peer login |
-| [`../traefik`](../traefik) | TLS-passthrough entry for the self-hosted reverse proxy |
-| [`../cloudflare-tunnel`](../cloudflare-tunnel) | The overlapping alternative for public exposure |
-| [`../../../kubernetes/metallb`](../../../kubernetes/metallb) | Stable IP if the management plane runs on the cluster |
-| [`../../storage/longhorn`](../../storage/longhorn) | Persistence for the management database |
+| [`keycloak`](../../security/rights-management/keycloak) | OIDC identity provider for peer login |
+| [`traefik`](../traefik) | TLS-passthrough entry for the self-hosted reverse proxy |
+| [`cloudflare-tunnel`](../cloudflare-tunnel) | The overlapping alternative for public exposure |
+| [`metallb`](../../../kubernetes/metallb) | Stable IP if the management plane runs on the cluster |
+| [`longhorn`](../../storage/longhorn) | Persistence for the management database |
 
 ---
 

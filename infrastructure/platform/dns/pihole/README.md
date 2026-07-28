@@ -57,9 +57,9 @@ The choice between the two is close. This project prefers AdGuard Home mainly fo
 
 | Dependency | Purpose |
 |---|---|
-| [`../../../kubernetes/metallb`](../../../kubernetes/metallb) | Stable LAN IP for DNS clients |
-| [`../../storage/longhorn`](../../storage/longhorn) | Persistence for config and query database |
-| [`../../../../setup/networking`](../../../../setup/networking) | DHCP must hand out the Pi-hole IP |
+| [`metallb`](../../../kubernetes/metallb) | Stable LAN IP for DNS clients |
+| [`longhorn`](../../storage/longhorn) | Persistence for config and query database |
+| [`networking`](../../../../setup/networking) | DHCP must hand out the Pi-hole IP |
 | Optional `unbound`/`cloudflared` | Encrypted or recursive upstream resolution |
 
 ---

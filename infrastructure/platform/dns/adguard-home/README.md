@@ -60,11 +60,11 @@ It is also a genuinely useful always-on service: the first component where the f
 
 | Dependency | Purpose |
 |---|---|
-| [`../../../kubernetes/metallb`](../../../kubernetes/metallb) | Stable LAN IP — DNS clients need a fixed address, not ingress |
-| [`../coredns`](../coredns) | Upstream for internal homelab zones |
-| [`../../storage/longhorn`](../../storage/longhorn) | Persistence for config, filters and query log |
-| [`../../../../setup/networking`](../../../../setup/networking) | MikroTik DHCP must hand out the AdGuard IP |
-| [`../../ingress/traefik`](../../ingress/traefik) | Optional HTTPS exposure of the admin UI only |
+| [`metallb`](../../../kubernetes/metallb) | Stable LAN IP — DNS clients need a fixed address, not ingress |
+| [`coredns`](../coredns) | Upstream for internal homelab zones |
+| [`longhorn`](../../storage/longhorn) | Persistence for config, filters and query log |
+| [`networking`](../../../../setup/networking) | MikroTik DHCP must hand out the AdGuard IP |
+| [`traefik`](../../ingress/traefik) | Optional HTTPS exposure of the admin UI only |
 
 ---
 

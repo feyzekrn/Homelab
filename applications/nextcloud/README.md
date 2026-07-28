@@ -79,14 +79,14 @@ It is useful both as a personal tool and as a practical test of whether the clus
 
 | Dependency | Purpose |
 |---|---|
-| [`../../infrastructure/platform/databases/postgresql`](../../infrastructure/platform/databases/postgresql) | Recommended primary database |
-| [`../../infrastructure/platform/databases/redis`](../../infrastructure/platform/databases/redis) | Cache and file locking |
-| [`../../infrastructure/platform/storage/longhorn`](../../infrastructure/platform/storage/longhorn) | Persistent application and data volumes |
-| [`../../infrastructure/platform/storage/minio`](../../infrastructure/platform/storage/minio) | Optional S3-compatible object storage |
-| [`../../infrastructure/platform/ingress/traefik`](../../infrastructure/platform/ingress/traefik) | HTTP(S) ingress |
-| [`../../infrastructure/platform/ingress/cert-manager`](../../infrastructure/platform/ingress/cert-manager) | TLS certificates |
-| [`../../infrastructure/platform/security/rights-management/keycloak`](../../infrastructure/platform/security/rights-management/keycloak) | Optional SSO/OIDC provider |
-| [`../../infrastructure/platform/backup/velero`](../../infrastructure/platform/backup/velero) | Backup and restore orchestration |
+| [`postgresql`](../../infrastructure/platform/databases/postgresql) | Recommended primary database |
+| [`redis`](../../infrastructure/platform/databases/redis) | Cache and file locking |
+| [`longhorn`](../../infrastructure/platform/storage/longhorn) | Persistent application and data volumes |
+| [`minio`](../../infrastructure/platform/storage/minio) | Optional S3-compatible object storage |
+| [`traefik`](../../infrastructure/platform/ingress/traefik) | HTTP(S) ingress |
+| [`cert-manager`](../../infrastructure/platform/ingress/cert-manager) | TLS certificates |
+| [`keycloak`](../../infrastructure/platform/security/rights-management/keycloak) | Optional SSO/OIDC provider |
+| [`velero`](../../infrastructure/platform/backup/velero) | Backup and restore orchestration |
 
 ---
 

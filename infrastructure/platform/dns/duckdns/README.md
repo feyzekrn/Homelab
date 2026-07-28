@@ -57,8 +57,8 @@ The planned shape here (and the typical homelab shape):
 | Dependency | Purpose |
 |---|---|
 | Kubernetes CronJob (or router feature) | Periodic IP update against the DuckDNS API |
-| [`../../ingress/cert-manager`](../../ingress/cert-manager) | TLS via the community DuckDNS DNS-01 webhook |
-| [`../../../../setup/networking`](../../../../setup/networking) | Router port forward, if direct exposure is intended |
+| [`cert-manager`](../../ingress/cert-manager) | TLS via the community DuckDNS DNS-01 webhook |
+| [`networking`](../../../../setup/networking) | Router port forward, if direct exposure is intended |
 
 ---
 

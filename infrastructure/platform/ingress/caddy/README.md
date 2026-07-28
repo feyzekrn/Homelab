@@ -68,7 +68,7 @@ If a reader deploys it (outside Kubernetes, its natural habitat):
 | Dependency | Purpose |
 |---|---|
 | A public DNS name | Required for automatic Let's Encrypt certificates |
-| [`../../dns/duckdns`](../../dns/duckdns) | Free hostname option for readers without a domain |
+| [`duckdns`](../../dns/duckdns) | Free hostname option for readers without a domain |
 | Port 80/443 reachability | HTTP-01/TLS-ALPN-01 challenges need inbound access |
 
 ---
