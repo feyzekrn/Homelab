@@ -38,20 +38,23 @@ In a company, artifact management is a core supply-chain concern. Registries are
 
 ## Components
 
-| Name | Path | Status | Idle RAM | Location | Recommendation | Role |
+| Name | Path | Status | Runs on | Idle RAM | Recommendation | Role |
 |---|---|---|---|---|---|---|
-| Harbor | [docs](./harbor) · [chart](../../../helm-charts/infrastructure/platform/registry/harbor) · [config](./harbor/terraform) | ⚫ Inactive | ~1–2 GB | Self-hosted | Homelab container registry | Full-featured container registry |
-| Nexus Repository | [docs](./artifact-repository) · [chart](../../../helm-charts/infrastructure/platform/registry/artifact-repository) · [config](./artifact-repository/terraform) | ⚫ Inactive | ~1.5–2.5 GB | Self-hosted | Homelab artifact standard | Docker, npm, NuGet and generic repositories |
-| JFrog Artifactory | [docs](./artifact-repository) | ⚫ Inactive | ~2–4 GB | Self-hosted or external | Business artifact standard | Enterprise-grade artifact management |
-| GitHub Packages | [docs](./artifact-repository) | ⚫ Inactive | — (external) | External | Optional hosted alternative | Hosted container and package registry |
+| Harbor | [docs](./harbor) · [chart](../../../helm-charts/infrastructure/platform/registry/harbor) · [config](./harbor/terraform) | ⚫ Inactive | k8s | ~1–2 GB | Chosen registry | Images, Helm charts and OCI artifacts, with scanning and RBAC |
+| Nexus Repository | [docs](./artifact-repository) · [chart](../../../helm-charts/infrastructure/platform/registry/artifact-repository) · [config](./artifact-repository/terraform) | ⚫ Inactive | k8s | ~1.5–2.5 GB | Planned later | npm, NuGet, Maven and generic packages — the formats Harbor cannot serve |
+| GitHub Packages | [docs](./github-packages) | ⚫ Inactive | — | — (external) | Not planned | The free bridge for private npm until Nexus exists |
+| Forgejo / Gitea | [docs](./forgejo) | ⚫ Inactive | — | ~0.3 GB | Documented alternative | Git server with a built-in multi-format package registry |
+| JFrog Artifactory | [docs](./artifact-repository) | ⚫ Inactive | — | ~2–4 GB | Documented alternative | The commercial counterpart to Nexus, common in companies |
+
+**The split that matters:** Harbor is an *OCI* registry — container images and Helm charts. It does not speak npm, Maven or NuGet. Anything in those formats needs a second system, which is why Nexus stays on the roadmap and GitHub Packages fills the gap in the meantime.
 
 ---
 
 ## Decision Guide
 
-Start with an external registry such as GitHub Container Registry if the project only has a few private images. Add a self-hosted registry when the homelab needs to learn supply-chain operations, image scanning, internal package feeds or fully local artifact hosting.
+This homelab goes straight to [Harbor](./harbor), because custom images appear early and image scanning, robot accounts and retention policies are exactly the supply-chain concepts worth learning. [Nexus](./artifact-repository) follows only when private npm packages become real — until then [GitHub Packages](./github-packages) covers that need without a second server.
 
-Do not install every registry product at once. Harbor and Nexus can overlap for Docker images. Choose the product based on whether the main goal is container-image operations or broad package management.
+Do not install every registry product at once. Harbor and Nexus overlap for Docker images; run Harbor for containers and let Nexus handle the language ecosystems when it arrives.
 
 ---
 

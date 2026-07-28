@@ -35,11 +35,13 @@ In a homelab, tracing is mainly useful after custom services exist. In companies
 
 ## Components
 
-| Name | Path | Idle RAM | Role |
-|---|---|---|---|
-| OpenTelemetry Collector | [docs](./opentelemetry-collector) · [chart](../../../../helm-charts/infrastructure/platform/observability/tracing/opentelemetry-collector) · [config](./opentelemetry-collector/terraform) | ~0.1–0.2 GB | Vendor-neutral telemetry pipeline |
-| Jaeger | [docs](./jaeger) · [chart](../../../../helm-charts/infrastructure/platform/observability/tracing/jaeger) · [config](./jaeger/terraform) | ~0.2–0.5 GB | Trace storage and UI |
-| Zipkin | [docs](./zipkin) · [chart](../../../../helm-charts/infrastructure/platform/observability/tracing/zipkin) · [config](./zipkin/terraform) | ~0.3–0.5 GB | Simpler tracing backend and compatibility target |
+| Name | Path | Status | Runs on | Idle RAM | Recommendation | Role |
+|---|---|---|---|---|---|---|
+| OpenTelemetry Collector | [docs](./opentelemetry-collector) · [chart](../../../../helm-charts/infrastructure/platform/observability/tracing/opentelemetry-collector) · [config](./opentelemetry-collector/terraform) | ⚫ Inactive | k8s | ~0.1–0.2 GB | Chosen pipeline | Vendor-neutral telemetry pipeline |
+| Jaeger | [docs](./jaeger) · [chart](../../../../helm-charts/infrastructure/platform/observability/tracing/jaeger) · [config](./jaeger/terraform) | ⚫ Inactive | k8s | ~0.2–0.5 GB | Chosen backend | Trace storage and UI |
+| Zipkin | [docs](./zipkin) | ⚫ Inactive | — | ~0.3–0.5 GB | Documented alternative | Simpler tracing backend and compatibility target |
+
+Both chosen components wait for the same trigger: **tracing needs something to trace.** They get deployed once the first custom services in [`services`](../../../../services) call each other — before that, there are no requests crossing service boundaries to follow.
 
 ---
 

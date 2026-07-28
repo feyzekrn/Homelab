@@ -92,7 +92,7 @@ It is also a good first choice because it does not require a large web UI to be 
 
 ## Runtime Status
 
-Flux is currently `⚫ Inactive`. It should become a core component once the cluster moves beyond manual learning steps.
+Flux is `⚫ Inactive` and **not planned**. [Argo CD](../argocd) is the chosen GitOps controller for this cluster — see the [GitOps overview](../README.md#recommendation) for the reasoning. This page stays because Flux is the other half of the standard GitOps comparison, and because that decision deserves a documented loser, not just a winner.
 
 ---
 

@@ -77,7 +77,7 @@ The short version: DuckDNS for free plumbing names and as the everything-for-zer
 
 ## Runtime Status
 
-DuckDNS is currently `⚫ Inactive`. It is part of the chosen access stack and becomes active together with the first externally reachable entry point (typically alongside NetBird).
+DuckDNS is `⚫ Inactive` and **dropped from the plan**. It answers the question "how does the outside world find my changing home IP" — and in this architecture nothing needs to: [Cloudflare Tunnel](../../ingress/cloudflare-tunnel) publishes apps through outbound connections, [NetBird](../../ingress/netbird) provides private access, and certificates are issued through the Cloudflare API on an own domain. The page stays because dynamic DNS remains the right answer for anyone exposing services directly.
 
 ---
 

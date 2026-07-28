@@ -36,10 +36,15 @@ In companies, storage is treated as a reliability layer. Teams care about perfor
 
 ## Components
 
-| Name | Path | Status | Idle RAM | Recommendation | Role |
-|---|---|---|---|---|---|
-| Longhorn | [docs](./longhorn) · [chart](../../../helm-charts/infrastructure/platform/storage/longhorn) · [config](./longhorn/terraform) | ⚫ Inactive | ~0.3–0.5 GB / node | Homelab standard | Distributed block storage |
-| MinIO | [docs](./minio) · [chart](../../../helm-charts/infrastructure/platform/storage/minio) · [config](./minio/terraform) | ⚫ Inactive | ~0.2–0.5 GB | Homelab S3 standard | S3-compatible object storage |
+| Name | Path | Status | Runs on | Idle RAM | Recommendation | Role |
+|---|---|---|---|---|---|---|
+| Longhorn | [docs](./longhorn) · [chart](../../../helm-charts/infrastructure/platform/storage/longhorn) · [config](./longhorn/terraform) | ⚫ Inactive | k8s | ~0.3–0.5 GB / node | Chosen block storage | Distributed block storage for the cluster |
+| ZFS + shares 🗄️ NAS | [docs](./zfs-nas) · [config](./zfs-nas/terraform) | ⚫ Inactive | lxc | ~0.1 GB service + ZFS ARC | Chosen NAS approach | ZFS pool on the host, published through a share container |
+| MinIO | [docs](./minio) · [config](./minio/terraform) | ⚫ Inactive | lxc | ~0.2–0.5 GB | Chosen S3 target | S3-compatible object storage for backups |
+| TrueNAS SCALE 🗄️ NAS | [docs](./truenas) | ⚫ Inactive | — | ~8–16 GB | Documented alternative | Full NAS operating system as a VM |
+| OpenMediaVault 🗄️ NAS | [docs](./openmediavault) | ⚫ Inactive | — | ~1–2 GB | Documented alternative | Lightweight NAS distribution on Debian |
+
+Rows marked 🗄️ **NAS** are competing answers to the same question — where the household's files live. The [ZFS-on-host approach](./zfs-nas) is chosen because it keeps datasets bind-mountable into the app containers instead of forcing every access through the network.
 
 ---
 

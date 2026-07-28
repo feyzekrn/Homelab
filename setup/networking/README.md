@@ -2,7 +2,9 @@
 
 [← Back to Setup Overview](../README.md)
 
-**In this folder:** [`./design.md`](./design.md) — VLANs, DHCP, firewall zones and addressing · [`./mikrotik`](./mikrotik) — switch configuration docs and Terraform.
+**In this folder:** [`design.md`](./design.md) — VLANs, DHCP, firewall zones and addressing · [`mikrotik`](./mikrotik) — switch configuration docs and Terraform · [`router`](./router) — the gateway layer: OPNsense as router and firewall.
+
+The network is built by two devices with a clean division of labour: the **switch** carries the VLANs and moves frames at wire speed, the **router** owns every VLAN gateway and enforces the trust zones. This page covers the physical side — switch, patch panel, cabling; the router has its [own folder](./router).
 
 ---
 
@@ -34,24 +36,57 @@ Forcing dense internal cluster traffic through a standard home router or ISP box
 1. **Severe Bufferbloat & Ping Spikes:** When storage solutions like Longhorn replicate gigabytes of data across nodes, your home router's CPU will instantly redline. This results in massive latency spikes, causing online games to lag, Netflix streams to buffer, and web pages to load quälend langsam.
 2. **NAT Table Overflows & Crashes:** Kubernetes pods, databases, and brokers spin up thousands of concurrent connections. Simple home routers have tiny session tables. When these overflow, the router freezes entirely, dropping the internet connection for everyone in the house.
 
-Even if you own a high-end Layer 3 router, pairing it with a cheap unmanaged switch is a mistake. Inter-VLAN traffic would still have to travel up to the router and back (**Hairpinning**), destroying your low latencies and bottlenecking your cluster. For Kubernetes, the Layer 3 routing **must** happen directly on the switch hardware where the nodes are physically connected.
+Even if you own a high-end Layer 3 router, pairing it with a cheap unmanaged switch is a mistake. Inter-VLAN traffic would still have to travel up to the router and back (**Hairpinning**), destroying your low latencies and bottlenecking your cluster.
+
+> **Update — how this reads with [OPNsense](./router) in the picture:**
+> The warning above is about *ISP boxes*, and it stays true: consumer routers must never carry cluster traffic. It is not an argument that Layer 3 has to live on the switch. A properly sized firewall on a 10G trunk routes between VLANs comfortably, and this project starts exactly there: **OPNsense routes everything, the switch stays pure Layer 2.** The switch's Layer 3 capability is held in reserve for two cases — if inter-VLAN traffic ever measurably strains the firewall, and as a rescue path that does not run through the hypervisor hosting the router.
+>
+> **Neither device replaces the other.** OPNsense is needed no matter how much the switch can route: a switch does stateless port filtering at best, while the trust model in [`design.md`](./design.md) — home may not reach management, IoT may reach nothing but the MQTT broker, an exposed app stays caged in its DMZ — requires a **stateful firewall**, and DHCP, DNS and the internet edge live there too. The switch's job is the opposite one: keeping bulk traffic away from the firewall. That matters more now that the MS-01 hangs on the same switch — NAS transfers, cluster backups and VM traffic all cross it, and every one of those flows that stays Layer 2 is a flow the router never has to touch. Firewall where decisions are needed, switch where only throughput is needed.
+
+### Port Plan — Current Target (3 nodes + MS-01)
+
+**The internet does not enter the switch.** The ISP router connects with a single cable directly into one of the MS-01's own 2.5G ports, where OPNsense terminates it as its WAN interface. Everything else — cluster data, management and all Proxmox guests — travels over one **SFP+ trunk** carrying every VLAN tagged.
+
+```text
+                         ISP router (internet)
+                                  │
+                                  │  ← WAN, straight into pve0
+                                  ▼
+[  node0   ]──  2.5G M.2  ──┐  [ pve0 (MS-01) ]
+[  node0   ]── 1G onboard ──┤          │
+[  node1   ]──  2.5G M.2  ──┤          │ 10G SFP+ trunk
+[  node1   ]── 1G onboard ──┼── MikroTik CRS310 ──┘   VLAN 10/20/30/40/50 tagged
+[  node2   ]──  2.5G M.2  ──┤
+[  node2   ]── 1G onboard ──┘
+```
+
+| Port type | Used | Free | By what |
+|---|--:|--:|---|
+| 2.5G RJ45 | 6 of 8 | 2 | 3× node data (2.5G M.2) + 3× node management (1G onboard) |
+| SFP+ | 1 of 2 | 1 | MS-01 trunk — the second stays free for a WiFi AP, a bonded second link or a future NAS |
+
+**Why the WAN bypasses the switch.** Untrusted internet traffic never becomes a VLAN on the switch at all, which removes an entire class of mistakes: no WAN VLAN to misconfigure, no chance of a tagging error putting the raw internet next to the cluster. The MS-01 has two spare RJ45 ports, so it costs nothing — and it frees a switch port as a side effect.
+
+The only price is a physical dependency: the cable from the ISP router has to reach the MS-01. Since both live next to each other, that is not a real constraint.
 
 ### Maxed Switch Setup
-All traffic — data and management — runs through the MikroTik. Works up to 4 nodes before all 8× 2.5G RJ45 ports are occupied. The two SFP+ ports remain free for a WiFi AP and Node 5 without dual cable,
-if a 5th Node is sat up then there is no room a NAS or future expansion.
 
+Without a management switch, the RJ45 ports run out at four nodes: 8 ports = 4× data + 4× management. Neither the MS-01 (SFP+) nor the internet uplink (direct into the MS-01) competes for them.
+
+```text
+[  node0   ]──  2.5G M.2  ──┐
+[  node0   ]── 1G onboard ──┤
+[  node1   ]──  2.5G M.2  ──┤
+[  node1   ]── 1G onboard ──┤
+[  node2   ]──  2.5G M.2  ──┤── MikroTik CRS310
+[  node2   ]── 1G onboard ──┤
+[  node3   ]──  2.5G M.2  ──┤
+[  node3   ]── 1G onboard ──┘
+[ pve0 (MS-01) ]── 10G SFP+ ──┤
+[     WiFi AP  ]── 10G SFP+ ──┘
 ```
-[  Node 1  ]──  2.5G M.2  ──┐
-[  Node 1  ]── 1G onboard ──┤
-[  Node 2  ]──  2.5G M.2  ──┤
-[  Node 2  ]── 1G onboard ──┤
-[  Node 3  ]──  2.5G M.2  ──┤
-[  Node 3  ]── 1G onboard ──┤── MikroTik CRS310 ──── Router (WAN only)
-[  Node 4  ]──  2.5G M.2  ──┤
-[  Node 4  ]── 1G onboard ──┤
-[  Node 5  ]──   10G SFP+ ──┤
-[   WiFi   ]──   10G SFP+ ──┘
-```
+
+Beyond four nodes, management traffic has to move to a dedicated switch — the setup described below.
 
 ---
  
@@ -90,29 +125,30 @@ Not purchased yet — planned for a later stage when a dedicated management netw
 The GS308 would serve as a simple 1G extension switch. Its only job is to connect the onboard 1G ports of the Tiny nodes, providing a dedicated path for SSH, monitoring and fallback traffic. No routing or management features needed from it — the MikroTik handles all of that. The GS308 just extends the number of available 1G ports.
 
 ### Maxed Dual Switch Setup
-Management traffic moves to a dedicated Netgear GS308, freeing all 8× 2.5G ports on the MikroTik for cluster data. Scales up to 7 nodes with a dedicated management path, plus Node 8 connecting via SFP+ for a faster dedicated link.
 
-```
-[       Node 1      ]──  2.5G M.2 ──┐
-[       Node 2      ]──  2.5G M.2 ──┤
-[       Node 3      ]──  2.5G M.2 ──┤
-[       Node 4      ]──  2.5G M.2 ──┤
-[       Node 5      ]──  2.5G M.2 ──┤
-[       Node 6      ]──  2.5G M.2 ──┤── MikroTik CRS310 ──── Router (WAN only)
-[       Node 7      ]──  2.5G M.2 ──┤
-[       Node 8      ]──  2.5G M.2 ──┤
-[   Netgear GS308   ]──  10G SFP+ ──┤
-[        WiFi       ]──  10G SFP+ ──┘
+Management traffic moves to a dedicated Netgear GS308, freeing all 8× 2.5G ports on the MikroTik for cluster data. With the MS-01 on SFP+ and the WAN going directly into it, this scales to **8 nodes** with a dedicated management path.
 
-[      Node 1     ]── 1G onboard ──┐
-[      Node 2     ]── 1G onboard ──┤
-[      Node 3     ]── 1G onboard ──┤
-[      Node 4     ]── 1G onboard ──┤── Netgear GS308 ──── MikroTik (VLAN trunk)
-[      Node 5     ]── 1G onboard ──┤
-[      Node 6     ]── 1G onboard ──┤
-[      Node 7     ]── 1G onboard ──┤
-[ MikroTik CRS310 ]── 1G onboard ──┘
+```text
+[      node0       ]──  2.5G M.2 ──┐
+[      node1       ]──  2.5G M.2 ──┤
+[      node2       ]──  2.5G M.2 ──┤
+[      node3       ]──  2.5G M.2 ──┤
+[      node4       ]──  2.5G M.2 ──┤── MikroTik CRS310
+[      node5       ]──  2.5G M.2 ──┤
+[      node6       ]──  2.5G M.2 ──┤
+[      node7       ]──  2.5G M.2 ──┤
+[  pve0 (MS-01)    ]──  10G SFP+ ──┤   trunk, all VLANs
+[   GS308 / WiFi   ]──  10G SFP+ ──┘
+
+[      node0       ]── 1G onboard ──┐
+[      node1       ]── 1G onboard ──┤
+[      node2       ]── 1G onboard ──┤
+[      node3       ]── 1G onboard ──┤── Netgear GS308 ──── MikroTik (VLAN 30 trunk)
+[   … up to node7  ]── 1G onboard ──┤
+[ MikroTik CRS310  ]── 1G onboard ──┘
 ```
+
+The MS-01 keeps its second SFP+ port free throughout — reserve for a bonded second trunk link (LACP) if storage traffic ever justifies it, or for a direct link to a future dedicated NAS.
 The 2.5G link handles all high-throughput Kubernetes and storage traffic directly on the MikroTik's L3 hardware. The 1G link handles management, SSH, monitoring and fallback via the cheap Netgear switch. 
 
 **Why this unmanaged switch does NOT cause Hairpinning:**
@@ -145,10 +181,14 @@ You can purchase an affordable, unmanaged 2.5G switch (such as a budget YuanLey 
 
 ## Upgrade Path
 
+**Short term**
+- Connect the MS-01 to the first SFP+ port as a tagged trunk (needs an SFP+ module or DAC cable — not included with either device)
+- Replace the ISP router with a [Fritz!Box 7490](./router#the-isp-router-problem) so the interim setup gets static routes and a configurable DNS handout
+
 **Mid term**
 - Purchase and set up the Netgear GS308 once the management network separation becomes relevant
 - Connect all onboard 1G ports to create the full dual-path setup
 
 **Long term**
-- Use the SFP+ ports on the MikroTik for a faster uplink or a dedicated NAS connection
-- Add a second switch when expanding beyond 7 nodes
+- Use the second SFP+ port for a bonded MS-01 link, a WiFi AP or a dedicated NAS connection
+- Add a second switch when expanding beyond 8 nodes

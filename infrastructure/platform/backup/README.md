@@ -58,9 +58,12 @@ In a homelab, backup work teaches what data is actually important and how painfu
 
 ## Components
 
-| Name | Path | Idle RAM | Role |
-|---|---|---|---|
-| Velero | [docs](./velero) · [chart](../../../helm-charts/infrastructure/platform/backup/velero) · [config](./velero/terraform) | ~0.1–0.2 GB | Kubernetes resource and volume backup orchestration |
+| Name | Path | Status | Runs on | Idle RAM | Recommendation | Role |
+|---|---|---|---|---|---|---|
+| Velero | [docs](./velero) · [chart](../../../helm-charts/infrastructure/platform/backup/velero) · [config](./velero/terraform) | ⚫ Inactive | k8s | ~0.1–0.2 GB | Chosen for the cluster | Kubernetes resource and volume backup orchestration |
+| Proxmox Backup Server | [docs](./proxmox-backup-server) · [config](./proxmox-backup-server/terraform) | ⚫ Inactive | vm | ~1–2 GB | Planned later | Deduplicating backup server for VMs and containers |
+
+**Two worlds, two backup tools — plus one that predates both.** Velero backs up Kubernetes resources and volumes to [MinIO](../storage/minio). [Proxmox Backup Server](./proxmox-backup-server) will back up the VMs and containers, once `vzdump` to the ZFS pool stops being sufficient. And underneath both, the irreplaceable datasets (photos, personal cloud) get their own `zfs send` copy off the machine — because a backup that lives on the box it protects only survives mistakes, not disasters.
 
 ---
 

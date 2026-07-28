@@ -42,13 +42,14 @@ In companies, these same ideas become formal controls: identity providers, least
 
 ## Components
 
-| Name | Path | Idle RAM | Role |
-|---|---|---|---|
-| Secret Store | [docs](./secret-store) · [chart](../../../helm-charts/infrastructure/platform/security/secret-store) · [config](./secret-store/terraform) | ~0.2–0.5 GB | Runtime secret access for applications and infrastructure integrations |
-| External Secrets Operator | [docs](./external-secrets) · [chart](../../../helm-charts/infrastructure/platform/security/external-secrets) · [config](./external-secrets/terraform) | ~50–100 MB | Syncs secrets from an external secret backend into Kubernetes |
-| Sealed Secrets | [docs](./sealed-secrets) · [chart](../../../helm-charts/infrastructure/platform/security/sealed-secrets) · [config](./sealed-secrets/terraform) | ~50 MB | Encrypts Kubernetes secrets safely for Git storage |
-| Rights Management | [docs](./rights-management) | — | Identity, permissions and application authorization model (category) |
-| Password Manager | [docs](./password-manager) | — | Human password vault for the family (category, chosen: Bitwarden/Vaultwarden) |
+| Name | Path | Status | Runs on | Idle RAM | Recommendation | Role |
+|---|---|---|---|---|---|---|
+| Secret Store (Vault) | [docs](./secret-store) · [chart](../../../helm-charts/infrastructure/platform/security/secret-store) · [config](./secret-store/terraform) | ⚫ Inactive | k8s | ~0.2–0.5 GB | Chosen secret store | Runtime secret access for applications and infrastructure integrations |
+| External Secrets Operator | [docs](./external-secrets) · [chart](../../../helm-charts/infrastructure/platform/security/external-secrets) · [config](./external-secrets/terraform) | ⚫ Inactive | k8s | ~50–100 MB | Chosen sync mechanism | Syncs secrets from the secret backend into Kubernetes |
+| Rights Management | [docs](./rights-management) | ⚫ Inactive | — | — | Category | Identity, permissions and application authorization model |
+| Password Manager | [docs](./password-manager) | ⚫ Inactive | — | — | Category | Human password vault for the family (chosen: Vaultwarden) |
+| OpenBao | [docs](./openbao) | ⚫ Inactive | — | ~0.2–0.5 GB | Documented alternative | Open-source fork of Vault, API-compatible |
+| Sealed Secrets | [docs](./sealed-secrets) | ⚫ Inactive | — | ~50 MB | Documented alternative | Encrypts Kubernetes secrets for Git storage, without a vault server |
 
 ---
 
@@ -56,9 +57,16 @@ In companies, these same ideas become formal controls: identity providers, least
 
 Start simple while learning. Do not commit plain Kubernetes `Secret` values to Git.
 
-For a long-term GitOps setup, prefer a real Secret Store as the source of truth. External Secrets Operator can sync selected values into Kubernetes, while Dapr can let applications read secrets at runtime through an abstraction layer.
+The chosen combination is **HashiCorp Vault as the source of truth plus External Secrets Operator as the bridge** into Kubernetes. Vault is the industry standard, which matters for a project that aims at transferable skills, and ESO turns "the secret lives in Vault" into an ordinary Kubernetes Secret without that value ever appearing in a repository. [OpenBao](./openbao) stays documented as the API-compatible escape hatch should Vault's BUSL licence ever become a problem.
 
-Use Sealed Secrets only when the goal is encrypted secrets directly in Git without running a separate vault system.
+[Sealed Secrets](./sealed-secrets) solves a smaller version of the same problem — encrypted values committed to Git, no server to run. It is documented but not planned: alongside Vault it would be a second, weaker secret path with no rotation, no audit trail and no dynamic credentials.
+
+Two vaults, two audiences — worth stating plainly because the names invite confusion:
+
+| | Who reads from it | Chosen |
+|---|---|---|
+| **Secret Store** | machines: pods, pipelines, operators | Vault (`k8s`) |
+| **Password Manager** | humans: the family in a browser or phone | Vaultwarden (`lxc`) |
 
 ---
 

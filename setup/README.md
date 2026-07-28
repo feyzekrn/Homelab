@@ -60,6 +60,7 @@ How the cluster is powered cleanly and safely. Covers the power supply unit, DC/
 | Status | Item                               | Qty |  Unit price |       Total |
 | :----: | ---------------------------------- | --: | ----------: | ----------: |
 |   ⬜   | MikroTik CRS310                    |   1 |     ~ 180 € |     ~ 180 € |
+|   ⬜   | SFP+ DAC cable (MS-01 ↔ switch)    |   1 |      ~ 25 € |      ~ 25 € |
 |   ⬜   | Patch Panel 12-Port Cat.6a 10" 1HE |   1 |      ~ 35 € |      ~ 35 € |
 |   ⬜   | 0.25m Slim Patch Cables            |  10 |       ~ 2 € |      ~ 20 € |
 |   ⬜   | PSU MEAN WELL MW UHP-500-24        |   1 |      ~ 75 € |      ~ 75 € |
@@ -71,9 +72,9 @@ How the cluster is powered cleanly and safely. Covers the power supply unit, DC/
 
 | | |
 | --- | ----------: |
-| **Total (all listed parts)** | **~ 1141 €** |
+| **Total (all listed parts)** | **~ 1166 €** |
 | **Already spent** ✅ | **~ 778 €** |
-| **Still outstanding** ⬜ | **~ 363 €** |
+| **Still outstanding** ⬜ | **~ 388 €** |
 
 ---
 

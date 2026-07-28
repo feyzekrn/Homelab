@@ -32,7 +32,7 @@ Both are needed.
 
 | Name | Path | Idle RAM | Category | Best fit | Recommendation |
 |---|---|---|---|---|---|
-| Keycloak | [docs](./keycloak) · [chart](../../../../helm-charts/infrastructure/platform/security/rights-management/keycloak) · [config](./keycloak/terraform) | ~0.7–1 GB | Identity provider | OIDC, OAuth2, SSO, realms, clients, users and roles | Best first choice |
+| Keycloak | [docs](./keycloak) · [chart](../../../../helm-charts/infrastructure/platform/security/rights-management/keycloak) · [config](./keycloak/terraform) | ~0.7–1 GB | Identity provider (`k8s`) | OIDC, OAuth2, SSO, realms, clients, users and roles | **Chosen** identity provider |
 | Authentik | [Authentik docs](https://docs.goauthentik.io/docs/) | ~0.5–1 GB | Identity provider | Modern self-hosted identity with strong UX | Good alternative |
 | Zitadel | [Zitadel docs](https://zitadel.com/docs) | ~0.3–0.5 GB | Identity provider | Cloud-native identity provider and OIDC/OAuth2 learning | Good alternative |
 | OpenFGA | [OpenFGA docs](https://openfga.dev/docs) | ~0.1 GB | Authorization | Relationship-based authorization for app permissions | Later if needed |

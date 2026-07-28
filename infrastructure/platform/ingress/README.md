@@ -31,50 +31,58 @@ External access is documented in the same place because it is the same decision 
 
 ## Components
 
-| Name | Path | Status | Idle RAM | Recommendation | Role |
-|---|---|---|---|---|---|
-| Traefik | [docs](./traefik) · [chart](../../../helm-charts/infrastructure/platform/ingress/traefik) · [config](./traefik/terraform) | ⚫ Inactive | ~100–150 MB | Chosen ingress controller | Ingress controller and reverse proxy |
-| cert-manager | [docs](./cert-manager) · [chart](../../../helm-charts/infrastructure/platform/ingress/cert-manager) · [config](./cert-manager/terraform) | ⚫ Inactive | ~50–100 MB | Strongly recommended | Automatic TLS certificate management |
-| Cloudflare Tunnel | [docs](./cloudflare-tunnel) · [chart](../../../helm-charts/infrastructure/platform/ingress/cloudflare-tunnel) · [config](./cloudflare-tunnel/terraform) | ⚫ Inactive | ~20–50 MB | Chosen for public app exposure | Publish selected apps externally without port forwarding |
-| NetBird | [docs](./netbird) · [chart](../../../helm-charts/infrastructure/platform/ingress/netbird) · [config](./netbird/terraform) | ⚫ Inactive | ~50 MB peer / ~0.5 GB self-hosted stack | Chosen for private/admin access | WireGuard mesh with built-in reverse proxy |
-| Caddy | [docs](./caddy) | ⚫ Inactive | ~30–50 MB | Documented alternative to Traefik | Reverse proxy with automatic HTTPS; best outside Kubernetes |
+| Name | Path | Status | Runs on | Idle RAM | Recommendation | Role |
+|---|---|---|---|---|---|---|
+| Traefik | [docs](./traefik) · [chart](../../../helm-charts/infrastructure/platform/ingress/traefik) · [config](./traefik/terraform) | ⚫ Inactive | k8s | ~100–150 MB | Chosen ingress controller for the cluster | Ingress controller and reverse proxy |
+| Caddy | [docs](./caddy) · [config](./caddy/terraform) | ⚫ Inactive | lxc | ~30–50 MB | Chosen reverse proxy for the Proxmox world | Static reverse proxy with automatic HTTPS |
+| cert-manager | [docs](./cert-manager) · [chart](../../../helm-charts/infrastructure/platform/ingress/cert-manager) · [config](./cert-manager/terraform) | ⚫ Inactive | k8s | ~50–100 MB | Chosen TLS automation (cluster side) | Automatic TLS certificate management |
+| Cloudflare Tunnel | [docs](./cloudflare-tunnel) · [chart](../../../helm-charts/infrastructure/platform/ingress/cloudflare-tunnel) · [config](./cloudflare-tunnel/terraform) | ⚫ Inactive | lxc + k8s | ~20–50 MB | Chosen for public app exposure | Publish selected apps externally without port forwarding |
+| NetBird | [docs](./netbird) · [config](./netbird/terraform) | ⚫ Inactive | lxc | ~50 MB peer | Chosen for private/admin access | WireGuard mesh, managed control plane |
+
+**Two proxies, two worlds — and that is the point.** Traefik serves the cluster, where it watches Kubernetes resources and configures itself. Caddy serves the Proxmox containers, where there is nothing to watch and a two-line config file per app is the honest answer. Running a second Traefik there would mean using a Kubernetes-shaped tool without Kubernetes.
+
+The reason for the split is a failure domain, not a preference: if the family apps were routed through the cluster's ingress, then rebuilding the cluster would take the photos and films offline with it. Each world keeps its own entrance, so either can be torn down without affecting the other.
+
+Certificates follow the same split: cert-manager issues for the cluster, Caddy obtains its own automatically. [AdGuard Home](../dns/adguard-home) points each hostname at the right entrance internally through split DNS.
 
 ---
 
 ## Recommended Choice
 
-Start with [Traefik](./traefik) or ingress-nginx. Both are valid.
-
-For this homelab, [Traefik](./traefik) is the first candidate because it is easy to operate, has a useful dashboard and fits smaller clusters well. ingress-nginx is the more conservative default when compatibility with common examples matters most.
+For the cluster, Traefik is chosen: easy to operate, a useful dashboard, CRD-based middleware and a good fit for small clusters. ingress-nginx would be the more conservative default when compatibility with copy-paste examples matters most.
 
 | Alternative | Notes |
 |---|---|
-| Traefik | Good UX, simple operations, strong homelab fit |
-| ingress-nginx | Very common, huge ecosystem, predictable behavior |
-| [Caddy](./caddy) | Simplest automatic-HTTPS proxy; shines outside Kubernetes |
+| Traefik | Good UX, simple operations, strong homelab fit — chosen for the cluster |
+| Caddy | Simplest automatic-HTTPS proxy; shines outside Kubernetes — chosen for the Proxmox side |
+| ingress-nginx | Very common, huge ecosystem, predictable behaviour |
 | HAProxy Ingress | Powerful, less beginner-friendly |
 | Gateway API controllers | Future-facing, worth evaluating later |
 
-Do not run multiple ingress controllers unless there is a clear reason and ingress class separation.
+Do not run multiple ingress controllers **inside the cluster** unless there is a clear reason and ingress class separation. Traefik and Caddy are not a violation of that rule: they live in different failure domains and never route the same hostname.
 
 ---
 
 ## Traffic Paths
 
 ```text
-LAN device                     Internet device
-    │                                │
-    │ DNS: AdGuard/CoreDNS           │ DNS: Cloudflare
-    ▼                                ▼
-MetalLB IP ──► Traefik ◄── cloudflared tunnel (outbound-only)
-                  │
-        TLS via cert-manager
-                  │
-                  ▼
-          Kubernetes Service
+                LAN device                          Internet device
+                     │                                     │
+        DNS: AdGuard (split DNS)                    DNS: Cloudflare
+                     │                                     │
+        ┌────────────┴────────────┐                        │
+        ▼                         ▼                        ▼
+   MetalLB IP                 Caddy (LXC)          Cloudflare edge
+        │                         │                        │
+     Traefik                      │              ┌─────────┴─────────┐
+        │                         │              ▼                   ▼
+  TLS: cert-manager      TLS: automatic     cloudflared (k8s)  cloudflared (lxc)
+        │                         │              │                   │
+        ▼                         ▼              ▼                   ▼
+ Kubernetes Service      Proxmox container    Traefik              Caddy
 ```
 
-Both paths converge on the same ingress controller, so routing rules, TLS and middleware are defined once.
+Internally, split DNS sends each hostname straight to its own entrance — no detour through the internet. Externally, Cloudflare routes each hostname into the connector of the world that owns the app. Both worlds keep their own TLS story, and neither depends on the other being up.
 
 ---
 

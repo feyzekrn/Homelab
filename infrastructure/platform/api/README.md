@@ -55,9 +55,11 @@ The API layer should not become a dumping ground for all business logic. It shou
 
 ## Components
 
-| Name | Path | Idle RAM | Role |
-|---|---|---|---|
-| GraphQL | [docs](./graphql) · [chart](../../../helm-charts/infrastructure/platform/api/graphql) · [config](./graphql/terraform) | ~0.1–0.3 GB | GraphQL gateway and schema design experiments |
+| Name | Path | Status | Runs on | Idle RAM | Recommendation | Role |
+|---|---|---|---|---|---|---|
+| GraphQL | [docs](./graphql) | ⚫ Inactive | — | ~0.1–0.3 GB | Documented | GraphQL gateway and schema design experiments |
+
+**Not platform infrastructure here.** Whether an API speaks REST or GraphQL is a decision per custom service, made in [`services`](../../../services) — not something the platform provides centrally. A standalone gateway would only earn its place once several services need to be aggregated behind one schema.
 
 ---
 

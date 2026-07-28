@@ -30,7 +30,7 @@ It is also just something I enjoy. Not everything needs a professional justifica
 
 The cluster is the foundation, but it is not the goal. It is the environment where everything else runs and gets learned. Here is what that looks like in practice:
 
-**Kubernetes on bare metal** — not managed, not abstracted. Custom CNI configuration, distributed block storage with Longhorn, real multi-node failure scenarios and the debugging that comes with them. Databases and message brokers — PostgreSQL, MongoDB, Redis, RabbitMQ — self-hosted and actually maintained.
+**Kubernetes on bare metal** — not managed, not abstracted. Custom CNI configuration, distributed block storage with Longhorn, real multi-node failure scenarios and the debugging that comes with them. Databases and message brokers — PostgreSQL, Redis, NATS — self-hosted and actually maintained.
 
 **Virtualization with Proxmox** — the second world: a Minisforum MS-01 running Proxmox VE as the infrastructure anchor. OPNsense as router and firewall, a ZFS-backed NAS, DNS and the family-facing apps as VMs and LXC containers — plus reserve VMs that can join the Kubernetes cluster as extra nodes when needed.
 
@@ -38,7 +38,7 @@ The cluster is the foundation, but it is not the goal. It is the environment whe
 
 **Python for hardware automation** — the nodes support Intel vPro, which is a hardware management interface that works independently of the operating system. The idea is to write tooling that talks to this layer: automated reboots, node isolation based on cluster health and power-triggered events from temperature or load metrics.
 
-**Infrastructure as Code across the whole stack** — Terraform for the MikroTik network configuration, Ansible for bare-metal provisioning, GitOps for application deployment. The goal is that nothing is configured manually without it being tracked somewhere.
+**Infrastructure as Code across the whole stack** — Terraform for the MikroTik and OPNsense network configuration, Ansible for bare-metal provisioning, GitHub Actions for CI and Argo CD for GitOps deployment. The goal is that nothing is configured manually without it being tracked somewhere.
 
 **Next.js and Flutter** — a proper admin dashboard with real-time data and a mobile companion app for cluster monitoring and hardware control from a phone.
 
@@ -60,8 +60,9 @@ Homelab/
 │   │   │   └── os/           #   Ubuntu Server now, Talos later
 │   │   └── proxmox-cluster/  # 1× Minisforum MS-01: Proxmox VE host
 │   │       └── os/           #   Proxmox VE + macOS USB workflow
-│   ├── networking/       #   Switch purchase, network design + MikroTik config
-│   │   └── mikrotik/     #     Switch docs + Terraform
+│   ├── networking/       #   Network design, switch and router
+│   │   ├── mikrotik/     #     Switch docs + Terraform
+│   │   └── router/       #     OPNsense (VM): gateways, firewall zones
 │   └── power-supply/     #   PSU, DC/DC conversion, fuse box
 ├── infrastructure/       # The software infrastructure
 │   ├── provisioning/     #   Ansible: machines become consistent servers
@@ -88,7 +89,7 @@ Hardware decisions and everything attached to them: each hardware area is a fold
 | [`/setup/compute`](/setup/compute) | ✅ Active | The two compute worlds and their operating systems |
 | [`/setup/compute/k8s-cluster`](/setup/compute/k8s-cluster) | ✅ Active | The 3 Kubernetes nodes (CPU, RAM, storage) and the [OS running on them](/setup/compute/k8s-cluster/os) |
 | [`/setup/compute/proxmox-cluster`](/setup/compute/proxmox-cluster) | ✅ Active | The MS-01 Proxmox host and its [Proxmox VE installation](/setup/compute/proxmox-cluster/os) |
-| [`/setup/networking`](/setup/networking) | ✅ Active | Switch purchase, [network design](/setup/networking/design.md) and [MikroTik config + Terraform](/setup/networking/mikrotik) |
+| [`/setup/networking`](/setup/networking) | ✅ Active | Switch purchase, [network design](/setup/networking/design.md), [MikroTik config](/setup/networking/mikrotik) and the [router/firewall](/setup/networking/router) |
 | [`/setup/power-supply`](/setup/power-supply) | ✅ Active | PSU, DC/DC conversion and fuse box |
 
 ### 🏗️ Infrastructure — The Software World
@@ -111,7 +112,7 @@ Everything code-defined between the hardware and the apps: provisioning, the clu
 
 | Path | Status | Content |
 |---|---|---|
-| [`/helm-charts`](/helm-charts) | 🔜 Planned | All Helm charts, mirroring the docs tree — kept at top level so they can be referenced by Argo CD/Flux or moved to a dedicated repo later |
+| [`/helm-charts`](/helm-charts) | 🔜 Planned | All Helm charts, mirroring the docs tree — kept at top level so they can be referenced by Argo CD or moved to a dedicated repo later |
 | [`/db-designs`](/db-designs) | 🔜 Planned | ER diagrams and design patterns for the hosted databases |
 
 ### ⚙️ Services
@@ -171,7 +172,7 @@ infrastructure/platform/dns/coredns/terraform/       # optional config IaC (zone
 The rules behind this:
 
 - **Docs explain, charts deploy.** A README never contains manifests; a chart directory never explains concepts.
-- **`helm-charts/` mirrors the docs tree 1:1.** Given any docs path, the chart path is derivable without lookup — which is what a one-click rebuild script or Argo CD/Flux needs. Keeping charts in one top-level tree also allows extracting them into a dedicated repo later without touching the documentation.
+- **`helm-charts/` mirrors the docs tree 1:1.** Given any docs path, the chart path is derivable without lookup — which is what a one-click rebuild script or Argo CD needs. Keeping charts in one top-level tree also allows extracting them into a dedicated repo later without touching the documentation.
 - **Terraform lives next to the component it configures** (`setup/networking/mikrotik/terraform/`, `infrastructure/platform/dns/coredns/terraform/`). Terraform here is configuration extras, not the deployment mechanism — so it stays close to the docs where a reader looks first. Automation checks one known location per component: if `terraform/` exists, apply it after the chart.
 
 ---

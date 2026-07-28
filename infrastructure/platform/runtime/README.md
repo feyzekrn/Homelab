@@ -37,10 +37,12 @@ In a homelab, runtime tools should come after plain Kubernetes services are unde
 
 ## Components
 
-| Name | Path | Idle RAM | Role |
-|---|---|---|---|
-| Dapr | [docs](./dapr) · [chart](../../../helm-charts/infrastructure/platform/runtime/dapr) · [config](./dapr/terraform) | ~0.3 GB + ~50 MB sidecar / app | Distributed application runtime |
-| Service Mesh | [docs](./service-mesh) · [chart](../../../helm-charts/infrastructure/platform/runtime/service-mesh) · [config](./service-mesh/terraform) | ~0.5–1 GB + sidecars | Traffic management and service-to-service security |
+| Name | Path | Status | Runs on | Idle RAM | Recommendation | Role |
+|---|---|---|---|---|---|---|
+| Dapr | [docs](./dapr) | ⚫ Inactive | — | ~0.3 GB + ~50 MB sidecar / app | Documented | Distributed application runtime |
+| Service Mesh | [docs](./service-mesh) | ⚫ Inactive | — | ~0.5–1 GB + sidecars | Documented | Traffic management and service-to-service security |
+
+**Neither is planned.** Both solve problems that appear with many services talking to each other — and this homelab has none yet. Dapr becomes interesting once several custom services share state and events; a service mesh becomes interesting once traffic policy or mTLS between services is a real requirement, and even then [Cilium](../../kubernetes/cilium) already provides a large part of it without sidecars. Documented so the decision is informed later, not adopted early.
 
 ---
 

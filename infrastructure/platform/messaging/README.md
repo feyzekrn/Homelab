@@ -57,11 +57,13 @@ For this homelab, good real use cases include hardware power events, dashboard l
 
 ## Messaging Catalog
 
-| Name | Path | Status | Idle RAM | Best fit |
+| Name | Path | Status | Runs on | Idle RAM | Best fit |
 |---|---|---|---|---|
-| NATS | [docs](./nats) · [chart](../../../helm-charts/infrastructure/platform/messaging/nats) · [config](./nats/terraform) | ⚫ Inactive | ~20–50 MB | Lightweight eventing, internal service communication, JetStream |
-| RabbitMQ | [docs](./rabbitmq) · [chart](../../../helm-charts/infrastructure/platform/messaging/rabbitmq) · [config](./rabbitmq/terraform) | ⚫ Inactive | ~0.15–0.3 GB | Queues, routing patterns, job processing, AMQP ecosystem |
-| Kafka | [docs](./kafka) · [chart](../../../helm-charts/infrastructure/platform/messaging/kafka) · [config](./kafka/terraform) | ⚫ Inactive | ~1–2 GB+ | Durable event logs, replayable streams, stream processing |
+| NATS | [docs](./nats) · [chart](../../../helm-charts/infrastructure/platform/messaging/nats) · [config](./nats/terraform) | ⚫ Inactive | k8s | ~20–50 MB | **Chosen** — lightweight eventing, service communication, JetStream, and the MQTT broker for IoT devices |
+| RabbitMQ | [docs](./rabbitmq) | ⚫ Inactive | — | ~0.15–0.3 GB | Documented — revisit when real job queues with retries appear |
+| Kafka | [docs](./kafka) | ⚫ Inactive | — | ~1–2 GB+ | Documented alternative — durable event logs, too heavy for this scale |
+
+**Why NATS covers both jobs.** It is the lightest broker of the three and speaks MQTT natively, which means the same component serves custom services *and* the smart-home sensors that [Home Assistant](../../../applications/home-assistant) talks to. That avoids running a separate Mosquitto alongside a separate event bus — one broker, two protocols, under 50 MB.
 
 ---
 

@@ -35,10 +35,12 @@ In a homelab, logging is useful once there are enough services that `kubectl log
 
 ## Components
 
-| Name | Path | Idle RAM | Role |
-|---|---|---|---|
-| Fluent Bit | [docs](./fluent-bit) · [chart](../../../../helm-charts/infrastructure/platform/observability/logging/fluent-bit) · [config](./fluent-bit/terraform) | ~30–50 MB / node | Lightweight log collector on nodes |
-| OpenSearch | [docs](./opensearch) · [chart](../../../../helm-charts/infrastructure/platform/observability/logging/opensearch) · [config](./opensearch/terraform) | ~2–4 GB+ | Search and analytics backend similar to Elasticsearch |
+| Name | Path | Status | Runs on | Idle RAM | Recommendation | Role |
+|---|---|---|---|---|---|---|
+| Fluent Bit | [docs](./fluent-bit) · [chart](../../../../helm-charts/infrastructure/platform/observability/logging/fluent-bit) · [config](./fluent-bit/terraform) | ⚫ Inactive | k8s | ~30–50 MB / node | Chosen collector | Lightweight log collector on nodes |
+| OpenSearch | [docs](./opensearch) | ⚫ Inactive | — | ~2–4 GB+ | Documented alternative | Search and analytics backend similar to Elasticsearch |
+
+**The backend is still open.** Fluent Bit collects; where the logs land is the second decision. OpenSearch is the powerful answer and the expensive one — 2–4 GB before a single log line matters. Loki is the lighter path and pairs naturally with the chosen Grafana, which makes it the likely choice when logging becomes real.
 
 ---
 

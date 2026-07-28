@@ -4,7 +4,7 @@
 
 Caddy is an open-source web server and reverse proxy written in Go, famous for one feature above all: **automatic HTTPS by default**. Point it at a domain and it obtains, renews and serves Let's Encrypt certificates without any configuration.
 
-In this homelab, Caddy is documented as the **main alternative** to [Traefik](../traefik). This project runs Kubernetes, and there Traefik's ingress integration, CRD middleware and ecosystem win. But for the very common homelab setup this repository's readers may start from — a single host with docker-compose — Caddy is arguably the better first reverse proxy, and any honest ingress comparison has to include it.
+In this homelab, Caddy is the **chosen reverse proxy for the Proxmox world**: it serves the family applications running as containers on [`pve0`](../../../../setup/compute/proxmox-cluster), while [Traefik](../traefik) serves the Kubernetes cluster. Two proxies, two failure domains — deliberately.
 
 The core idea: a `Caddyfile` with three lines replaces what takes dozens of lines in nginx, including TLS:
 
@@ -18,16 +18,16 @@ That is a complete, production-grade HTTPS reverse proxy definition. Certificate
 
 ---
 
-## Why It Is Documented
+## Why It Is Chosen For The Proxmox Side
 
-Caddy earns a page even though it is not the chosen tool:
+The family applications — Jellyfin, Immich, Nextcloud — run as containers on the Proxmox host, not on the cluster. They need an entrance, and it must not be the cluster's:
 
-- it is the simplest possible entry into reverse proxies and TLS — ideal for the pre-Kubernetes phase of a homelab
-- automatic HTTPS made an entire class of configuration errors disappear; understanding *why* teaches good TLS habits
-- comparing it against Traefik shows what Kubernetes-native actually means: watching cluster resources vs. editing a config file
-- it remains useful *around* the cluster: a Caddy on a small VPS is a clean TLS entry point, e.g. in front of a self-hosted [NetBird](../netbird) deployment or any service that lives outside Kubernetes
+- **Failure domains stay separate.** If those apps were routed through Traefik, rebuilding the cluster would take the family's photos and films offline with it. That is exactly the dependency this architecture avoids.
+- **There is nothing dynamic to discover.** Traefik's strength is watching Kubernetes resources and reconfiguring itself. On a Proxmox host there are no such resources — a second Traefik would be a Kubernetes-shaped tool used without Kubernetes, configured through files anyway, but with a far more complex syntax.
+- **Two lines per application, and TLS is solved.** No cert-manager, no issuers, no annotations — Caddy obtains and renews certificates by itself, which is the right amount of machinery for five static backends.
+- **The Caddyfile is versionable.** It is a small, readable file that belongs in Git next to everything else — the same "config as code" goal, without a control plane to run it.
 
-The reason it is not chosen here: Caddy's Kubernetes ingress controller is far less mature than Traefik or ingress-nginx. Inside the cluster, ingress rules should come from Kubernetes resources via GitOps, not from a hand-maintained Caddyfile.
+Inside the cluster the calculation reverses, and that is why it stays [Traefik](../traefik) there: ingress rules should come from Kubernetes resources via GitOps, not from a hand-maintained file. Caddy's own Kubernetes ingress controller is also markedly less mature.
 
 ---
 
@@ -53,23 +53,23 @@ The reason it is not chosen here: Caddy's Kubernetes ingress controller is far l
 
 ## Weaknesses
 
-- Kubernetes ingress controller exists but is immature compared to Traefik/ingress-nginx.
-- Config-file mindset fits GitOps-managed clusters poorly.
+- Kubernetes ingress controller exists but is immature compared to Traefik/ingress-nginx — which is why it stays out of the cluster.
+- Config-file mindset fits GitOps-managed clusters poorly (outside the cluster it is an advantage).
 - Plugins require rebuilding the binary with `xcaddy` (no dynamic loading).
 - Smaller middleware ecosystem than Traefik's CRD-based one.
-- In this repository's architecture there is simply no gap for it to fill inside the cluster.
+- No dynamic discovery: every new container has to be added to the Caddyfile by hand.
 
 ---
 
 ## Infrastructure Dependencies
 
-If a reader deploys it (outside Kubernetes, its natural habitat):
-
 | Dependency | Purpose |
 |---|---|
-| A public DNS name | Required for automatic Let's Encrypt certificates |
-| [`duckdns`](../../dns/duckdns) | Free hostname option for readers without a domain |
-| Port 80/443 reachability | HTTP-01/TLS-ALPN-01 challenges need inbound access |
+| An own domain | Required for automatic Let's Encrypt certificates |
+| DNS-01 challenge via the Cloudflare API | Issues certificates without any inbound port being open |
+| [`adguard-home`](../../dns/adguard-home) | Split DNS: resolves the app hostnames to this proxy internally |
+| [`cloudflare-tunnel`](../cloudflare-tunnel) | The external path — the tunnel connector delivers requests to Caddy locally |
+| [`zfs-nas`](../../storage/zfs-nas) | Not a proxy dependency, but the reason these apps live here: their datasets are bind-mounted locally |
 
 ---
 
@@ -77,27 +77,28 @@ If a reader deploys it (outside Kubernetes, its natural habitat):
 
 | System | Best at | Tradeoff |
 |---|---|---|
-| Caddy | Zero-config HTTPS, simplest possible setup | Weak Kubernetes-native story |
-| [Traefik](../traefik) | Kubernetes-native ingress, CRD middleware (chosen here) | More concepts to learn upfront |
+| Caddy | Zero-config HTTPS, simplest possible setup (chosen outside the cluster) | Weak Kubernetes-native story |
+| [Traefik](../traefik) | Kubernetes-native ingress, CRD middleware (chosen inside the cluster) | More concepts to learn upfront |
 | ingress-nginx | Predictable Kubernetes standard | Manual TLS wiring via cert-manager |
+| Nginx Proxy Manager | Click-together UI, popular in homelabs | GUI state instead of a file in Git |
 | nginx (plain) | Ubiquitous, infinitely documented | Verbose config, manual certificates |
 
-The short version: on a docker host, start with Caddy. On Kubernetes, use Traefik with [cert-manager](../cert-manager) — which together provide exactly the automatic-HTTPS experience Caddy pioneered, but driven by cluster resources.
+The short version: on a container host, Caddy. On Kubernetes, Traefik with [cert-manager](../cert-manager) — which together provide exactly the automatic-HTTPS experience Caddy pioneered, but driven by cluster resources.
 
 ---
 
 ## Runtime Status
 
-Caddy is `⚫ Inactive` and not planned for the cluster. [Traefik](../traefik) is the chosen ingress controller; this page exists for comparison and as the recommended entry point for readers who are not on Kubernetes yet.
+`⚫ Inactive` — planned as a container on [`pve0`](../../../../setup/compute/proxmox-cluster), alongside the family applications it will serve. It is one of the first services to deploy there, because it is what makes those apps reachable under real hostnames.
 
 ---
 
-## Future Deployment Link
+## Configuration Link
 
-If it were deployed (e.g. as a VPS entry point), configuration would follow the component convention:
+The Caddyfile and any supporting configuration live next to this page:
 
 ```text
-../../../../helm-charts/infrastructure/platform/ingress/caddy/
+infrastructure/platform/ingress/caddy/terraform/
 ```
 
 ---

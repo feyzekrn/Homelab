@@ -69,7 +69,7 @@ Argo CD can also be useful when comparing GitOps models. Flux teaches the Kubern
 
 ## Runtime Status
 
-Argo CD is currently `⚫ Inactive`. It should be evaluated later if a visual GitOps application dashboard becomes useful. Running both Argo CD and Flux can be useful for learning, but creates duplicate responsibility if not clearly separated.
+Argo CD is `⚫ Inactive` and is the **chosen GitOps controller**. It becomes active once the cluster runs and the first components move from manual installation into Git. The visual application tree and live-versus-declared diffs are the deciding argument while learning GitOps; [Flux](../flux) stays documented as the alternative and is deliberately not run alongside it.
 
 ---
 

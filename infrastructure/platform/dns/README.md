@@ -52,12 +52,16 @@ In companies, DNS is one of the most critical shared services. Split-horizon DNS
 
 ## Component Catalog
 
-| Name | Path | Status | Idle RAM | Recommendation | Purpose |
-|---|---|---|---|---|---|
-| CoreDNS | [docs](./coredns) · [chart](../../../helm-charts/infrastructure/platform/dns/coredns) · [config](./coredns/terraform) | ⚫ Inactive | ~30–50 MB | Chosen: cluster DNS and internal zones | Cluster DNS and authoritative internal DNS |
-| AdGuard Home | [docs](./adguard-home) · [chart](../../../helm-charts/infrastructure/platform/dns/adguard-home) · [config](./adguard-home/terraform) | ⚫ Inactive | ~50–100 MB | Chosen LAN resolver for this homelab | Network-wide filtering and forwarding resolver |
-| Pi-hole | [docs](./pihole) | ⚫ Inactive | ~50–100 MB | Documented alternative | Classic network-wide ad-blocking resolver |
-| DuckDNS | [docs](./duckdns) · [chart](../../../helm-charts/infrastructure/platform/dns/duckdns) · [config](./duckdns/terraform) | ⚫ Inactive | ≈ 0 (CronJob) | Chosen: free public name for entry points | Dynamic public DNS for a changing home IP |
+| Name | Path | Status | Runs on | Idle RAM | Recommendation | Purpose |
+|---|---|---|---|---|---|---|
+| AdGuard Home | [docs](./adguard-home) · [chart](../../../helm-charts/infrastructure/platform/dns/adguard-home) · [config](./adguard-home/terraform) | ⚫ Inactive | lxc + k8s | ~50–100 MB | Chosen LAN resolver | Network-wide filtering and forwarding resolver |
+| CoreDNS | [docs](./coredns) · [chart](../../../helm-charts/infrastructure/platform/dns/coredns) · [config](./coredns/terraform) | ⚫ Inactive | k8s | ~30–50 MB | Chosen: cluster DNS and internal zones | Cluster DNS and authoritative internal DNS |
+| Pi-hole | [docs](./pihole) | ⚫ Inactive | — | ~50–100 MB | Documented alternative | Classic network-wide ad-blocking resolver |
+| DuckDNS | [docs](./duckdns) | ⚫ Inactive | — | ≈ 0 (CronJob) | Dropped from the plan | Dynamic public DNS for a changing home IP |
+
+**Two AdGuard instances, one configuration.** The primary runs as a container on the Proxmox host — the stable world, so the household keeps DNS even while the cluster is being rebuilt. A second instance on the cluster provides the redundancy that DHCP hands out as a secondary resolver. They are kept identical by `adguardhome-sync`, so only the primary is ever configured by hand.
+
+**Why DuckDNS was dropped:** it answers "how does the internet find my changing home IP" — a question that disappears once [Cloudflare Tunnel](../ingress/cloudflare-tunnel) publishes apps through outbound connections and [NetBird](../ingress/netbird) handles private access. Nothing needs to know the home IP anymore, and certificates come from the own domain via the Cloudflare API.
 
 ---
 

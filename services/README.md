@@ -82,18 +82,20 @@ services/
 ├── node-control-api/
 ├── cluster-admin-api/
 ├── dashboard-bff/
+├── responder/
 └── operators/
 ```
 
-Potential future services:
+Potential future services (`Runs on`: `k8s` = cluster workload, `pve` = guest on the Proxmox host):
 
-| Service | Purpose |
-|---|---|
-| `hardware-event-api` | Publishes hardware and node events to the messaging layer |
-| `node-control-api` | Controls power, reboot and maintenance actions through Intel vPro or similar hardware APIs |
-| `cluster-admin-api` | Provides backend operations for the admin dashboard |
-| `dashboard-bff` | Backend-for-frontend for web or mobile dashboards |
-| `operators/*` | Custom Kubernetes operators built for this homelab |
+| Service | Runs on | Purpose |
+|---|---|---|
+| `cluster-admin-api` | k8s | Provides backend operations for the admin dashboard |
+| `dashboard-bff` | k8s | Backend-for-frontend for web or mobile dashboards |
+| `hardware-event-api` | k8s | Publishes hardware and node events to the messaging layer |
+| `node-control-api` | k8s | Controls power, reboot and maintenance actions through Intel vPro or similar hardware APIs |
+| `operators/*` | k8s | Custom Kubernetes operators built for this homelab |
+| `responder` | lxc + k8s | Cross-watchdog: the LXC instance monitors the k8s nodes, the cluster instance monitors the Proxmox host — each can alert and revive the other world via Intel vPro. Neither world watches itself. |
 
 ---
 

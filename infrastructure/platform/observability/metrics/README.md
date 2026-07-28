@@ -33,10 +33,12 @@ In a homelab, metrics help you learn how workloads behave under load and how muc
 
 ## Components
 
-| Name | Path | Idle RAM | Role |
-|---|---|---|---|
-| Prometheus | [docs](./prometheus) · [chart](../../../../helm-charts/infrastructure/platform/observability/metrics/prometheus) · [config](./prometheus/terraform) | ~0.5–1 GB+ | Metrics collection and alerting |
-| Grafana | [docs](./grafana) · [chart](../../../../helm-charts/infrastructure/platform/observability/metrics/grafana) · [config](./grafana/terraform) | ~0.15–0.3 GB | Dashboards and visualization |
+| Name | Path | Status | Runs on | Idle RAM | Recommendation | Role |
+|---|---|---|---|---|---|---|
+| Prometheus | [docs](./prometheus) · [chart](../../../../helm-charts/infrastructure/platform/observability/metrics/prometheus) · [config](./prometheus/terraform) | ⚫ Inactive | k8s | ~0.5–1 GB+ | Chosen | Metrics collection and alerting |
+| Grafana | [docs](./grafana) · [chart](../../../../helm-charts/infrastructure/platform/observability/metrics/grafana) · [config](./grafana/terraform) | ⚫ Inactive | k8s | ~0.15–0.3 GB | Chosen | Dashboards and visualization |
+
+Both run on the cluster but watch **both worlds**: Prometheus scrapes the Proxmox host through `pve-exporter` and the switch through its API, so a single Grafana shows cluster, hypervisor and network side by side.
 
 ---
 

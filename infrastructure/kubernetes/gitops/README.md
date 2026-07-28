@@ -84,18 +84,35 @@ This project should use GitOps for platform services such as Cilium, MetalLB, Tr
 
 ## Components
 
-| Name | Path | Idle RAM | Role |
-|---|---|---|---|
-| Flux | [docs](./flux) · [chart](../../../helm-charts/infrastructure/kubernetes/gitops/flux) · [config](./flux/terraform) | ~200–300 MB | Kubernetes-native GitOps controller with strong HelmRelease and Kustomize support |
-| Argo CD | [docs](./argocd) · [chart](../../../helm-charts/infrastructure/kubernetes/gitops/argocd) · [config](./argocd/terraform) | ~0.5–1 GB | UI-focused GitOps platform with application views, diffs and sync controls |
+| Name | Path | Status | Idle RAM | Recommendation | Role |
+|---|---|---|---|---|---|
+| Argo CD | [docs](./argocd) · [chart](../../../helm-charts/infrastructure/kubernetes/gitops/argocd) · [config](./argocd/terraform) | ⚫ Inactive | ~0.5–1 GB | Chosen GitOps controller | UI-focused GitOps platform with application views, diffs and sync controls |
+| Argo Rollouts | [docs](./argo-rollouts) · [chart](../../../helm-charts/infrastructure/kubernetes/gitops/argo-rollouts) · [config](./argo-rollouts/terraform) | ⚫ Inactive | ~100–200 MB | Planned later | Blue/green and canary deployments with metric-gated rollback |
+| Flux | [docs](./flux) | ⚫ Inactive | ~200–300 MB | Documented alternative | Kubernetes-native GitOps controller with strong HelmRelease and Kustomize support |
 
 ---
 
 ## Recommendation
 
-Start with Flux if the goal is a clean Git-driven platform with HelmRelease resources. Evaluate Argo CD later if a strong visual application dashboard becomes important.
+**Argo CD is chosen.** Both controllers implement the same principle correctly, so the deciding factor is what each makes visible. Argo CD shows the application tree, the live-versus-declared diff and the sync status of every resource in a UI — which is precisely the feedback that turns GitOps from an abstract idea into something observable while learning it. Flux is leaner and more Kubernetes-native in style, but its state lives in CRDs and controller logs, which is a harder place to learn from.
 
-Do not run both unless there is a clear split of responsibility.
+The second reason is trajectory: Argo CD brings [Argo Rollouts](./argo-rollouts) for progressive delivery in the same family, so blue/green and canary releases later are an addition rather than a new tool.
+
+Do not run both. [Flux](./flux) stays documented as the alternative, not as a parallel deployment.
+
+---
+
+## Where CI Ends And GitOps Begins
+
+For this project the boundary is fixed: **GitHub Actions builds, Argo CD deploys.**
+
+```text
+git push → GitHub Actions             → Harbor      → Argo CD        → cluster
+           test, build, scan, push,     the image     detects the
+           bump the image tag in Git    is stored     commit and syncs
+```
+
+The pipeline never receives cluster credentials — it only writes to a Git repository. The cluster pulls its own changes. That is the property worth protecting: a compromised CI system cannot deploy to the cluster, and everything running can be traced back to a commit.
 
 ---
 

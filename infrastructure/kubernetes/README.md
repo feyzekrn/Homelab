@@ -38,15 +38,30 @@ Status meanings:
 
 Each row links up to three locations, following the [Component Layout Convention](../../README.md#component-layout-convention): `docs` (local README), `chart` (planned Helm chart under [`helm-charts`](../../helm-charts)) and `config` (optional Terraform next to the docs). Chart and config directories are created when a component becomes active.
 
-`Idle RAM` is a rough per-instance ballpark at homelab scale; `/ node` values run on every node. The whole cluster core (Cilium, MetalLB, Flux) costs roughly 1 GB across three nodes — see the [platform catalog](../platform/README.md#how-to-read-this-catalog) for how to read the column.
+`Idle RAM` is a rough per-instance ballpark at homelab scale; `/ node` values run on every node. The whole cluster core (Cilium, MetalLB, Argo CD) costs roughly 1.5 GB across three nodes — see the [platform catalog](../platform/README.md#how-to-read-this-catalog) for how to read the column.
+
+Everything in this directory runs on the cluster by definition, so there is no `Runs on` column here — unlike the [platform catalog](../platform/README.md), where components are split between the cluster and the Proxmox host.
+
+### How CI and CD fit together
+
+The pipeline is deliberately split along the industry-standard line, and it is worth stating once because it explains why Argo CD exists at all:
+
+```text
+git push → GitHub Actions (CI)              → Harbor        → Argo CD (CD)       → cluster
+           build, test, scan, push image,      the image       sees the new tag
+           bump the tag in the GitOps repo     is stored       in Git and syncs
+```
+
+GitHub Actions never touches the cluster. It writes to Git; the cluster *pulls* from Git. That means no cluster credentials live in a CI system, and the declared state in Git is always the state that is running — the two properties that make GitOps worth the extra moving part.
 
 | Name | Path | Status | Idle RAM | What it is | Recommendation | Last update |
 |---|---|---|---|---|---|---|
 | Bootstrap | [docs](./bootstrap) · [chart](../../helm-charts/infrastructure/kubernetes/bootstrap) · [config](./bootstrap/terraform) | ⚫ Inactive | — | The first process that creates the Kubernetes cluster | Unavoidable | 2026-06-17 |
 | Cilium | [docs](./cilium) · [chart](../../helm-charts/infrastructure/kubernetes/cilium) · [config](./cilium/terraform) | ⚫ Inactive | ~150–200 MB / node | The pod network layer (CNI) for Kubernetes | Unavoidable CNI choice | 2026-06-17 |
 | MetalLB | [docs](./metallb) · [chart](../../helm-charts/infrastructure/kubernetes/metallb) · [config](./metallb/terraform) | ⚫ Inactive | ~50 MB + ~50 MB / node | LoadBalancer IP provider for bare-metal clusters | Bare-metal standard | 2026-06-17 |
-| Flux | [docs](./gitops/flux) · [chart](../../helm-charts/infrastructure/kubernetes/gitops/flux) · [config](./gitops/flux/terraform) | ⚫ Inactive | ~200–300 MB | GitOps controller that keeps the cluster synced from Git | Recommended standard | 2026-06-17 |
-| Argo CD | [docs](./gitops/argocd) · [chart](../../helm-charts/infrastructure/kubernetes/gitops/argocd) · [config](./gitops/argocd/terraform) | ⚫ Inactive | ~0.5–1 GB | GitOps platform with a strong visual application UI | Optional alternative | 2026-06-17 |
+| Argo CD | [docs](./gitops/argocd) · [chart](../../helm-charts/infrastructure/kubernetes/gitops/argocd) · [config](./gitops/argocd/terraform) | ⚫ Inactive | ~0.5–1 GB | GitOps platform with a strong visual application UI | Chosen GitOps controller | 2026-07-28 |
+| Argo Rollouts | [docs](./gitops/argo-rollouts) · [chart](../../helm-charts/infrastructure/kubernetes/gitops/argo-rollouts) · [config](./gitops/argo-rollouts/terraform) | ⚫ Inactive | ~100–200 MB | Progressive delivery: blue/green and canary deployments | Planned later — once a service deserves a rollout strategy | 2026-07-28 |
+| Flux | [docs](./gitops/flux) | ⚫ Inactive | ~200–300 MB | GitOps controller that keeps the cluster synced from Git | Documented alternative to Argo CD | 2026-07-28 |
 | Operators | [docs](./operators) · [chart](../../helm-charts/infrastructure/kubernetes/operators) | ⚫ Inactive | ~50–150 MB each | Controllers that automate lifecycle of complex software (category) | Use selectively | 2026-06-17 |
 
 ---
@@ -59,6 +74,7 @@ infrastructure/kubernetes/
 ├── cilium/
 ├── metallb/
 ├── gitops/
+│   ├── argo-rollouts/
 │   ├── argocd/
 │   └── flux/
 └── operators/
