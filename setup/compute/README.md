@@ -27,6 +27,26 @@ Both worlds watch each other: a responder service on each side monitors the heal
 
 ---
 
+## ⚠️ The Proxmox Host Is Optional
+
+Anyone rebuilding this setup should know up front: **the MS-01 is not a requirement. The homelab this repository describes is the Kubernetes cluster, and that runs on three mini PCs for well under 300 €.** The workstation was added later, when the project grew beyond "learn Kubernetes" into "also host the household's data".
+
+Everything the Proxmox host does can be done differently:
+
+| What it provides | How to do it without | What is lost |
+|---|---|---|
+| Router / firewall (OPNsense) | A dedicated router (Fritz!Box), or OPNsense on any old PC, or the Layer 3 features of the CRS310 | Multi-zone firewalling; the switch does no stateful filtering |
+| NAS / storage | An existing NAS, an old desktop with disks, or [Longhorn](../../infrastructure/platform/storage/longhorn) plus a USB disk for backups | Capacity and the ZFS dataset model — Longhorn on 256 GB SSDs is not a media library |
+| Family apps (Jellyfin, Immich, Nextcloud) | Run them on the cluster instead | The failure separation: rebuilding the cluster then takes the family's data offline with it |
+| Extra Kubernetes nodes on demand | Add a fourth Tiny for ~50 € | Nothing — a real node is better than a VM node |
+| Future GPU / AI workloads | Any desktop with a PCIe slot | Nothing, if such a machine is available |
+
+**Start with the three nodes.** Build the cluster, break it, rebuild it — that is where the learning is, and none of it needs a hypervisor. The MS-01 becomes worth its ~500 € at a specific point: when the lab stops being only an experiment and starts holding things other people depend on. Before that point it is comfort, not infrastructure.
+
+The reverse is also true, and worth saying: a Proxmox host alone, without the cluster, is a perfectly reasonable homelab too. It just teaches virtualization and self-hosting rather than Kubernetes.
+
+---
+
 ## Sections
 
 ### [☸️ k8s-cluster — The Bare-Metal Kubernetes Nodes](./k8s-cluster)

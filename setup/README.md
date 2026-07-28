@@ -55,6 +55,8 @@ How the cluster is powered cleanly and safely. Covers the power supply unit, DC/
 |   ✅   | fanxiang S880 1 TB NVMe SSD              |   1 |   in bundle |         0 € |
 |   ✅   | WiFi module                              |   1 | from old PC |         0 € |
 
+The MS-01 block is **optional** — see [the compute overview](./compute#-the-proxmox-host-is-optional). Without it the total drops to roughly 640 €, and the Kubernetes cluster this project is built around still works completely.
+
 **Networking & Power**
 
 | Status | Item                               | Qty |  Unit price |       Total |
@@ -67,14 +69,18 @@ How the cluster is powered cleanly and safely. Covers the power supply unit, DC/
 |   ⬜   | DC-DC Step-Down Converter 20A      |   1 |      ~ 25 € |      ~ 25 € |
 |   ⬜   | KFZ Fuse Box 6-Port                |   1 |       ~ 8 € |       ~ 8 € |
 |   ⬜   | Kill Switch + fuses + cable        |   1 |      ~ 20 € |      ~ 20 € |
+|   ⬜   | Fritz!Box 7490 (used)              |   1 |      ~ 40 € |      ~ 40 € |
+
+The Fritz!Box replaces the ISP router for the transition phase: it can do static routes and hand out a custom DNS server, [neither of which the Speedport can](./networking/router#the-isp-router-problem). Afterwards it continues as modem and WiFi access point behind OPNsense.
 
 **Totals**
 
 | | |
 | --- | ----------: |
-| **Total (all listed parts)** | **~ 1166 €** |
+| **Total (all listed parts)** | **~ 1206 €** |
 | **Already spent** ✅ | **~ 778 €** |
-| **Still outstanding** ⬜ | **~ 388 €** |
+| **Still outstanding** ⬜ | **~ 428 €** |
+| *Without the optional MS-01 block* | *~ 706 €* |
 
 ---
 

@@ -12,6 +12,8 @@ The stable half of the homelab. While the Tiny nodes form the experimentation fi
 
 Bought as a **complete bundle** — RAM and SSD were already installed, which made the price hard to beat compared to buying the barebone and parts separately.
 
+> ⚠️ **This machine is optional.** The homelab works without it — the Kubernetes cluster on three mini PCs is the core of this project, and it costs less than a third of what this workstation did. See [the compute overview](../README.md#-the-proxmox-host-is-optional) for what the MS-01 provides and how each of those things can be solved differently. It was added when the lab started holding data other people depend on, not at the beginning.
+
 | Part                                    | Qty | Details                                                          |    What I paid | Where to find it                                                                     |
 | --------------------------------------- | --: | ---------------------------------------------------------------- | -------------: | ------------------------------------------------------------------------------------ |
 | Minisforum MS-01 Workstation             |   1 | Intel Core i9-12900H (14C/20T), 2× 10G SFP+, 2× 2.5G RJ45, PCIe x16 slot | ~ 500 € (bundle) | [eBay](https://www.ebay.de/sch/i.html?_nkw=Minisforum+MS-01) · [Minisforum](https://store.minisforum.de/) |
