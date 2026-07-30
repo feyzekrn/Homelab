@@ -12,8 +12,8 @@ The long-term goal of this project is not only to run workloads. The goal is to 
 
 | Phase | Duration | Operating system | Used for | Main reason |
 |---|---:|---|---|---|
-| 1 | ~1 year | [Ubuntu Server 24.04 LTS](./installations/ubuntu-server-24.04) | First cluster build, Linux administration, Kubernetes learning, networking experiments, storage and service hosting | Exposes the underlying system instead of hiding it |
-| 2 | After phase 1 | [Talos Linux](./installations/talos) | Rebuilt bare-metal Kubernetes cluster with immutable nodes and IaC from the start | Closer to the real target architecture |
+| 1 | ~1 year | [Ubuntu Server 24.04 LTS](./ubuntu-server-24.04) | First cluster build, Linux administration, Kubernetes learning, networking experiments, storage and service hosting | Exposes the underlying system instead of hiding it |
+| 2 | After phase 1 | [Talos Linux](./talos) | Rebuilt bare-metal Kubernetes cluster with immutable nodes and IaC from the start | Closer to the real target architecture |
 
 Phase 1 is not the final architecture. It is the training ground.
 
@@ -23,7 +23,7 @@ Phase 2 is the real bare-metal Kubernetes approach: wipe the nodes, install Talo
 
 ## Phase 1 — Ubuntu Server 24.04 LTS
 
-For the first year all nodes run **[Ubuntu Server 24.04 LTS](./installations/ubuntu-server-24.04)**.
+For the first year all nodes run **[Ubuntu Server 24.04 LTS](./ubuntu-server-24.04)**.
 
 Ubuntu is the right starting point because it keeps the full Linux system visible. That matters for this project. Before making the cluster minimal and immutable, I want to understand what is actually happening on the nodes: boot process, services, logs, packages, network interfaces, kernel modules, disks, mounts, systemd units and the way Kubernetes interacts with all of it.
 
@@ -72,7 +72,7 @@ This does not make Ubuntu the wrong first choice. It just means its value is str
 
 ## Phase 2 — Talos Linux
 
-After roughly one year, the cluster gets rebuilt from scratch with **[Talos Linux](./installations/talos)** on every node.
+After roughly one year, the cluster gets rebuilt from scratch with **[Talos Linux](./talos)** on every node.
 
 Talos is the target operating system for the serious bare-metal Kubernetes phase. It removes the traditional Linux server surface: no SSH-based administration, no package manager workflows, no manual node changes. Nodes are managed through declarative machine configuration and Kubernetes APIs.
 
@@ -117,18 +117,14 @@ The project exists to build skills, especially around cloud-native infrastructur
 
 ---
 
-## Installation Media
+## Per-OS Documentation
 
-Installer images and version notes live under:
+Each operating system has its own folder with the same two files:
 
-[`./installations`](./installations)
+- [Ubuntu Server 24.04 LTS](./ubuntu-server-24.04) — why this OS, exact installer version and checksum notes, plus a [getting-started guide](./ubuntu-server-24.04/getting-started.md) covering the full path from bootable USB to a freshly updated node with SSH access
+- [Talos Linux](./talos) — the phase-2 target OS; its [getting-started guide](./talos/getting-started.md) gets filled in when the rebuild starts
 
-This directory is the local staging area for the operating system images that are written to USB sticks:
-
-- Ubuntu Server 24.04 LTS ISO for the first cluster phase
-- Talos Linux metal image for the later rebuild phase
-
-Large ISO and image files should stay out of Git. The repository tracks the version, filename, source URL and checksum notes; the actual installer files can be placed in the matching local folder when needed.
+The OS folders double as the local staging area for installer images. Large ISO and image files should stay out of Git — the repository tracks the version, filename, source URL and checksum notes; the actual installer files can be placed in the matching folder when needed.
 
 ---
 
@@ -136,9 +132,9 @@ Large ISO and image files should stay out of Git. The repository tracks the vers
 
 | Node | Phase 1 OS | Phase 2 OS |
 |---|---|---|
-| Node 1 | [Ubuntu Server 24.04 LTS](./installations/ubuntu-server-24.04) | [Talos Linux](./installations/talos) |
-| Node 2 | [Ubuntu Server 24.04 LTS](./installations/ubuntu-server-24.04) | [Talos Linux](./installations/talos) |
-| Node 3 | [Ubuntu Server 24.04 LTS](./installations/ubuntu-server-24.04) | [Talos Linux](./installations/talos) |
+| Node 1 | [Ubuntu Server 24.04 LTS](./ubuntu-server-24.04) | [Talos Linux](./talos) |
+| Node 2 | [Ubuntu Server 24.04 LTS](./ubuntu-server-24.04) | [Talos Linux](./talos) |
+| Node 3 | [Ubuntu Server 24.04 LTS](./ubuntu-server-24.04) | [Talos Linux](./talos) |
 
 If more nodes are added during the Ubuntu phase, they should follow the same rule: Ubuntu first for learning and consistency, Talos later during the full rebuild.
 

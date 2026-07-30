@@ -12,19 +12,19 @@ For a beginner, this is useful because Kubernetes deployments otherwise feel inv
 
 ---
 
-## Why It Is Documented
+## Why It Is Chosen
 
-Argo CD is one of the most common GitOps tools in Kubernetes environments. It is worth understanding even if Flux becomes the first choice for this repository.
+Argo CD is the **chosen GitOps controller** for this cluster, and the deciding factor is what it makes visible. Both controllers implement reconciliation correctly, so the difference that matters here is pedagogical: Argo CD shows the application tree, the live-versus-declared diff and the sync status of every resource in a UI. That is exactly the feedback loop that turns GitOps from an abstract principle into something observable while learning it. [Flux](../flux)'s state lives in CRDs and controller logs — leaner, but a harder place to learn from.
 
-Argo CD is especially relevant in teams where people want an application-centric view of the platform. It is common in organizations that need developers, platform engineers and operators to inspect deployment state without giving everyone direct cluster-admin workflows.
+The second reason is trajectory: [Argo Rollouts](../argo-rollouts) comes from the same project family, so blue/green and canary releases later are an addition to a familiar tool rather than a new one.
+
+Argo CD is also the more common choice in the environments this project is preparing for. It is widely used in organizations that need developers, platform engineers and operators to inspect deployment state without giving everyone direct cluster-admin workflows.
 
 ---
 
-## Why It Might Fit Later
+## What It Runs On
 
-Flux is a better first match for this repository because the planned workflow is compact, Git-driven and HelmRelease-oriented. Argo CD becomes attractive if the homelab grows into many applications or if a visual dashboard becomes valuable for learning, demos or day-to-day operations.
-
-Argo CD can also be useful when comparing GitOps models. Flux teaches the Kubernetes-controller-first approach. Argo CD teaches the application-dashboard approach.
+Argo CD runs **on the Kubernetes cluster** (`k8s`) — it is a cluster component by definition and reconciles only cluster resources. It has no authority over the Proxmox world: the guests on [`pve0`](../../../../../setup/compute/proxmox-cluster) are defined as code separately, because Argo CD reconciles Kubernetes resources and nothing else. Two worlds, two deployment mechanisms.
 
 ---
 
@@ -62,8 +62,8 @@ Argo CD can also be useful when comparing GitOps models. Flux teaches the Kubern
 |---|---|---|
 | Primary advantage | Visual application operations | Kubernetes-native declarative controllers |
 | Best first impression | UI, resource tree and health state | Git, CRDs and controller reconciliation |
-| Homelab timing | Later, when a dashboard helps | First GitOps controller |
-| Risk | Duplicate ownership if paired badly | Less visual for beginners |
+| Decision here | **Chosen** — the visible diff is the learning tool | Documented alternative, deliberately not run alongside |
+| Risk | UI can encourage click-ops if boundaries are loose | Less visual while learning |
 
 ---
 

@@ -68,7 +68,7 @@ The 7490 is old hardware (2013) and deliberately not bought for performance — 
 
 Being honest about its limits: the 7490 tops out at roughly 100 Mbit VDSL and WiFi AC, and it has no fibre modem. If the internet connection is or becomes faster than that, it is a bottleneck as a gateway — another reason to reduce it to modem duty as soon as OPNsense takes over.
 
-> ⚠️ **It cannot be modem and house WiFi at the same time.** As the modem it sits *in front of* OPNsense at the WAN edge; an access point has to sit *behind* OPNsense in the home VLAN. Its own WiFi would therefore land on the untrusted side of the firewall, which is exactly where the family should not be. So the household WLAN needs a **separate access point** on switch port 7 — and one that can tag VLANs, because it has to serve the home and IoT zones as separate networks. That is a planned purchase; see the [port assignment](../README.md#port-assignment--every-port-on-the-crs310).
+> ⚠️ **It cannot be modem and house WiFi at the same time.** As the modem it sits *in front of* OPNsense at the WAN edge; an access point has to sit *behind* OPNsense in the home VLAN. Its own WiFi would therefore land on the untrusted side of the firewall, which is exactly where the family should not be. So the household WLAN needs a **separate access point** on switch port 7 — and one that can tag VLANs, because it has to serve the home and IoT zones as separate networks. That purchase belongs to **phase 2 only** — as long as the interim setup runs, the Fritz!Box's own WLAN serves the house and no AP exists; see the phase table below and the [port assignment](../README.md#port-assignment--every-port-on-the-crs310).
 
 ### The two paths, and why the purchase is still worth it
 
@@ -77,7 +77,39 @@ Being honest about its limits: the 7490 tops out at roughly 100 Mbit VDSL and Wi
 | **Home network stays in front** *(interim)* | Only the lab sits behind OPNsense; the ISP box remains the gateway for phones, TVs and laptops | **Yes** — which is exactly what the Speedport cannot provide and the Fritz!Box can |
 | **Everything moves behind OPNsense** *(target)* | The ISP box degrades to a plain internet uplink; the home WLAN comes from an access point behind OPNsense, which becomes the gateway for every network | **No** — the problem disappears entirely, because one router knows all networks |
 
-The target path removes the need for static routes altogether, so the Fritz!Box is not a permanent dependency. It is bought for the **transition**: the months in which the lab already has VLANs but the family still hangs on the ISP router. Without it, that phase either means no access from the home network to lab services, or an all-or-nothing switch to the final architecture in one evening — which is exactly the kind of big-bang change this project tries to avoid.
+The target path removes the need for static routes altogether, so the Fritz!Box is not a permanent dependency. It is bought for the **transition**: the phase — deliberately open-ended, see below — in which the lab already has VLANs but the family still hangs on the ISP router. Without it, that phase either means no access from the home network to lab services, or an all-or-nothing switch to the final architecture in one evening — which is exactly the kind of big-bang change this project tries to avoid.
+
+### Where the house WiFi comes from in each phase
+
+The two paths above are not just a routing question — they decide which device serves the household WLAN. This table spells it out, because it is easy to get confused about why an access point appears in the target design when the Fritz!Box "already has WiFi":
+
+| Phase | Family gateway | House WiFi comes from | Separate AP needed? |
+|---|---|---|---|
+| **Today** | Speedport | Speedport | no |
+| **Phase 1 — interim** *(current plan)* | Fritz!Box | The Fritz!Box's own WLAN | **no** |
+| **Phase 2 — target** | OPNsense | Access point behind the switch (port 7) | **yes** |
+
+The logic: in phase 1 the Fritz!Box is a normal home router — it routes the family *and* radiates the WLAN, exactly as consumer routers do. In phase 2 it is demoted to a modem *in front of* OPNsense, which puts its WiFi on the untrusted side of the firewall — anyone connecting there would stand outside every zone. At that moment, and only at that moment, the house needs a new WLAN source *behind* the firewall: the access point on switch port 7 (bought, or the old Speedport recycled as a dumb untagged AP for the home VLAN only).
+
+### Why phase 2 is the better and safer design
+
+Phase 2 is documented as the target because it is genuinely superior, not just tidier:
+
+- **One router knows every network.** The static-route workaround disappears; nothing depends on a consumer box forwarding packets correctly into the lab.
+- **The firewall finally covers the family.** In phase 1, home devices never pass OPNsense — the zone model only protects the lab from the house, not the house from anything. In phase 2, every WiFi client is a real member of VLAN 1: it reaches the apps, it can never reach Proxmox, the switch or vPro.
+- **The IoT cage becomes real for wireless devices.** A VLAN-tagging AP serves a second SSID mapped to VLAN 40, so a smart plug shares airwaves with the family but can reach nothing except the MQTT broker. In phase 1, every wireless device — bulb or laptop — sits in the same flat home network.
+- **DNS and DHCP are enforced, not offered.** OPNsense hands out AdGuard per zone and can block devices that try to bypass it (hardcoded DNS, DoH) — a Fritz!Box can only politely suggest a resolver.
+- **One administration surface.** Firewall rules, leases, VPN and monitoring live in one UI instead of being split across OPNsense and a consumer router.
+
+### Decision: staying in phase 1 for the foreseeable future
+
+**This project deliberately stays in phase 1, with no date set for phase 2.** The reasoning, stated honestly so future-me does not mistake this for an oversight:
+
+- **The added safety protects against threats that are not present yet.** Wireless zone enforcement matters once untrusted IoT devices exist and once services are exposed to the internet. Neither is the case today — the enterprise-grade WLAN zoning solves next year's problem at this year's cost.
+- **Phase 2 has real switching costs.** It needs the VLAN-capable AP (~50–70 €), an evening of migration in which the whole house changes gateway, and from then on the family's internet shares fate with the OPNsense VM far more deeply. Phase 1 keeps the household on a boring appliance that never reboots because of a lab experiment.
+- **The lab loses nothing.** All VLANs, firewall zones, the 10G trunk and the DMZ exist in full behind OPNsense either way — phase 1 only leaves the *wireless family devices* out of the zone model, not the infrastructure.
+
+**What would trigger phase 2:** exposing services directly to the internet (the DMZ then earns its firewall), buying WiFi IoT devices that deserve the cage, an internet uplink faster than the 7490 can route, or simply the day the zone model itself becomes the thing worth learning. Until one of those happens, the interim architecture *is* the architecture.
 
 ---
 

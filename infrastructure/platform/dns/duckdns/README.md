@@ -4,22 +4,26 @@
 
 DuckDNS is a free dynamic DNS service: it gives you a public subdomain (`yourname.duckdns.org`) that always points at your home IP address, even when the ISP changes it.
 
-In this homelab, DuckDNS is **part of the chosen stack**: it provides the free, always-current public name for entry points that need one — for example the public reachability of a self-hosted [NetBird](../../ingress/netbird) server — while the Cloudflare-managed domain (see [Cloudflare Tunnel](../../ingress/cloudflare-tunnel)) covers the user-facing app names. For readers who own no domain at all, DuckDNS alone is also the free entry path into remote access.
+In this homelab, DuckDNS is **documented but dropped from the plan**. It answers one question — "how does the outside world find my changing home IP?" — and the chosen architecture never asks it: [Cloudflare Tunnel](../../ingress/cloudflare-tunnel) publishes apps through outbound connections, [NetBird](../../ingress/netbird) provides private access through its managed control plane, and certificates are issued over the Cloudflare API on an owned domain. Nothing needs to know the home IP, so nothing needs to track it.
+
+The page stays because dynamic DNS remains the correct answer for a different architecture — one that exposes services directly through a port forward — and because that is the setup most readers arrive with.
 
 Dynamic DNS exists because most home connections have changing IP addresses. A small updater — a cron job or Kubernetes CronJob calling the DuckDNS token API — reports the current IP every few minutes, and the DNS record follows. Combined with a router port forward, services become reachable at a stable name; combined with a DNS-01 webhook, even Let's Encrypt certificates work without any open port.
 
 ---
 
-## Why It Fits
+## Why It Is Documented Anyway
 
-DuckDNS earns its place in the stack:
+DuckDNS earns a page despite not being deployed:
 
-- it is the classic zero-cost answer to "how do I reach my homelab from outside?"
+- it is the classic zero-cost answer to "how do I reach my homelab from outside?" and the first thing most readers try
 - it teaches the dynamic-DNS concept that also underlies paid DynDNS offerings
-- cert-manager can issue real TLS certificates for `*.duckdns.org` names via a community DNS-01 webhook — free valid HTTPS without a domain
-- it is the natural stepping stone before buying a domain and moving to Cloudflare or deSEC
+- cert-manager can issue real TLS certificates for `*.duckdns.org` names via a community DNS-01 webhook — free valid HTTPS without owning a domain
+- it is the honest fallback if the Cloudflare dependency ever becomes unwelcome
 
-Its role here is deliberately narrow: a free, stable name for the few entry points that need direct reachability. User-facing apps get real names on the owned Cloudflare domain; DuckDNS covers the plumbing underneath and costs nothing.
+**What replaced it.** The decision was not "DuckDNS is bad" but "this architecture has no inbound path at all". A dynamic-DNS name is only useful when something outside is supposed to connect *to* the home IP. Here every external path is outbound-initiated — the tunnel connector dials Cloudflare, the NetBird peer dials its control plane — which removes the port forward, the open firewall rule and the need for a public name in one move. That is a security property first and a convenience second.
+
+For a reader who owns no domain and wants remote access on a budget, DuckDNS plus a port forward remains the shortest path. It is simply a different trade: an open port and a public IP in exchange for owning nothing.
 
 ---
 

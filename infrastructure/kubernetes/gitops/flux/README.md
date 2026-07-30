@@ -2,7 +2,9 @@
 
 [<- Back to GitOps](../README.md)
 
-Flux is the recommended first GitOps controller for this homelab. It is a Kubernetes-native system that watches Git repositories and other sources, then applies the declared Kubernetes resources to the cluster.
+Flux is a Kubernetes-native GitOps system that watches Git repositories and other sources, then applies the declared Kubernetes resources to the cluster.
+
+In this homelab, Flux is the **documented alternative** to [Argo CD](../argocd), which is the chosen GitOps controller. It is not planned for deployment — this page exists because Flux is the other half of the standard GitOps comparison, and a decision deserves a documented loser, not just a winner.
 
 Flux is best understood as a set of controllers. Those controllers reconcile Git sources, Kustomize overlays, Helm charts, Helm releases, image updates and notifications. Instead of a human running `helm upgrade` manually, Flux reads the desired release state from Git and keeps the cluster aligned with it.
 
@@ -20,11 +22,13 @@ That design makes Flux easy to store in Git and easy to review. The deployment w
 
 ---
 
-## Why It Fits
+## Why It Lost — And What Would Change That
 
-Flux fits the repository style well because future deployment files such as `HelmRelease`, `Kustomization` and values files can stay versioned and reviewed. It also keeps the cluster close to the principle: if it matters, it should be in Git.
+The case for Flux is real: `HelmRelease`, `Kustomization` and values files stay versioned and reviewed, it needs no web UI to be useful, and its footprint is a fraction of Argo CD's (~200–300 MB against ~0.5–1 GB). For a purely declarative, documentation-first platform that is an honest fit.
 
-It is also a good first choice because it does not require a large web UI to be useful. The main workflow is Git, Kubernetes resources and `flux` CLI inspection. That is a better fit for a documentation-first platform where understanding the state matters more than clicking through a dashboard.
+It lost on one criterion — **visibility while learning**. Flux's state lives in CRDs, events and controller logs, which means understanding "what does the cluster think it should be running, and how does that differ from reality?" requires knowing which resources to inspect first. Argo CD answers that question on a screen. Since learning GitOps is an explicit goal here rather than a means to an end, the heavier tool that shows its work won.
+
+What would reverse the decision: if the cluster ever runs unattended and the UI stops being read, Argo CD's RAM becomes rent paid for nothing — and Flux becomes the better tenant.
 
 ---
 
@@ -65,18 +69,22 @@ It is also a good first choice because it does not require a large web UI to be 
 | Primary workflow | Git, Kubernetes resources and CLI | Git plus strong web UI |
 | Best fit | Platform-as-code, HelmRelease, Kustomize, compact operations | Visual app management, manual sync inspection, team dashboards |
 | Learning curve | YAML/controller concepts first | UI makes state easier to inspect early |
-| Operational style | Lightweight and composable | More product-like platform |
-| Homelab recommendation | First choice | Evaluate later if a UI becomes important |
+| Idle RAM | ~200–300 MB | ~0.5–1 GB |
+| Decision here | Documented alternative — not deployed | **Chosen GitOps controller** |
 
 ---
 
-## Application Examples
+## What It Would Look Like Here
 
-- Flux installs Cilium after bootstrap and keeps the CNI configuration versioned.
-- Flux deploys Traefik from a Helm chart and applies the local values file.
-- Flux applies a `Kustomization` for `observability` after storage and networking are ready.
-- A future CI pipeline builds an image, updates an image tag in Git and lets Flux roll it out.
-- A cluster rebuild installs Flux first, then Flux restores the rest of the platform from Git.
+Not the plan — but the shape of the alternative, for comparison against [how Argo CD does it](../argocd):
+
+- a `GitRepository` resource points at this repository and a `Kustomization` reconciles it
+- a `HelmRelease` deploys Traefik from its chart with the local values file
+- `Kustomization` dependencies order the stack: CNI, then storage, then observability
+- image automation updates a tag in Git when CI publishes a new build
+- a cluster rebuild installs Flux first, and Flux restores everything else from Git
+
+The last point is the property both tools share, and the reason either is worth running: the cluster is rebuildable from the repository rather than from memory.
 
 ---
 
@@ -96,21 +104,12 @@ Flux is `⚫ Inactive` and **not planned**. [Argo CD](../argocd) is the chosen G
 
 ---
 
-## Operating Notes
+## Operating Notes — Valid For Either Tool
 
-Before enabling Flux, decide the repository layout for environments, Helm values and shared components. Bootstrap should be documented carefully because Flux cannot reconcile itself until the first controller installation is complete.
+Two constraints apply regardless of which controller is chosen, and both are worth stating once:
 
-For this homelab, Flux should not be responsible for raw hardware provisioning, MikroTik configuration or personal password management. It should reconcile Kubernetes resources and link to the systems that own those other concerns.
-
----
-
-## Future Deployment Link
-
-Planned deployment location:
-
-```text
-../../../../helm-charts/infrastructure/kubernetes/gitops/flux/
-```
+- **Bootstrap is a special case.** The first controller cannot reconcile itself into existence; it has to be installed by hand or by [`bootstrap`](../../bootstrap) before it can take over.
+- **A GitOps controller owns Kubernetes resources and nothing else.** Bare-metal provisioning belongs to [Ansible](../../../provisioning/ansible), switch and router configuration to [Terraform](../../../../setup/networking/mikrotik), Proxmox guests to the Proxmox world, and human passwords to [Vaultwarden](../../../platform/security/password-manager/bitwarden). Widening a GitOps controller past the cluster boundary is how it becomes the thing nobody understands.
 
 ---
 

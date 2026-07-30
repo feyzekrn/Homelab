@@ -1,10 +1,12 @@
 # MinIO
 
-[<- Back to Kubernetes Storage](../README.md)
+[<- Back to Storage](../README.md)
 
 MinIO provides S3-compatible object storage.
 
-It is useful for applications that expect S3, for backup targets and for learning object storage patterns without using a public cloud provider.
+In this homelab, MinIO is the **chosen S3 target for cluster backups**, and it runs in a place that matters: as a **container on [`pve0`](../../../../setup/compute/proxmox-cluster) (`lxc`)**, not on the Kubernetes cluster. Its data directory is the `tank/backups` dataset of the [ZFS pool](../zfs-nas).
+
+That placement is the entire point. A backup that lives inside the system it protects is not a backup — if [Velero](../../backup/velero) wrote its cluster backups to a MinIO running on the same cluster, a cluster failure would take the backups with it. Putting the bucket in the other world means the restore path survives the thing it restores.
 
 Object storage stores data as objects inside buckets. Applications access those objects through an API instead of mounting a disk. This is the model popularized by Amazon S3, and many modern applications know how to talk to S3-compatible storage.
 
@@ -16,9 +18,29 @@ Object storage is different from block storage. A database usually wants block s
 
 ## Why It Fits
 
-MinIO is the recommended homelab S3 equivalent. It gives applications an S3-compatible endpoint without requiring AWS, and it is easy to understand compared to larger distributed object-storage platforms.
+MinIO is the homelab S3 equivalent. It gives applications an S3-compatible endpoint without requiring AWS, and it is easy to understand compared to larger distributed object-storage platforms.
 
-For this project, MinIO is the first choice for self-hosted buckets, backup targets and local development against S3 APIs.
+For this project it serves three jobs, in order of importance:
+
+1. **The backup target.** [Velero](../../backup/velero) speaks S3, and so does Longhorn's backup mechanism. MinIO is what makes `tank/backups` look like a bucket.
+2. **Object storage for applications** that prefer S3 over a mounted volume.
+3. **A local S3 to develop against**, so custom services can use the same SDK shape they would use in a cloud.
+
+---
+
+## Where It Runs — And Why Not On The Cluster
+
+| | |
+|---|---|
+| **Runs on** | `lxc` — a container on [`pve0`](../../../../setup/compute/proxmox-cluster) |
+| **Data directory** | `tank/backups` on the [ZFS pool](../zfs-nas) |
+| **Reached by** | Velero and Longhorn from the cluster, over the storage VLAN |
+
+The obvious placement would be a MinIO Helm chart on the cluster, next to the workloads using it. That is exactly what must not happen for the backup role: **a backup stored inside the failure domain it protects is not a backup.** Wipe the cluster to rebuild it and the restore path goes with it.
+
+Running MinIO on the Proxmox host puts one machine boundary and one filesystem boundary between the data and the thing being backed up — and it inherits ZFS snapshots for free, which means an accidental bucket deletion is also recoverable, not just a node failure.
+
+The honest limit: `pve0` is still one box in one flat. It protects against cluster mistakes, not against fire or theft. That is what the `zfs send` copy off the machine is for, documented in [zfs-nas](../zfs-nas#operational-notes).
 
 ---
 
@@ -62,9 +84,9 @@ For this project, MinIO is the first choice for self-hosted buckets, backup targ
 
 ---
 
-## When To Run
+## Runtime Status
 
-MinIO is currently `⚫ Inactive`. It does not need to run from day one. Add it when an application, backup workflow or artifact workflow needs object storage.
+MinIO is currently `⚫ Inactive`. It becomes relevant at a specific moment: **before the first irreplaceable data exists**, because it is the target Velero writes to. In practice that means it is deployed together with the [ZFS pool](../zfs-nas), early in the Proxmox build and well before the cluster holds anything worth losing.
 
 ---
 
@@ -82,24 +104,22 @@ MinIO is currently `⚫ Inactive`. It does not need to run from day one. Add it 
 
 ## Hands-On Start
 
-Deployment files should eventually live under `helm-charts`, but the basic upstream Helm flow is:
+**Not a Helm chart.** MinIO runs as a Proxmox container, so there is no chart path for it — the [Component Layout Convention](../../../../README.md#component-layout-convention) gives `k8s` components a `chart` link and Proxmox guests a `config` link only. The guest definition will live with the other `pve0` guests once that section exists.
 
-```bash
-helm repo add minio https://charts.min.io/
-helm repo update
-helm install minio minio/minio --namespace minio --create-namespace
-```
+First evaluation order:
 
-After installing, create a first bucket for test uploads and configure one application or backup tool against the S3 endpoint.
+1. Create the `tank/backups` dataset with its own quota.
+2. Create the container and bind-mount that dataset as MinIO's data directory.
+3. Create one bucket and one access key pair; keep the credentials in [Vault](../../security/secret-store).
+4. Point [Velero](../../backup/velero) at the endpoint and run one backup.
+5. **Restore it into an empty namespace.** A backup nobody has restored is a hypothesis, not a backup.
 
 ---
 
-## Future Deployment Link
-
-Planned deployment location:
+## Configuration Link
 
 ```text
-../../../../helm-charts/infrastructure/platform/storage/minio/
+infrastructure/platform/storage/minio/terraform/
 ```
 
 ---

@@ -15,17 +15,14 @@ The MS-01 runs **Proxmox VE** — a bare-metal hypervisor based on Debian. Unlik
 
 ---
 
-## Installations
+## Installation
 
-Installer images and version notes live under [`./installations`](./installations):
+Same schema as in the [k8s cluster](../../k8s-cluster/os/README.md): one folder per operating system, with version notes and a step-by-step guide.
 
-- [Proxmox VE](./installations/proxmox-ve) — ISO metadata and the macOS bootable-USB workflow
+- [Proxmox VE](./proxmox-ve_v9) — exact ISO version and checksum notes
+- [Getting Started](./proxmox-ve_v9/getting-started.md) — bootable USB (macOS, no Rufus), installer choices, first login, repositories and first update
 
 Large ISO files stay out of Git — the repository tracks version, source URL and checksum only.
-
-## After the Installation
-
-- [First Steps](./first-steps.md) — repositories, first update, reboot: the mandatory post-install routine
 
 ---
 

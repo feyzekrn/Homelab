@@ -61,7 +61,11 @@ It also fits a security learning path. A registry is part of the software supply
 
 ## Runtime Status
 
-Harbor is currently `⚫ Inactive`. Start with an external registry unless self-hosting images becomes a learning goal.
+Harbor is `⚫ Inactive` and is the **chosen registry** — planned as one of the first platform components once the cluster runs, because the CI/CD pipeline documented in [GitOps](../../../kubernetes/gitops/README.md#where-ci-ends-and-gitops-begins) has a Harbor-shaped hole in the middle of it: GitHub Actions builds and pushes an image, Argo CD deploys it, and Harbor is what sits between them.
+
+It runs **on the Kubernetes cluster** (`k8s`) at roughly 1–2 GB idle — the heaviest single platform component planned, and worth stating plainly. Until it exists, [GitHub Packages](../github-packages) is the pragmatic bridge.
+
+Harbor does not cover every package format. Private npm, NuGet and Maven feeds need [Nexus](../artifact-repository), which is planned separately and later.
 
 ---
 

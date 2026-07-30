@@ -1,10 +1,12 @@
-# Talos Linux Installer
+# Talos Linux
 
-[← Back to Installation Media](../README.md)
+[← Back to OS Strategy](../README.md)
 
 Talos Linux is planned for phase 2 of the homelab.
 
-After roughly one year of running Ubuntu Server 24.04 LTS, all nodes are expected to be wiped and rebuilt with Talos. This is the real bare-metal Kubernetes phase: immutable nodes, declarative machine configuration and infrastructure as code from the beginning.
+After roughly one year of running Ubuntu Server 24.04 LTS, all nodes are expected to be wiped and rebuilt with Talos. This is the real bare-metal Kubernetes phase: immutable nodes, declarative machine configuration and infrastructure as code from the beginning. The full reasoning lives in the [OS Strategy](../README.md).
+
+**In this folder:** [Getting Started](./getting-started.md) — the install walkthrough; gets written when the rebuild starts.
 
 ---
 
@@ -40,26 +42,7 @@ The exact Talos version should be chosen when the rebuild starts, not during the
 Place the downloaded or generated Talos image here locally:
 
 ```text
-setup/compute/k8s-cluster/os/installations/talos/talos-metal-amd64-<version>.raw.xz
+setup/compute/k8s-cluster/os/talos/talos-metal-amd64-<version>.raw.xz
 ```
 
 The image itself should not be committed to Git.
-
----
-
-## USB Write Example
-
-If the Talos image is compressed, decompress it first:
-
-```bash
-xz -dk ./os/installations/talos/talos-metal-amd64-<version>.raw.xz
-```
-
-Then write the raw image to the USB stick:
-
-```bash
-sudo dd if=./os/installations/talos/talos-metal-amd64-<version>.raw of=/dev/rdiskX bs=4m status=progress
-sync
-```
-
-Replace `diskX` with the actual USB disk from `diskutil list`.

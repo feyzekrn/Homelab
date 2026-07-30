@@ -2,7 +2,7 @@
 
 [← Back to Compute Overview](../README.md)
 
-**In this folder:** [`./os`](./os) — the operating system strategy and installations for these nodes (Ubuntu Server now, Talos later).
+**In this folder:** [`./os`](./os) — the operating system strategy for these nodes, with one folder per OS (Ubuntu Server now, Talos later), each holding version notes and a getting-started guide.
 
 ---
 

@@ -1,10 +1,12 @@
-# Ubuntu Server 24.04 LTS Installer
+# Ubuntu Server 24.04 LTS
 
-[← Back to Installation Media](../README.md)
+[← Back to OS Strategy](../README.md)
 
 Ubuntu Server 24.04 LTS is used for phase 1 of the homelab.
 
-It is installed on all Lenovo M910q Tiny nodes for the first learning-focused cluster build. This phase is about building strong Linux, Kubernetes, cloud-native and networking fundamentals before the later Talos rebuild.
+It is installed on all Lenovo M910q Tiny nodes for the first learning-focused cluster build. This phase is about building strong Linux, Kubernetes, cloud-native and networking fundamentals before the later Talos rebuild. The full reasoning lives in the [OS Strategy](../README.md).
+
+**In this folder:** [Getting Started](./getting-started.md) — step by step from bootable USB to a freshly updated node with SSH access.
 
 ---
 
@@ -40,20 +42,7 @@ Use the latest available 24.04 LTS point-release ISO when preparing the USB stic
 Place the downloaded ISO here locally:
 
 ```text
-setup/compute/k8s-cluster/os/installations/ubuntu-server-24.04/ubuntu-24.04.x-live-server-amd64.iso
+setup/compute/k8s-cluster/os/ubuntu-server-24.04/ubuntu-24.04.x-live-server-amd64.iso
 ```
 
 The ISO itself should not be committed to Git.
-
----
-
-## USB Write Example
-
-From the repository root:
-
-```bash
-sudo dd if=./os/installations/ubuntu-server-24.04/ubuntu-24.04.x-live-server-amd64.iso of=/dev/rdiskX bs=4m status=progress
-sync
-```
-
-Replace `diskX` with the actual USB disk from `diskutil list`.
