@@ -24,7 +24,7 @@ The MikroTik CRS310 as the central 2.5G data switch and why Layer 3 routing on t
 
 ### [🔋 Power Supply — PSU, DC/DC Converter & Fuse Box](./power-supply)
 
-How the cluster is powered cleanly and safely. Covers the power supply unit, DC/DC conversion for the nodes, fuse box setup and the reasoning behind centralising power distribution instead of running individual adapters per device.
+How the lab is powered cleanly and safely. Covers the power supply unit, DC/DC conversion, fuse box setup and the reasoning behind centralising power distribution instead of running individual adapters per device. Every machine now hangs off one PSU — including the MS-01, which needs **19V** where the Tiny nodes need **20V**, so the rail splits into two regulated branches. That page also carries the sizing math for when the 500W supply runs out.
 
 ---
 
@@ -54,8 +54,13 @@ How the cluster is powered cleanly and safely. Covers the power supply unit, DC/
 |   ✅   | Corsair Vengeance 32 GB DDR5-4800 SODIMM |   1 |   in bundle |         0 € |
 |   ✅   | fanxiang S880 1 TB NVMe SSD              |   1 |   in bundle |         0 € |
 |   ✅   | WiFi module                              |   1 | from old PC |         0 € |
+|   ⬜   | 2 TB 3.5" HDD (ZFS mirror)               |   2 |      ~ 55 € |     ~ 110 € |
 
-The MS-01 block is **optional** — see [the compute overview](./compute#-the-proxmox-host-is-optional). Without it the total drops to roughly 640 €, and the Kubernetes cluster this project is built around still works completely.
+The **two HDDs form the ZFS pool** as a mirror — 2 TB usable, which carries the media library, photo originals, personal cloud data and the backup target. They are the blocker for [Jellyfin](../applications/jellyfin), [Immich](../applications/immich), [Nextcloud](../applications/nextcloud) and the whole backup concept: none of them can exist before the pool does.
+
+Storage is deliberately **two-tier**: the existing 1 TB NVMe stays the fast tier for the hypervisor, VM disks and anything latency-sensitive, while the HDD mirror is the bulk tier. Media streaming and photo storage are sequential workloads that do not benefit from NVMe — spending the money on capacity instead of speed is the right trade here.
+
+The MS-01 block is **optional** — see [the compute overview](./compute#-the-proxmox-host-is-optional). Without it the total drops to roughly 806 €, and the Kubernetes cluster this project is built around still works completely.
 
 **Networking & Power**
 
@@ -65,10 +70,11 @@ The MS-01 block is **optional** — see [the compute overview](./compute#-the-pr
 |   ⬜   | SFP+ DAC cable (MS-01 ↔ switch)    |   1 |      ~ 25 € |      ~ 25 € |
 |   ⬜   | Patch Panel 12-Port Cat.6a 10" 1HE |   1 |      ~ 35 € |      ~ 35 € |
 |   ⬜   | 0.25m Slim Patch Cables            |  10 |       ~ 2 € |      ~ 20 € |
-|   ⬜   | PSU MEAN WELL MW UHP-500-24        |   1 |      ~ 75 € |      ~ 75 € |
-|   ⬜   | DC-DC Step-Down Converter 20A      |   1 |      ~ 25 € |      ~ 25 € |
+|   ✅   | PSU MEAN WELL UHP-750-24           |   1 |      ~ 50 € |      ~ 50 € |
+|   ⬜   | DC-DC **Buck** Converter 40A       |   2 |      ~ 30 € |      ~ 60 € |
 |   ⬜   | KFZ Fuse Box 6-Port                |   1 |       ~ 8 € |       ~ 8 € |
-|   ⬜   | Kill Switch + fuses + cable        |   1 |      ~ 20 € |      ~ 20 € |
+|   ⬜   | Schaltbare PDU / Not-Aus (230V)    |   1 |      ~ 30 € |      ~ 30 € |
+|   ⬜   | DC Kill Switch + fuses + cable     |   1 |      ~ 25 € |      ~ 25 € |
 |   ⬜   | Fritz!Box 7490 (used)              |   1 |      ~ 40 € |      ~ 40 € |
 |   ⬜   | WiFi access point, VLAN-capable    |   1 |      ~ 60 € |      ~ 60 € |
 
@@ -80,10 +86,16 @@ The **access point** is what carries the household WLAN once OPNsense becomes th
 
 | | |
 | --- | ----------: |
-| **Total (all listed parts)** | **~ 1266 €** |
-| **Already spent** ✅ | **~ 778 €** |
-| **Still outstanding** ⬜ | **~ 488 €** |
-| *Without the optional MS-01 block* | *~ 766 €* |
+| **Total (all listed parts)** | **~ 1421 €** |
+| **Already spent** ✅ | **~ 828 €** |
+| **Still outstanding** ⬜ | **~ 593 €** |
+| *Without the optional MS-01 block* | *~ 781 €* |
+
+The MS-01 line item is 500 €, but dropping it saves 640 € — the second converter exists only to give that machine its 19V, and the two HDDs only exist to be its storage pool, so both leave with it.
+
+> ✅ **The 750W PSU takes the power question off the table.** It was bought for 50 € — cheaper than the 500W unit originally planned — and at three nodes the lab sits at 48% even on measured figures. The first component to run out is now clearly the **node converter at six nodes (98%)**, while the PSU is still at 55%. Staggered boot remains worth setting up, but it is no longer what makes the budget work. The full calculation is in [power-supply](./power-supply#is-750w-enough).
+
+> ⚠️ **The two converters must be BUCK (step-down) modules**, and their printed current rating should be read at roughly half. Both are the same part — one dialled to 20V for the nodes, one to 19V for the MS-01. See [power-supply](./power-supply#buck-not-boost--get-the-type-right-first).
 
 ---
 
@@ -91,7 +103,7 @@ The **access point** is what carries the household WLAN once OPNsense becomes th
 
 **Ø Average** = realistic 24/7 mix, since the machines are never permanently idle or at full load: ~50% idle (nights, low activity), ~45% default operation, ~5% full load.
 
-**\* MS-01 values are estimated** from typical i9-12900H MS-01 reports — not yet measured on the actual machine. They will be replaced with real measurements.
+**\* MS-01 values come from [ServeTheHome's measurements](https://www.servethehome.com/minisforum-ms-01-review-the-10gbe-with-pcie-slot-mini-pc-intel/5/)** of an MS-01 review unit — ~25–29 W idle, and under load ~115 W for 45 s before settling at 90–95 W. The full-load row uses the sustained 90–95 W, since a 45-second burst does not move a monthly bill. Still not measured on *this* machine; a clamp meter on `pve0` is the number to replace them with.
 
 | Device           | Scenario  |        Watt |       Per month |    Per year |
 | ---------------- | --------- | ----------: | --------------: | ----------: |
@@ -105,16 +117,21 @@ The **access point** is what carries the household WLAN once OPNsense becomes th
 | MikroTik CRS310  | Full load |      ~ 34 W |        ~ 8.69 € |     ~ 104 € |
 | MikroTik CRS310  | Ø Average |      ~ 24 W |        ~ 6.22 € |      ~ 75 € |
 |                  |           |             |                 |             |
-| MS-01 (pve0) *   | Idle      |   ~ 20–28 W |   ~ 5.11–7.15 € |   ~ 61–86 € |
+| MS-01 (pve0) *   | Idle      |   ~ 25–29 W |   ~ 6.39–7.41 € |   ~ 77–89 € |
 | MS-01 (pve0) *   | Default   |   ~ 35–50 W |  ~ 8.94–12.78 € |  ~ 107–153 € |
-| MS-01 (pve0) *   | Full load |  ~ 90–120 W | ~ 23.00–30.66 € | ~ 276–368 € |
-| MS-01 (pve0) *   | Ø Average |   ~ 30–43 W |  ~ 7.67–10.99 € |  ~ 92–132 € |
+| MS-01 (pve0) *   | Full load |   ~ 90–95 W | ~ 23.00–24.27 € | ~ 276–291 € |
+| MS-01 (pve0) *   | Ø Average |   ~ 33–42 W |  ~ 8.43–10.73 € |  ~ 101–129 € |
 |                  |           |             |                 |             |
 |                  |           |             |                 |             |
 | 3 nodes + switch | Idle      |   ~ 36–45 W |  ~ 9.20–11.50 € | ~ 110–138 € |
 | 3 nodes + switch | Default   |   ~ 57–72 W | ~ 14.56–18.40 € | ~ 175–221 € |
 | 3 nodes + switch | Full load | ~ 139–154 W | ~ 35.51–39.35 € | ~ 426–472 € |
 | 3 nodes + switch | Ø Average |   ~ 51–63 W | ~ 12.93–16.00 € | ~ 155–192 € |
+|                  |           |             |                 |             |
+| **+ MS-01** *(the lab as it stands)* | Idle |   ~ 61–74 W | ~ 15.59–18.91 € | ~ 187–227 € |
+| **+ MS-01** | Default   |  ~ 92–122 W | ~ 23.51–31.17 € | ~ 282–374 € |
+| **+ MS-01** | Full load | ~ 229–249 W | ~ 58.51–63.62 € | ~ 702–763 € |
+| **+ MS-01** | Ø Average |  ~ 84–105 W | ~ 21.46–26.83 € | ~ 258–322 € |
 |                  |           |             |                 |             |
 | 5 nodes + switch | Idle      |   ~ 46–61 W | ~ 11.75–15.59 € | ~ 141–187 € |
 | 5 nodes + switch | Default   |  ~ 77–102 W | ~ 19.67–26.06 € | ~ 236–313 € |

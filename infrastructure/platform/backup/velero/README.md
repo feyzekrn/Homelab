@@ -2,9 +2,11 @@
 
 [<- Back to Backup](../README.md)
 
-Velero backs up and restores Kubernetes resources and persistent volume data.
+Velero backs up and restores Kubernetes resources and persistent volume data (`k8s`).
 
 It is useful for disaster recovery, cluster migration and testing rebuild workflows.
+
+**It covers the cluster only.** The Proxmox world has its own tooling — `vzdump` now, [Proxmox Backup Server](../proxmox-backup-server) later — because containers and VMs are not Kubernetes objects. Two worlds, two backup tools, documented together in the [backup overview](../README.md).
 
 Velero is a Kubernetes backup tool. It can save Kubernetes API resources such as Deployments, Services, Ingresses, ConfigMaps and custom resources. Depending on the storage integration, it can also coordinate persistent volume backups.
 
@@ -17,6 +19,22 @@ Velero is not a magic full-system backup. It must be configured with a backup lo
 This project is explicitly about breaking and rebuilding infrastructure. Velero provides a structured way to test whether the cluster can recover from mistakes, node loss or a full rebuild.
 
 It also teaches an important production habit: write the restore procedure before relying on the backup. A Velero backup is only valuable if the project can explain where it is stored, how credentials are recovered, how namespaces are restored and which workloads need extra application-level recovery.
+
+---
+
+## Prerequisites
+
+| Requirement | Why |
+|---|---|
+| A running cluster with [Cilium](../../../kubernetes/cilium) | It runs as pods |
+| [Longhorn](../../storage/longhorn) | The volumes being backed up, and the CSI snapshot integration |
+| **[MinIO (backup)](../../storage/minio) on `pve0`** | The S3 target — and it must be the `lxc` instance, not the cluster one |
+| Disks in `pve0` → [ZFS pool](../../storage/zfs-nas) | MinIO's backup instance has nowhere to write without them |
+| [Vault](../../security/secret-store) | S3 credentials do not belong in a values file |
+
+**The target must not be the cluster.** Velero writing to a MinIO running on the same cluster is a backup stored inside the failure domain it protects — wipe the cluster and the restore path goes with it. This is why [MinIO is deployed twice](../../storage/minio#how-each-instance-is-built), and pointing Velero at the wrong one silently produces useless backups.
+
+Consequence worth stating: **the whole backup chain is currently blocked on two hard drives.** Until `pve0` has disks, the cluster has no valid backup target, and anything deployed before then runs without a restore path.
 
 ---
 
@@ -74,7 +92,9 @@ It also teaches an important production habit: write the restore procedure befor
 
 ## Runtime Status
 
-Velero is currently `⚫ Inactive`. It is optional at the start, but should become a core candidate before important data is stored.
+Velero is currently `⚫ Inactive`. The timing rule is simple and worth holding to: **it must run before the first irreplaceable data exists on the cluster**, not after. Retrofitting backups onto data that already matters means the gap was real for however long it took.
+
+In practice it is blocked by the same hardware as everything else in the backup chain — see the prerequisites above.
 
 ---
 

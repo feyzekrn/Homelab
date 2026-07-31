@@ -43,7 +43,7 @@ In companies, observability supports incident response, service-level objectives
 | Name | Path | Idle RAM | Purpose |
 |---|---|---|---|
 | Metrics | [docs](./metrics) | ~0.7–1.3 GB total | Numeric time-series about systems and services |
-| Logging | [docs](./logging) | ~50 MB / node; +2–4 GB with OpenSearch | Structured and searchable logs |
+| Logging | [docs](./logging) | ~50 MB / node + ~0.3 GB | Structured and searchable logs |
 | Tracing | [docs](./tracing) | ~0.3–0.7 GB total | Request flow across services |
 
 ---
@@ -53,7 +53,7 @@ In companies, observability supports incident response, service-level objectives
 Start with metrics first, then logs, then tracing:
 
 1. Prometheus and Grafana for infrastructure visibility.
-2. Fluent Bit and OpenSearch for searchable logs.
+2. Loki and Fluent Bit for logs — Loki first, then the collector that feeds it.
 3. OpenTelemetry Collector and Jaeger when custom services start communicating.
 
 This order keeps the platform understandable while still moving toward a real production-style setup.

@@ -4,11 +4,27 @@
 
 Grafana is the dashboard layer for metrics, logs and traces.
 
-It does not collect data by itself. It visualizes data from systems such as Prometheus, OpenSearch, Loki, Jaeger or InfluxDB.
+It does not collect data by itself. It visualizes data from systems such as Prometheus, Loki, Jaeger or InfluxDB.
+
+In this homelab it is the **single pane for everything**: [Prometheus](../prometheus) metrics, [Loki](../../logging/loki) logs and [Jaeger](../../tracing/jaeger) traces all land here — including the metrics scraped from `pve0`, the switch and OPNsense. It is the one place where both worlds appear together.
 
 Grafana is the visual interface for observability data. It connects to data sources, runs queries and displays results as dashboards, graphs, tables, gauges and alerts.
 
-For example, Prometheus may store CPU metrics, OpenSearch may store logs and Jaeger may store traces. Grafana can provide a single UI that links those signals together. It is usually the first observability tool a human opens during troubleshooting.
+For example, Prometheus may store CPU metrics, Loki may store logs and Jaeger may store traces. Grafana provides a single UI that links those signals together. It is usually the first observability tool a human opens during troubleshooting.
+
+---
+
+## Prerequisites
+
+| Requirement | Why |
+|---|---|
+| A running cluster with [Cilium](../../../../kubernetes/cilium) | It runs as pods |
+| At least one data source | [Prometheus](../prometheus) first — Grafana displays nothing on its own |
+| [Longhorn](../../../storage/longhorn) | Dashboards, users and settings are state worth keeping |
+| [Traefik](../../../ingress/traefik) + [cert-manager](../../../ingress/cert-manager) | It is a web UI and needs a hostname |
+| [Keycloak](../../../security/rights-management/keycloak) | Optional — OIDC login instead of a local admin account |
+
+Deploy Prometheus first. Grafana without a data source is an empty dashboard that teaches nothing.
 
 Grafana is not a replacement for the data sources behind it. If Prometheus is not collecting metrics, Grafana has no Prometheus metrics to show.
 

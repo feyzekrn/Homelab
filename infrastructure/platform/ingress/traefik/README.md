@@ -2,9 +2,11 @@
 
 [<- Back to Ingress](../README.md)
 
-Traefik is the preferred first ingress controller for this homelab.
+Traefik is the **chosen ingress controller for the Kubernetes cluster** (`k8s`).
 
 It acts as a Kubernetes-aware reverse proxy. It watches Kubernetes resources, receives HTTP and HTTPS traffic and routes requests to the correct service.
+
+**It serves the cluster only.** The applications on [`pve0`](../../../../setup/compute/proxmox-cluster) have their own entrance in [Caddy](../caddy), deliberately — routing the family apps through the cluster's ingress would mean a cluster rebuild takes the photos offline with it. Two proxies, two failure domains; they never route the same hostname.
 
 Traefik sits at the edge of the cluster for web traffic. When a request arrives for `grafana.homelab.local`, Traefik looks at Kubernetes routing resources and forwards the request to the Grafana Service. When a request arrives for `api.homelab.local`, it can route to a different backend.
 
@@ -19,6 +21,20 @@ Traefik is a good homelab standard because it is easy to install, has strong Kub
 For a business standard, ingress-nginx, Traefik Enterprise or cloud/provider-specific ingress controllers may be evaluated depending on operational requirements.
 
 Traefik is also beginner-friendly because its dashboard helps reveal what routing rules exist and whether services are reachable. That makes it easier to learn ingress than a completely invisible proxy setup.
+
+---
+
+## Prerequisites
+
+| Requirement | Why |
+|---|---|
+| A running cluster with [Cilium](../../../kubernetes/cilium) | Traefik is a pod like any other; the CNI has to work first |
+| [MetalLB](../../../kubernetes/metallb) | Traefik needs a routable LoadBalancer IP on the LAN — this is the one that surprises people |
+| [cert-manager](../cert-manager) | For HTTPS. Traefik terminates TLS but does not obtain certificates itself |
+| An own domain + [AdGuard Home](../../dns/adguard-home) | Split DNS has to point the hostnames at the MetalLB IP internally |
+| [Cloudflare Tunnel](../cloudflare-tunnel) | Only for services that should also be reachable from outside |
+
+The MetalLB dependency is the one worth internalising: **an ingress controller with no external IP routes nothing.** [MetalLB](../../../kubernetes/metallb) assigns the address, DNS makes the name resolve to it, and Traefik decides what happens to the request once it arrives. Three different components, three different jobs, and all three have to be right before a single URL works.
 
 ---
 
@@ -91,7 +107,9 @@ After installing, expose Traefik through MetalLB and create a test `Ingress` or 
 
 ## Runtime Status
 
-Traefik is currently `⚫ Inactive`. It should become the first ingress controller once services need HTTP(S) access.
+Traefik is currently `⚫ Inactive`. It becomes active once the first cluster service needs a URL — in the build order that is after [Cilium](../../../kubernetes/cilium), [MetalLB](../../../kubernetes/metallb) and [Longhorn](../../storage/longhorn), and together with [cert-manager](../cert-manager).
+
+One operational note before it is exposed: **the dashboard must be protected first.** It reveals the full routing table of the cluster and is reachable by default. It belongs behind [NetBird](../netbird) or an authentication middleware, never on a public hostname.
 
 ---
 

@@ -14,11 +14,25 @@ Nextcloud has local user management, but this homelab centralizes identity in Ke
 
 Setup outline:
 
-1. Create a realm (e.g. `family`) in Keycloak with one user per member.
-2. Create Keycloak groups such as `parents`, `kids`, `admins`.
+1. Create the `homelab` realm in Keycloak with one user per member, in a `family` group.
+2. Create subgroups such as `parents`, `kids`, `admins`.
 3. Install the Nextcloud OIDC app (`user_oidc`) and register Nextcloud as a Keycloak client.
 4. Map Keycloak groups into Nextcloud groups so permissions follow the identity.
-5. Disable local Nextcloud registration; Keycloak is the only door.
+5. Disable local Nextcloud **registration** — but keep one local admin account, see below.
+
+### Keycloak lives in the other world — and that is handled
+
+Nextcloud runs as an LXC on [`pve0`](../../setup/compute/proxmox-cluster); Keycloak is a cluster workload. Left alone, that would mean a cluster rebuild locks the family out of their own files — the exact dependency the [two-world split](../../setup/compute/README.md) exists to prevent.
+
+It is resolved by [anchoring](../../setup/compute/README.md#the-bridge-one-node-with-a-foot-in-both-worlds): Keycloak keeps one replica pinned to a Proxmox-hosted cluster node, and its database is a container on `pve0` outside cluster storage. Logins survive the cluster being wiped.
+
+### Break-glass: keep one local admin
+
+**Do not disable local login entirely**, even though "Keycloak is the only door" is the cleaner-sounding rule. Keep exactly one local admin account, unused for daily work, with its password in [Vaultwarden](../../infrastructure/platform/security/password-manager/bitwarden) on `pve0`.
+
+The reason is circular dependency: if Keycloak is misconfigured or down, the person who must fix it needs to get into Nextcloud to diagnose it — and an OIDC-only Nextcloud will not let them. This is the single most common way a homelab SSO rollout turns a two-hour problem into a weekend.
+
+[Jellyfin](../jellyfin) sits outside this model entirely and keeps local accounts for everyone, because its OIDC support is a third-party plugin not worth depending on.
 
 What each member gets automatically:
 
@@ -81,7 +95,7 @@ Suggested minimal role model:
 Guardrails worth configuring:
 
 - default share permissions (e.g. disable resharing)
-- storage quotas per group
+- storage quotas per group — and a matching ZFS quota on `tank/nextcloud`, so one account cannot fill the pool that [Immich](../immich) also lives on
 - MFA enforced in Keycloak, at least for admin accounts
 
 ---
@@ -89,11 +103,14 @@ Guardrails worth configuring:
 ## Rollout Order
 
 1. Get single-user Nextcloud stable first ([README checklist](./README.md#hands-on-start)).
-2. Add Keycloak OIDC login; verify your own account works end to end.
-3. Prove [device sync](./synchronization.md) for yourself for a few weeks.
-4. Create family accounts and the shared folder/calendar structure.
-5. Onboard one family member as pilot — their devices, their sync.
-6. Onboard the rest only when backups and restores are boring routine. Family data raises the stakes: from that point on, the homelab has users who did not choose it.
+2. **Prove `vzdump` and a restore** before any second person is involved.
+3. Add Keycloak OIDC login; verify your own account works end to end, and verify the local break-glass admin still works too.
+4. Prove [device sync](./synchronization.md) for yourself for a few weeks.
+5. Create family accounts and the shared folder/calendar structure.
+6. Onboard one family member as pilot — their devices, their sync.
+7. Onboard the rest only when backups and restores are boring routine.
+
+Step 7 is the real threshold. From that point the homelab has **users who did not choose it**, and every outage becomes someone else's problem rather than a learning opportunity. That change is worth making deliberately rather than drifting into it.
 
 ---
 

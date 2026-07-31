@@ -52,6 +52,20 @@ The irreplaceable data (photos, personal cloud) is additionally covered at the d
 
 ---
 
+## Prerequisites
+
+| Requirement | Why |
+|---|---|
+| Disks in `pve0` → [ZFS pool](../../storage/zfs-nas) | Even `vzdump` needs somewhere to write |
+| A second machine or external disk | PBS on the host it backs up protects against mistakes, not against hardware loss |
+| RAM headroom (~1–2 GB) | It brings its own OS as a VM |
+
+**Start with `vzdump`, not with this.** Proxmox VE's built-in dump to the ZFS pool covers the family apps from day one and needs no extra component. PBS earns its place later, when deduplication and incremental backups matter — a full nightly dump of Immich's container is wasteful in a way a deduplicating store is not.
+
+The genuinely important step is neither of them: **getting a copy off the machine.** `zfs send` to an external disk protects against the case both `vzdump` and PBS-on-the-same-host share — the box itself being gone.
+
+---
+
 ## Documentation
 
 - [Proxmox Backup Server documentation](https://pbs.proxmox.com/docs/)

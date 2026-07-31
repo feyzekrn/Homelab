@@ -124,7 +124,23 @@ First evaluation checklist:
 
 ## Runtime Status
 
-Bitwarden/Vaultwarden is currently `⚫ Inactive`. It is a strong early candidate once ingress, TLS, storage and backups work — small footprint, huge daily value.
+Vaultwarden is currently `⚫ Inactive`. It is an **early component and deliberately so** — it runs as an LXC on [`pve0`](../../../../../setup/compute/proxmox-cluster), needs only [Caddy](../../../ingress/caddy) in front of it, and delivers daily value to the whole family from day one.
+
+**It has one job the architecture depends on:** holding the [break-glass credentials](../../rights-management/keycloak#break-glass-access) — the local admin accounts that get you back in when [Keycloak](../../rights-management/keycloak) is unavailable. That is precisely why it lives on `pve0` and not on the cluster. A password manager that stores the recovery keys for a system, inside that same system, is a locked door with the key behind it.
+
+---
+
+## Prerequisites
+
+| Requirement | Why |
+|---|---|
+| Proxmox VE running | It is an LXC |
+| [Caddy](../../../ingress/caddy) | HTTPS is mandatory — Bitwarden clients refuse plain HTTP |
+| An own domain | For a real certificate |
+| A backup path | The vault is irreplaceable; `vzdump` from the start, not later |
+| [Cloudflare Tunnel](../../../ingress/cloudflare-tunnel) or [NetBird](../../../ingress/netbird) | Only if it should be reachable outside the LAN — and it should, or people will not use it |
+
+**Back it up before adding the first password.** This is the one service where "I will set up backups next weekend" costs every credential the family has.
 
 ---
 

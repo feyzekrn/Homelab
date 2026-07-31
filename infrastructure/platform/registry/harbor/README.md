@@ -10,6 +10,20 @@ Compared with a minimal `registry:2` container, Harbor adds platform features: p
 
 ---
 
+## Prerequisites
+
+| Requirement | Why |
+|---|---|
+| A running cluster with [Cilium](../../../kubernetes/cilium) | It runs as pods — several of them |
+| [Longhorn](../../storage/longhorn) | Image layers are large; budget capacity against the ~250 GB total |
+| [Traefik](../../ingress/traefik) + [cert-manager](../../ingress/cert-manager) | Container registries require valid TLS; the runtime refuses otherwise |
+| [Vault](../../security/secret-store) | Robot account credentials for CI |
+| Something producing images | GitHub Actions and at least one custom service — otherwise it stores nothing |
+
+**Watch the storage.** Harbor is the cluster component most likely to quietly consume Longhorn capacity, because every build pushes new layers. Configure retention policies at deployment time rather than after the volume fills.
+
+---
+
 ## Why It Fits
 
 Harbor is useful once the homelab builds and runs multiple custom images. It teaches registry operations beyond simply pushing images to a public service.

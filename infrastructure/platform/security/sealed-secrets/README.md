@@ -2,9 +2,9 @@
 
 [<- Back to Security](../README.md)
 
-Sealed Secrets encrypts Kubernetes secrets so the encrypted form can be stored in Git.
+Sealed Secrets encrypts Kubernetes secrets so the encrypted form can be stored in Git. Only the controller inside the target cluster can decrypt them.
 
-Only the controller inside the target cluster can decrypt them.
+In this homelab, Sealed Secrets is a **documented alternative and is not planned**. [Vault](../secret-store) plus [External Secrets Operator](../external-secrets) covers the same problem more completely, and running both would mean two competing answers to "where does a secret live".
 
 Sealed Secrets lets an operator take a Kubernetes Secret, encrypt it with a public key and commit the encrypted result to Git. The encrypted object is called a `SealedSecret`. Inside the cluster, the Sealed Secrets controller has the private key and can decrypt the value into a normal Kubernetes `Secret`.
 
@@ -50,7 +50,11 @@ For this project, Sealed Secrets should be considered a fallback or bridge. The 
 
 ## Runtime Status
 
-Sealed Secrets is currently `⚫ Inactive`. Compare it against External Secrets Operator before choosing a long-term secret workflow.
+Sealed Secrets is `⚫ Inactive` and **not planned**. [Vault](../secret-store) with [External Secrets Operator](../external-secrets) is the chosen path.
+
+**Why it lost, briefly:** Sealed Secrets solves exactly one problem — getting an encrypted value safely into Git. It has no rotation, no audit trail, no dynamic credentials and no access policies, and the secret is still pinned to one cluster's private key. Vault does all of that and more; adding Sealed Secrets next to it would only create a second place to look.
+
+**When it would be the right choice:** a GitOps cluster with no external secret manager and no appetite to operate one. It is genuinely the simpler tool, and for a single-cluster setup that only needs a handful of static secrets, it is not a bad answer — just not this one.
 
 ---
 

@@ -33,7 +33,9 @@ Every entry created on any device syncs to Nextcloud, and from there to every ot
      └─────────────┘      └──────────────┘      └──────────────┘
 ```
 
-Prerequisite for all of this: the Nextcloud hostname must be reachable from everywhere the devices go, with valid TLS. Inside the LAN that is Traefik + cert-manager; outside it is [Cloudflare Tunnel](../../infrastructure/platform/ingress/cloudflare-tunnel). Sync protocols retry silently, but an unreachable server means stale data until the device is home again.
+Prerequisite for all of this: the Nextcloud hostname must be reachable from everywhere the devices go, with valid TLS. Inside the LAN that is [Caddy](../../infrastructure/platform/ingress/caddy) with its automatic certificates; outside it is [Cloudflare Tunnel](../../infrastructure/platform/ingress/cloudflare-tunnel). Both resolve to the same hostname — [split DNS](../../infrastructure/platform/dns/adguard-home) sends it to Caddy directly at home and through the tunnel elsewhere.
+
+Sync protocols retry silently, which is a mixed blessing: an unreachable server does not produce an error, it produces stale data until the device is home again. **Remote reachability is therefore not a nice-to-have for this app** — a calendar that only syncs on the home WiFi is worse than no migration at all, because it looks like it is working.
 
 ---
 
@@ -131,7 +133,9 @@ With [Keycloak SSO](./multi-user-family.md) enabled, browser login goes through 
 7. Install desktop sync clients; move working folders into the synced area.
 8. Copy remaining iCloud Drive/OneDrive files over.
 9. Run both systems in parallel for a few weeks.
-10. Disable Calendar/Contacts/Drive under the iCloud account — **only after backups are proven** ([Velero](../../infrastructure/platform/backup/velero) restore test).
+10. Disable Calendar/Contacts/Drive under the iCloud account — **only after backups are proven** by restoring a `vzdump` into a fresh container and confirming calendars and contacts survived.
+
+Step 10 is the point of no return. Until it happens, iCloud is still a working second copy; afterwards the homelab is the only copy, and the restore test is what makes that acceptable rather than reckless.
 
 ---
 

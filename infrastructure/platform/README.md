@@ -44,12 +44,15 @@ Current state: every component is `⚫ Inactive` until the cluster build starts.
 | Value | Meaning |
 |---|---|
 | `k8s` | Workload on the bare-metal Kubernetes cluster |
+| `k8s ⚓` | On the cluster, but with one replica **pinned to the Proxmox-hosted node** so it survives a cluster rebuild |
 | `lxc` | Container on the Proxmox host — the default for lightweight services in the stable world |
 | `vm` | Full virtual machine on the Proxmox host — when a component brings its own operating system |
 | `lxc + k8s` | Instances in both worlds (AdGuard Home: primary plus synced replica; Cloudflare Tunnel: one connector per world) |
 | `—` | Documented alternative or category — nothing to deploy |
 
 The split is not about capability but about **blast radius**: anything the household depends on runs where cluster experiments cannot reach it, and anything that benefits from rescheduling across nodes runs on the cluster.
+
+The rule that decides a placement is *who consumes the component*, not how much availability it needs — documented in full under [The Bridge](../../setup/compute/README.md#the-bridge-one-node-with-a-foot-in-both-worlds). Components whose consumers live in both worlds get the `⚓` anchor; components the cluster alone consumes stay plain `k8s` even when they are important, because their usefulness ends when the cluster does.
 
 `Idle RAM` is a rough ballpark per instance at homelab scale — what the component consumes just by running, before real load. Values marked `/ node` run on every node (DaemonSet-style), `each`/`sidecar` multiply per use. Load, caches and data change the picture; treat the column as an order-of-magnitude guide, not a promise.
 
@@ -98,6 +101,7 @@ infrastructure/platform/
 ├── observability/
 │   ├── logging/
 │   │   ├── fluent-bit/
+│   │   ├── loki/
 │   │   └── opensearch/
 │   ├── metrics/
 │   │   ├── grafana/
@@ -163,7 +167,8 @@ infrastructure/platform/
 | External Secrets Operator | [docs](./security/external-secrets) · [chart](../../helm-charts/infrastructure/platform/security/external-secrets) · [config](./security/external-secrets/terraform) | ⚫ Inactive | k8s | ~50–100 MB | Syncs selected vault secrets into Kubernetes Secrets | GitOps standard | 2026-06-17 |
 | Sealed Secrets | [docs](./security/sealed-secrets) | ⚫ Inactive | — | ~50 MB | Encrypted Kubernetes Secrets stored in Git | Documented alternative — not needed alongside Vault | 2026-07-28 |
 | Rights Management | [docs](./security/rights-management) | ⚫ Inactive | — | — | Identity, roles and app permission decisions (category) | Important later | 2026-06-17 |
-| Keycloak | [docs](./security/rights-management/keycloak) · [chart](../../helm-charts/infrastructure/platform/security/rights-management/keycloak) · [config](./security/rights-management/keycloak/terraform) | ⚫ Inactive | k8s | ~0.7–1 GB | Identity provider for SSO, OIDC, OAuth2, users, groups and service accounts | Chosen identity provider | 2026-07-28 |
+| Keycloak | [docs](./security/rights-management/keycloak) · [chart](../../helm-charts/infrastructure/platform/security/rights-management/keycloak) · [config](./security/rights-management/keycloak/terraform) | ⚫ Inactive | k8s ⚓ | ~0.7–1 GB | Identity provider for SSO, OIDC, OAuth2, users, groups and service accounts | Chosen identity provider — anchored, database on `pve0` | 2026-07-30 |
+| PostgreSQL (identity) | [docs](./databases/postgresql) · [config](./databases/postgresql/terraform) | ⚫ Inactive | lxc | ~0.1–0.3 GB | Dedicated database for Keycloak, kept outside the cluster | Required by the anchor — a pinned pod with a cluster-side database anchors nothing | 2026-07-30 |
 | Password Manager | [docs](./security/password-manager) | ⚫ Inactive | — | — | Human password vault, separate from application secrets (category) | High daily value | 2026-07-08 |
 | Bitwarden (Vaultwarden) | [docs](./security/password-manager/bitwarden) · [config](./security/password-manager/bitwarden/terraform) | ⚫ Inactive | lxc | ~50–100 MB | Family password manager (Vaultwarden server, Bitwarden clients) | Chosen password manager | 2026-07-28 |
 
@@ -175,17 +180,20 @@ infrastructure/platform/
 | ZFS + shares 🗄️ NAS | [docs](./storage/zfs-nas) · [config](./storage/zfs-nas/terraform) | ⚫ Inactive | lxc | ~0.1 GB service + ZFS ARC | ZFS pool on the Proxmox host, exported through a small share container | Chosen NAS approach | 2026-07-28 |
 | TrueNAS SCALE 🗄️ NAS | [docs](./storage/truenas) | ⚫ Inactive | — | ~8–16 GB | Full NAS operating system with a web UI, run as a VM | Documented alternative — costs the bind-mount architecture | 2026-07-28 |
 | OpenMediaVault 🗄️ NAS | [docs](./storage/openmediavault) | ⚫ Inactive | — | ~1–2 GB | Debian-based NAS distribution, lighter than TrueNAS | Documented alternative | 2026-07-28 |
-| MinIO | [docs](./storage/minio) · [config](./storage/minio/terraform) | ⚫ Inactive | lxc | ~0.2–0.5 GB | The homelab S3 bucket equivalent for object storage | Chosen S3 target for cluster backups | 2026-07-28 |
+| MinIO (apps) | [docs](./storage/minio) · [chart](../../helm-charts/infrastructure/platform/storage/minio) · [config](./storage/minio/terraform) | ⚫ Inactive | k8s | ~0.2–0.5 GB | S3 endpoint for application buckets — uploads, images, exports | Chosen object storage for apps — single replica on Longhorn | 2026-07-30 |
+| MinIO (backup) | [docs](./storage/minio) · [config](./storage/minio/terraform) | ⚫ Inactive | lxc | ~0.2–0.5 GB | S3 backup target on `tank/backups` | Chosen backup target — must outlive the cluster | 2026-07-30 |
 
 ### Databases And Data Stores
 
 | Name | Path | Status | Runs on | Idle RAM | What it is | Recommendation | Last update |
 |---|---|---|---|---|---|---|---|
-| PostgreSQL | [docs](./databases/postgresql) · [chart](../../helm-charts/infrastructure/platform/databases/postgresql) · [config](./databases/postgresql/terraform) | ⚫ Inactive | k8s | ~0.1–0.3 GB | Main SQL database for most custom services | Chosen default database | 2026-07-28 |
+| PostgreSQL | [docs](./databases/postgresql) · [chart](../../helm-charts/infrastructure/platform/databases/postgresql) · [config](./databases/postgresql/terraform) | ⚫ Inactive | k8s | ~0.1–0.3 GB | Main SQL database for custom services and cluster workloads | Chosen default database | 2026-07-30 |
 | Redis | [docs](./databases/redis) · [chart](../../helm-charts/infrastructure/platform/databases/redis) · [config](./databases/redis/terraform) | ⚫ Inactive | k8s | ~30–100 MB | Fast cache, session store and lightweight key-value system | Chosen cache — deployed once an app needs it | 2026-07-28 |
 | MySQL | [docs](./databases/mysql) | ⚫ Inactive | — | ~0.3–0.5 GB | SQL database for MySQL-compatible apps and learning | Documented alternative to PostgreSQL | 2026-07-28 |
 | MongoDB | [docs](./databases/mongodb) | ⚫ Inactive | — | ~0.3–1 GB | Document database for JSON-shaped data | Documented — deploy only for a real workload | 2026-07-28 |
 | InfluxDB | [docs](./databases/influxdb) | ⚫ Inactive | — | ~0.2–0.5 GB | Time-series database for sensors and measurements | Documented — Prometheus covers metrics for now | 2026-07-28 |
+
+**PostgreSQL runs more than once, on purpose.** The cluster instance above serves cluster workloads. A second, separate instance runs as an `lxc` on `pve0` for [Keycloak](./security/rights-management/keycloak#where-it-runs--the-hardest-placement-in-the-catalog) — see the identity row in the Security section. And the family apps on `pve0` keep their databases inside their own containers rather than sharing one, so that each app is a single self-contained `vzdump` and no shared database outage can take all three offline at once. One database engine, four deployments, three different reasons.
 
 ### Messaging
 
@@ -207,7 +215,8 @@ infrastructure/platform/
 |---|---|---|---|---|---|---|---|
 | Prometheus | [docs](./observability/metrics/prometheus) · [chart](../../helm-charts/infrastructure/platform/observability/metrics/prometheus) · [config](./observability/metrics/prometheus/terraform) | ⚫ Inactive | k8s | ~0.5–1 GB+ | Metrics database and alerting engine | Chosen metrics stack — also scrapes `pve0` and the switch | 2026-07-28 |
 | Grafana | [docs](./observability/metrics/grafana) · [chart](../../helm-charts/infrastructure/platform/observability/metrics/grafana) · [config](./observability/metrics/grafana/terraform) | ⚫ Inactive | k8s | ~0.15–0.3 GB | Dashboard UI for metrics, logs and traces | Chosen dashboard layer | 2026-07-28 |
-| Fluent Bit | [docs](./observability/logging/fluent-bit) · [chart](../../helm-charts/infrastructure/platform/observability/logging/fluent-bit) · [config](./observability/logging/fluent-bit/terraform) | ⚫ Inactive | k8s | ~30–50 MB / node | Lightweight log collector for Kubernetes nodes | Chosen log collector | 2026-07-28 |
+| Loki | [docs](./observability/logging/loki) · [chart](../../helm-charts/infrastructure/platform/observability/logging/loki) · [config](./observability/logging/loki/terraform) | ⚫ Inactive | k8s | ~0.2–0.4 GB | Log backend that indexes labels instead of full text | Chosen logging backend — shares Grafana with the metrics | 2026-07-30 |
+| Fluent Bit | [docs](./observability/logging/fluent-bit) · [chart](../../helm-charts/infrastructure/platform/observability/logging/fluent-bit) · [config](./observability/logging/fluent-bit/terraform) | ⚫ Inactive | k8s | ~30–50 MB / node | Lightweight log collector for Kubernetes nodes | Chosen log collector — ships into Loki | 2026-07-30 |
 | OpenTelemetry Collector | [docs](./observability/tracing/opentelemetry-collector) · [chart](../../helm-charts/infrastructure/platform/observability/tracing/opentelemetry-collector) · [config](./observability/tracing/opentelemetry-collector/terraform) | ⚫ Inactive | k8s | ~0.1–0.2 GB | Neutral pipeline for traces, metrics and logs | Chosen — deployed once custom services exist | 2026-07-28 |
 | Jaeger | [docs](./observability/tracing/jaeger) · [chart](../../helm-charts/infrastructure/platform/observability/tracing/jaeger) · [config](./observability/tracing/jaeger/terraform) | ⚫ Inactive | k8s | ~0.2–0.5 GB | Trace UI/backend for distributed services | Chosen tracing backend — same timing as the collector | 2026-07-28 |
 | OpenSearch | [docs](./observability/logging/opensearch) | ⚫ Inactive | — | ~2–4 GB+ | Search engine for logs and analytics | Documented alternative — too heavy; Loki is the lighter path | 2026-07-28 |

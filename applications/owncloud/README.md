@@ -57,15 +57,17 @@ This project chose Nextcloud because everything needed — calendar, contacts, f
 
 ## Infrastructure Dependencies
 
-If it were deployed, the profile matches Nextcloud's:
+If it were deployed, it would take exactly [Nextcloud](../nextcloud)'s place — an LXC on [`pve0`](../../setup/compute/proxmox-cluster) with the data bind-mounted from the ZFS pool:
 
 | Dependency | Purpose |
 |---|---|
-| [`longhorn`](../../infrastructure/platform/storage/longhorn) | Persistent data volumes |
-| [`postgresql`](../../infrastructure/platform/databases/postgresql) | Database (classic server only; oCIS needs none) |
-| [`traefik`](../../infrastructure/platform/ingress/traefik) | HTTP(S) ingress |
-| [`cert-manager`](../../infrastructure/platform/ingress/cert-manager) | TLS certificates |
+| [`zfs-nas`](../../infrastructure/platform/storage/zfs-nas) | `tank/nextcloud` equivalent, bind-mounted |
+| [`postgresql`](../../infrastructure/platform/databases/postgresql) | Database — classic server only; oCIS needs none |
+| [`caddy`](../../infrastructure/platform/ingress/caddy) | HTTPS reverse proxy |
 | [`keycloak`](../../infrastructure/platform/security/rights-management/keycloak) | External OIDC identity (oCIS integrates natively) |
+| `vzdump` | Container and data backup |
+
+One genuine advantage worth naming: **oCIS needs no database at all**, which would make the container simpler than Nextcloud's PostgreSQL-plus-Redis stack. That is a real operational win, and it is not enough to outweigh the missing calendar and contact story.
 
 ---
 
@@ -88,15 +90,6 @@ ownCloud is `⚫ Inactive` and there is no plan to deploy it. [Nextcloud](../nex
 
 ---
 
-## Future Deployment Link
-
-If it were deployed, the location would be:
-
-```text
-../../helm-charts/applications/owncloud/
-```
-
----
 
 ## Documentation
 

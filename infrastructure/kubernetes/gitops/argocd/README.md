@@ -22,9 +22,23 @@ Argo CD is also the more common choice in the environments this project is prepa
 
 ---
 
+## Prerequisites
+
+| Requirement | Why |
+|---|---|
+| [Bootstrap](../../bootstrap) + [Cilium](../../cilium) | It runs as pods in the cluster it manages |
+| [Longhorn](../../../platform/storage/longhorn) | Argo CD keeps state — application status, history, RBAC |
+| A Git repository it can read | This one. Deploy keys or a token in [Vault](../../../platform/security/secret-store) |
+| [Traefik](../../../platform/ingress/traefik) + [cert-manager](../../../platform/ingress/cert-manager) | For the UI, which is the reason it was chosen over Flux |
+| [Keycloak](../../../platform/security/rights-management/keycloak) | Optional — OIDC login instead of the built-in admin account |
+
+**Install it by hand, once.** Argo CD cannot reconcile itself into a cluster that has no Argo CD — that first `helm install` is unavoidable, and after it the app-of-apps pattern takes over. This is the bootstrap problem every GitOps controller has.
+
+---
+
 ## What It Runs On
 
-Argo CD runs **on the Kubernetes cluster** (`k8s`) — it is a cluster component by definition and reconciles only cluster resources. It has no authority over the Proxmox world: the guests on [`pve0`](../../../../../setup/compute/proxmox-cluster) are defined as code separately, because Argo CD reconciles Kubernetes resources and nothing else. Two worlds, two deployment mechanisms.
+Argo CD runs **on the Kubernetes cluster** (`k8s`) — it is a cluster component by definition and reconciles only cluster resources. It has no authority over the Proxmox world: the guests on [`pve0`](../../../../setup/compute/proxmox-cluster) are defined as code separately, because Argo CD reconciles Kubernetes resources and nothing else. Two worlds, two deployment mechanisms.
 
 ---
 

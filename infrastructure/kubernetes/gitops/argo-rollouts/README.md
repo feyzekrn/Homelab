@@ -28,6 +28,17 @@ This project explicitly aims at how companies deploy software, and progressive d
 
 ---
 
+## Prerequisites
+
+| Requirement | Why |
+|---|---|
+| [Argo CD](../argocd) | Same family, and the `Rollout` objects are deployed through it |
+| [Prometheus](../../../platform/observability/metrics/prometheus) | Automated analysis queries it — without metrics there is nothing to gate on |
+| [Traefik](../../../platform/ingress/traefik) with weighted routing | Canary needs traffic splitting, which is extra configuration |
+| **A service where a bad release hurts** | The real prerequisite, and the one that does not exist yet |
+
+---
+
 ## Why Not Immediately
 
 - Nothing is deployed yet — a rollout strategy for zero services is theatre.

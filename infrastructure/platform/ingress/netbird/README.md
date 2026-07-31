@@ -113,7 +113,22 @@ First evaluation checklist:
 
 ## Runtime Status
 
-NetBird is currently `⚫ Inactive`. It is the chosen private/admin access path and becomes active as the first piece of the remote-access build.
+NetBird is currently `⚫ Inactive`. It is the **first piece of the remote-access build** and runs as an LXC peer on [`pve0`](../../../../setup/compute/proxmox-cluster) — no cluster required, deployable on the flat interim network.
+
+It also comes before [Cloudflare Tunnel](../cloudflare-tunnel) in the build order, and that ordering is deliberate: NetBird gives private access to everything, the tunnel publishes selected things to the internet. Having the private path working first means nothing ever *has* to be published in a hurry.
+
+---
+
+## Prerequisites
+
+| Requirement | Why |
+|---|---|
+| A NetBird account (managed control plane) | Self-hosting the control plane is a later exercise, not a starting point |
+| Proxmox VE running | The peer is an LXC |
+| Client apps on the admin devices | Laptop and phone — this is what "private access" means in practice |
+| A routing peer configuration | So one peer exposes the whole LAN subnet instead of installing a client on every device |
+
+**What belongs here rather than on the tunnel:** the Kubernetes API, SSH, the Proxmox UI, the MikroTik, OPNsense, the [Traefik dashboard](../traefik) and Grafana. Anything administrative. The rule is in [Cloudflare Tunnel](../cloudflare-tunnel#trust-decision) — public tunnel for things the family uses, private mesh for things that control the homelab.
 
 ---
 

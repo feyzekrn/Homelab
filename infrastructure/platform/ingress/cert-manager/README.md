@@ -2,9 +2,11 @@
 
 [<- Back to Ingress](../README.md)
 
-cert-manager automates certificate creation, renewal and distribution inside Kubernetes.
+cert-manager automates certificate creation, renewal and distribution inside Kubernetes (`k8s`).
 
 It can issue certificates from public authorities such as Let's Encrypt or from an internal CA.
+
+**It covers the cluster half of TLS only.** The Proxmox world does not use it: [Caddy](../caddy) obtains and renews its own certificates automatically, which is one of the reasons it was chosen there. Two worlds, two certificate stories, no shared dependency — see the [ingress overview](../README.md#components).
 
 TLS certificates are what allow HTTPS clients to verify that they are talking to the expected service and to encrypt traffic. Without automation, certificates must be requested, installed, renewed and replaced manually.
 
@@ -19,6 +21,22 @@ For beginners, the practical result is simple: instead of manually copying certi
 TLS should be normal, even in a homelab. cert-manager removes manual certificate handling and makes HTTPS reproducible through Kubernetes resources.
 
 It also connects several important concepts: DNS names, ingress routing, Let's Encrypt, internal certificate authorities, Kubernetes Secrets and certificate renewal. Those concepts appear constantly in production infrastructure.
+
+---
+
+## Prerequisites
+
+| Requirement | Why |
+|---|---|
+| A running cluster with [Cilium](../../../kubernetes/cilium) | It runs as pods and needs to reach the ACME endpoint |
+| **An own domain** | Let's Encrypt does not issue for made-up internal TLDs |
+| A **Cloudflare API token** | For DNS-01 challenges — the issuer writes a TXT record to prove domain control |
+| [Traefik](../traefik) | The consumer: cert-manager fills a Secret, Traefik serves it |
+| [Vault](../../security/secret-store) + [External Secrets](../../security/external-secrets) | The API token must not be committed to Git |
+
+**Use DNS-01, not HTTP-01.** The HTTP-01 challenge requires Let's Encrypt to reach the cluster from the internet on port 80, which this architecture deliberately does not allow — there are no inbound ports and no port forwarding anywhere in the design. DNS-01 proves domain ownership through a TXT record instead, works entirely outbound, and has the additional benefit of supporting **wildcard certificates**.
+
+This is the same mechanism [Caddy](../caddy) uses on the Proxmox side, for the same reason.
 
 ---
 
@@ -63,7 +81,9 @@ It also connects several important concepts: DNS names, ingress routing, Let's E
 
 ## Runtime Status
 
-cert-manager is currently `⚫ Inactive`. It should run permanently once TLS is used by cluster services.
+cert-manager is currently `⚫ Inactive`. It is deployed together with [Traefik](../traefik) — the first exposed cluster service needs both, and configuring the ingress controller without TLS only means doing the work twice.
+
+**Use the Let's Encrypt staging issuer first.** Production has rate limits that are easy to hit while a DNS-01 configuration is still wrong, and a week-long lockout at that stage is a genuinely annoying way to learn. Switch the issuer to production once a staging certificate has been issued successfully.
 
 ---
 

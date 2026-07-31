@@ -2,7 +2,22 @@
 
 [<- Back to Kubernetes Cluster](../README.md)
 
-Cilium is the recommended CNI for this homelab. It provides pod networking, Kubernetes NetworkPolicy support and eBPF-based visibility into traffic.
+Cilium is the **chosen CNI** for this homelab. It provides pod networking, Kubernetes NetworkPolicy support and eBPF-based visibility into traffic.
+
+---
+
+## Prerequisites
+
+| Requirement | Why |
+|---|---|
+| [Bootstrap](../bootstrap) completed | There has to be a cluster before it can be given a network |
+| A recent kernel on every node | eBPF is where Cilium's advantages live; [Ansible](../../provisioning/ansible) ensures this during provisioning |
+| No other CNI installed | Two CNIs is not a configuration, it is a broken cluster |
+| An IP plan that does not collide | The pod CIDR must not overlap the LAN or any VLAN from the [network design](../../../setup/networking/design.md) |
+
+**Nothing works before this.** Every other component in this repository — MetalLB, Longhorn, Argo CD, every application — waits on a functioning CNI, which makes it the first real decision after the cluster exists.
+
+---
 
 A Kubernetes cluster needs a Container Network Interface, usually shortened to CNI. The CNI is the part that makes pod networking work across nodes. Without a working CNI, pods cannot reliably communicate with each other and normal Kubernetes networking will not function.
 
@@ -62,7 +77,9 @@ It is a strong learning choice because it can start as the normal CNI and later 
 
 ## Runtime Status
 
-Cilium is currently `⚫ Inactive`. It should run permanently once the Kubernetes cluster exists. Without a CNI, the cluster cannot provide normal pod networking.
+Cilium is currently `⚫ Inactive`. It is installed **immediately after [bootstrap](../bootstrap)** and before anything else — nodes stay `NotReady` until a CNI exists, so this is not a component that can be postponed.
+
+It is also the one component that must handle the [anchor node](../../../setup/compute/README.md#the-bridge-one-node-with-a-foot-in-both-worlds) correctly: that node is a VM on `pve0` reached over the SFP+ trunk rather than a Tiny node on the 2.5G switch ports. Pod networking has to work across that boundary like any other, which makes the CNI configuration the place where the two-world bridge either works or quietly does not.
 
 ---
 

@@ -6,11 +6,11 @@ Plex is a self-hosted media server for organizing and streaming movies, shows, m
 
 In this homelab, Plex is documented as the **main alternative** to [Jellyfin](../jellyfin), which is the chosen media server. Plex has the more polished client ecosystem, but key features require a Plex account and paid pass — Jellyfin's fully open model fits this repository better. This page stays because Plex vs. Jellyfin is one of the classic homelab decisions.
 
-It belongs under `applications` because it is a user-facing workload. It is not required for Kubernetes itself, but it is a useful real-world app for testing storage, networking and hardware capabilities.
+It belongs under `applications` because it is a user-facing workload. It is not required for the platform itself, but it is a useful real-world app for testing storage, networking and hardware capabilities.
 
 Plex scans a media library, organizes metadata and streams media to clients such as TVs, phones, browsers and media boxes. It is not a database, ingress controller or storage system; it is an application that uses those platform services.
 
-Plex is interesting in Kubernetes because it has practical infrastructure needs: persistent metadata, access to large media files, stable network exposure and sometimes hardware transcoding. That makes it a good example of an application that may be possible in Kubernetes but still needs careful placement.
+If it were deployed here it would take exactly the same place as [Jellyfin](../jellyfin): an **LXC container on [`pve0`](../../setup/compute/proxmox-cluster)** with the media library bind-mounted from the ZFS pool. The infrastructure profile is identical — the software and the licensing model are what differ.
 
 ---
 
@@ -19,13 +19,12 @@ Plex is interesting in Kubernetes because it has practical infrastructure needs:
 Plex is a good homelab workload because it stresses different parts of the platform than typical web apps:
 
 - large media libraries
-- persistent metadata
-- ingress or LAN exposure
-- storage layout
+- persistent metadata, separate from the media itself
+- reverse-proxy exposure and firewall zoning
+- storage layout and dataset design
 - optional hardware transcoding
-- node placement decisions
 
-It also forces a practical decision: some workloads are easier to run on Kubernetes than others. Plex can run in Kubernetes, but media paths, GPU/iGPU access and network discovery need careful handling.
+It also forces a practical decision that shaped this whole repository: **some workloads are easier to run beside Kubernetes than on it.** Media paths, iGPU access and terabyte-scale storage all point at a container on the machine that holds the disks — which is exactly the conclusion the [compute split](../../setup/compute/README.md) reached.
 
 ---
 
@@ -36,7 +35,7 @@ It also forces a practical decision: some workloads are easier to run on Kuberne
 - remote streaming experiments
 - testing large persistent media volumes
 - testing hardware transcoding support
-- learning node affinity and workload placement
+- learning workload placement: which apps belong beside the cluster rather than on it
 
 ---
 
@@ -44,41 +43,42 @@ It also forces a practical decision: some workloads are easier to run on Kuberne
 
 - Real workload with visible user value.
 - Tests storage layout and LAN service exposure.
-- Good case study for node affinity and hardware access.
-- Mature client ecosystem.
-- Useful comparison between Kubernetes and dedicated-host deployment.
+- Good case study for hardware access and container device passthrough.
+- Mature client ecosystem, still the best-in-class TV apps.
+- Useful comparison between cluster-hosted and host-hosted deployment models.
 
 ---
 
 ## Weaknesses
 
-- Hardware transcoding can complicate Kubernetes scheduling.
-- Media files may be better stored outside Longhorn volumes.
+- Requires a Plex account even for a fully local server — the thing this repository is built to avoid.
+- Hardware transcoding sits behind Plex Pass, a paid subscription.
 - Network discovery and remote access can be more awkward than normal web apps.
-- Some features depend on Plex account or paid plan.
+- The server phones home; a local-only setup is not the default path.
 - It is optional and should not block core platform work.
 
 ---
 
 ## Infrastructure Dependencies
 
+If it were deployed, the profile would match [Jellyfin](../jellyfin) exactly:
+
 | Dependency | Purpose |
 |---|---|
-| [`longhorn`](../../infrastructure/platform/storage/longhorn) | Metadata or configuration volume if suitable |
-| External media storage | Large media files usually belong on dedicated storage |
-| [`traefik`](../../infrastructure/platform/ingress/traefik) | Optional HTTP(S) exposure |
-| MetalLB / LAN networking | Stable LAN access to Plex |
-| Node labels / affinity | Pin Plex to a node with media access or hardware transcoding |
+| [`zfs-nas`](../../infrastructure/platform/storage/zfs-nas) | `tank/media` bind-mounted read-only — the library |
+| Local container volume | Metadata and watch state |
+| [`caddy`](../../infrastructure/platform/ingress/caddy) | HTTPS reverse proxy for the Proxmox world |
+| `/dev/dri` passthrough | Intel Quick Sync — but only with a paid Plex Pass |
+| `vzdump` | Container backup, separate from the media dataset |
 
 ---
 
 ## Application Examples
 
-- Stream local media inside the LAN.
-- Keep Plex metadata on persistent storage.
-- Pin Plex to a specific node with media disks attached.
-- Test Intel Quick Sync or other hardware transcoding later.
-- Compare Kubernetes deployment against running Plex directly on a dedicated host.
+- Stream local media inside the LAN through a bind-mounted library.
+- Keep Plex metadata in the container, backed up separately from the media.
+- Cage the container in the DMZ VLAN while it still reads storage locally.
+- Compare the polished client apps directly against Jellyfin's on the same library.
 
 ---
 
@@ -92,48 +92,26 @@ It also forces a practical decision: some workloads are easier to run on Kuberne
 
 ---
 
-## Kubernetes Notes
+## Why Jellyfin Won
 
-Plex is not a core platform service. Treat it as an application with special hardware and storage needs.
+The comparison is genuinely close on quality, and pretending otherwise would be dishonest — Plex has better client apps, especially on TVs, and a more forgiving setup experience.
 
-Before deploying:
+It lost on **ownership**, which is the criterion this repository weights above polish:
 
-- decide where media files live
-- decide whether transcoding is needed
-- decide whether the pod needs access to `/dev/dri`
-- pin the workload to the right node
-- document backup needs for metadata separately from media files
+| Question | Plex | Jellyfin |
+|---|---|---|
+| Works with no external account? | No | Yes |
+| Hardware transcoding included? | Paid (Plex Pass) | Free |
+| Server usable if the vendor disappears? | Uncertain | Yes |
+| Can the vendor change the terms? | Yes | No vendor to do so |
 
----
-
-## Hands-On Start
-
-Deployment files should eventually live under `helm-charts`.
-
-First evaluation checklist:
-
-1. Start without hardware transcoding.
-2. Mount a small test media directory.
-3. Expose Plex only on the LAN first.
-4. Verify metadata persists after pod restart.
-5. Add node affinity if the media path exists only on one node.
-6. Evaluate hardware transcoding only after the basic deployment is stable.
+A media server that requires an account to play files from a disk two metres away contradicts the premise of the whole project. That is the entire argument — not quality, not features.
 
 ---
 
 ## Runtime Status
 
-Plex is `⚫ Inactive` and there is no plan to deploy it. [Jellyfin](../jellyfin) is the chosen media server; this page exists for comparison and decision documentation. The Kubernetes considerations below apply to Jellyfin unchanged.
-
----
-
-## Future Deployment Link
-
-Planned deployment location:
-
-```text
-../../helm-charts/applications/plex/
-```
+Plex is `⚫ Inactive` and there is **no plan to deploy it**. [Jellyfin](../jellyfin) is the chosen media server; this page exists for comparison and decision documentation, because Plex vs. Jellyfin is one of the classic homelab decisions and the reasoning deserves to be written down rather than assumed.
 
 ---
 

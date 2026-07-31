@@ -4,7 +4,11 @@
 
 A Secret Store is the source of truth for sensitive values such as API tokens, database passwords, service credentials, SSH keys, account recovery material and integration secrets.
 
+**The chosen system is HashiCorp Vault** (`k8s`), with [OpenBao](../openbao) documented as the drop-in alternative should the licence become a problem.
+
 This is different from Kubernetes `Secret` objects. Kubernetes secrets are a delivery mechanism inside the cluster. A real Secret Store manages secrets, permissions, audit trails, rotation and programmatic access.
+
+It is also different from a **password manager**. Vault holds *application* secrets that workloads read at runtime; [Vaultwarden](../password-manager/bitwarden) holds *human* secrets that people type. Collapsing the two mixes very different threat models — the boundary is explained in [password-manager](../password-manager).
 
 ---
 
@@ -57,18 +61,45 @@ The app should request logical secret names, not backend-specific paths. That ke
 
 ---
 
-## Candidate Systems
+## Prerequisites
 
-| System | Best fit | Notes |
-|---|---|---|
-| Infisical | Modern developer-friendly secrets platform, self-hosting, app secrets, human workflows, PAM direction | Strong candidate if the goal is a polished password-manager-like developer experience |
-| OpenBao | Open-source Vault-style secret management | Strong candidate for Kubernetes-native and Dapr-compatible secret backend experiments |
-| HashiCorp Vault | Mature secrets engine and dynamic credentials | Very capable, but licensing and operational model should be considered |
-| 1Password Secrets Automation | Excellent human password manager with developer automation | Great if personal password manager integration matters more than self-hosting |
-| Bitwarden Secrets Manager | Password manager ecosystem with machine secrets | Good bridge between human and service secrets |
-| Google Secret Manager | Managed cloud secret backend | Useful if cloud integration is acceptable, less self-hosted |
-| Apple Passwords / iCloud Keychain | Human password management | Good personal UX, but not a practical runtime backend for Kubernetes apps |
-| Google Password Manager | Human password management | Useful for personal accounts, but Google Secret Manager is the app-facing backend option |
+| Requirement | Why |
+|---|---|
+| A running cluster with [Cilium](../../../kubernetes/cilium) | It runs as pods |
+| [Longhorn](../../storage/longhorn) | Vault's storage backend must persist — losing it loses every secret |
+| An **unseal strategy decided up front** | Vault starts sealed after every restart; see below |
+| [External Secrets Operator](../external-secrets) | The bridge into Kubernetes `Secret` objects for charts that expect them |
+| A backup path | The one component where losing state is unrecoverable rather than inconvenient |
+
+### The unseal problem — decide before deploying
+
+Vault encrypts its storage and starts **sealed** after every restart. Until it is unsealed it answers nothing, which means a node reboot at 03:00 can silently break every workload that reads a secret at startup.
+
+Three options, in increasing order of comfort and decreasing order of purity:
+
+| Approach | Trade |
+|---|---|
+| Manual unseal | Most secure, and genuinely painful — every restart needs a human with key shares |
+| Auto-unseal via a cloud KMS | Reliable, but puts the root of trust in a provider this project is trying to leave |
+| Transit auto-unseal from a second Vault | Self-hosted and automatic; the second instance becomes the thing that must not die |
+
+**This is not a detail to postpone.** A homelab Vault that requires manual unseal after every power event will be worked around within a month, and the workaround is always worse than the original problem.
+
+---
+
+## Why Vault Was Chosen
+
+| System | Why not |
+|---|---|
+| **HashiCorp Vault** | **Chosen** — the industry standard, and the one whose concepts transfer directly to professional work |
+| [OpenBao](../openbao) | Near drop-in fork under the Linux Foundation; the documented escape hatch if the BUSL licence becomes a problem |
+| Infisical | Better developer UX, much smaller ecosystem and a shorter track record |
+| 1Password / Bitwarden Secrets Manager | Strong for human secrets; [Vaultwarden](../password-manager/bitwarden) already covers that half |
+| Google Secret Manager | Managed and reliable, but the opposite of the point of this homelab |
+
+The deciding factor is **transferable knowledge**. Vault's model — engines, policies, roles, dynamic credentials, leases — is what appears in real infrastructure, and learning it here means learning it once. The licence change to BUSL is a genuine concern, which is exactly why OpenBao is documented rather than dismissed: it is API-compatible, so the migration path exists if it is ever needed.
+
+**The learning target worth aiming at is dynamic credentials.** Vault can issue a PostgreSQL user that exists for one hour and is then revoked automatically. A static password copied into a values file is what most homelabs do; short-lived credentials issued on demand are what makes the tool worth its operational weight.
 
 ---
 
@@ -82,15 +113,16 @@ Privileged Access Management becomes relevant if the homelab stores shared admin
 
 ---
 
-## Comparison Notes
+## The Split This Project Uses
 
-Infisical is attractive because it feels closer to a modern developer platform and includes human-friendly secret workflows. OpenBao and Vault are stronger as infrastructure-grade secret engines and map well to Kubernetes and Dapr-style runtime access. 1Password and Bitwarden are strong when private human passwords and shared accounts are central. Apple Passwords and Google Password Manager are useful for personal accounts, but they are not the same as a programmable application Secret Store.
+The question "one system for everything, or two?" is settled here in favour of two, each doing what it is good at:
 
-For this homelab, a good research path is:
+| | Holds | System | Runs on |
+|---|---|---|---|
+| **Application secrets** | DB passwords, API tokens, service credentials | Vault | `k8s` |
+| **Human secrets** | Family logins, recovery codes, break-glass accounts | [Vaultwarden](../password-manager/bitwarden) | `lxc` on `pve0` |
 
-1. Evaluate Infisical for developer experience, private account workflows and PAM-like capabilities.
-2. Evaluate OpenBao for Dapr-backed runtime secret access.
-3. Decide whether one system can cover both, or whether personal passwords stay in a password manager while application secrets live in OpenBao or Infisical.
+The placement is not accidental. Vaultwarden holds the [break-glass credentials](../rights-management/keycloak#break-glass-access) for the cluster — which means it must be reachable when the cluster is not. A password manager that lives inside the system it holds the recovery keys for is a locked door with the key inside.
 
 ---
 
@@ -123,7 +155,11 @@ This allows personal accounts and application secrets to be linked operationally
 
 ## Runtime Status
 
-Secret Store is currently `⚫ Inactive`. It should become a core security service before applications start depending on private API keys, database passwords or shared accounts.
+Vault is currently `⚫ Inactive`. It must exist **before the first application needs a credential**, because the alternative — a password pasted into a values file "just for now" — is the thing that never gets cleaned up and ends up in Git history.
+
+In the build order it comes after [Longhorn](../../storage/longhorn) and alongside [External Secrets](../external-secrets), and before [cert-manager](../../ingress/cert-manager), which needs the Cloudflare API token to come from somewhere.
+
+**Back it up before putting anything in it.** Every other component in this catalog can be rebuilt from documentation. A lost Vault is lost secrets.
 
 ---
 

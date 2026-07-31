@@ -4,19 +4,31 @@
 
 OpenSearch is a search and analytics engine derived from Elasticsearch.
 
-In this homelab, it is the preferred ELK-style logging backend candidate.
+In this homelab, OpenSearch is the **documented alternative** to [Loki](../loki), which is the chosen logging backend. It is not planned for deployment.
 
 OpenSearch stores documents and makes them searchable. In a logging stack, each log event becomes a document. Users can search by message, timestamp, namespace, pod name, severity or other fields.
 
-OpenSearch is useful when logs need full-text search, filtering, dashboards and retention policies. It is heavier than simply viewing `kubectl logs`, but it gives a much more powerful troubleshooting workflow once many services exist.
+---
+
+## Why It Lost
+
+The deciding factor is the cost of full-text indexing, and it is not a close call at this scale:
+
+| | OpenSearch | [Loki](../loki) |
+|---|---|---|
+| Idle RAM | ~2–4 GB+ | ~0.2–0.4 GB |
+| Indexes | Every field of every log line | Labels only |
+| Dashboard | OpenSearch Dashboards, a second UI to operate | [Grafana](../../metrics/grafana), already running |
+
+Roughly 3 GB of RAM before a single log line is stored is comparable to the *entire rest* of the observability stack — on nodes with 8–16 GB each, that is capacity taken directly from the workloads the cluster exists to run.
+
+What is genuinely given up: real full-text search across large log corpora, richer aggregation and analytics, and the ELK-family skills that are common in industry. Those are real losses. They are accepted because the questions actually asked here — "what did this pod do around this spike" — are the ones Loki is built for, and the honest answer is that a homelab does not generate a corpus worth indexing.
 
 ---
 
-## Why It Fits
+## When It Would Be The Right Choice
 
-An ELK-style stack teaches useful production concepts: indexing, retention, log search, dashboards and resource planning. OpenSearch keeps that learning path available while staying aligned with an open-source-friendly stack.
-
-This does not mean OpenSearch should run from day one. It consumes CPU, memory and storage. It should be installed when searchable log retention is an actual learning goal or operational need.
+Not a hypothetical, so the trigger is worth naming: OpenSearch becomes correct when logs stop being a debugging aid and become **data**. Security event analysis, long-retention audit trails, or anything requiring aggregation across millions of events by arbitrary fields. If this homelab ever grows a real log-analytics goal, this is the page to come back to — and by then the cluster will likely have the RAM to afford it.
 
 ---
 
@@ -60,7 +72,7 @@ This does not mean OpenSearch should run from day one. It consumes CPU, memory a
 
 ## Runtime Status
 
-OpenSearch is currently `⚫ Inactive`. It can be resource-heavy, so run it when there is a real logging goal.
+OpenSearch is `⚫ Inactive` and **not planned**. [Loki](../loki) is the chosen logging backend; this page exists for comparison and as the documented upgrade path if log analytics ever becomes a real requirement.
 
 ---
 

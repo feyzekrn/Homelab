@@ -2,9 +2,38 @@
 
 [<- Back to Bare-Metal Provisioning](../README.md)
 
-Ansible is the planned provisioning tool for the Ubuntu Server phase of this homelab.
+Ansible is the chosen provisioning tool for the Ubuntu Server phase of this homelab.
 
-It should automate repeatable node setup before Kubernetes and GitOps take over.
+It automates repeatable node setup before Kubernetes and GitOps take over.
+
+**Scope: the three Kubernetes nodes only.** Proxmox VE on `pve0` is installed and configured by hand and through its own tooling; the guests there are defined separately. Ansible's job ends where [bootstrap](../../kubernetes/bootstrap) begins.
+
+---
+
+## Prerequisites
+
+| Requirement | Why |
+|---|---|
+| Ubuntu Server installed on the three nodes | Ansible configures machines, it does not install operating systems |
+| SSH access with a key | The transport — password auth should be turned off by the first playbook |
+| Network reachability | The flat interim network is enough; VLANs are not required |
+| An inventory with static node addresses | Playbooks need stable targets |
+
+**Test against a throwaway VM on `pve0` first.** This is the one part of the build that can be developed and iterated today without touching the physical nodes — a disposable Ubuntu VM makes playbooks safe to get wrong, which is exactly what a provisioning tool needs during development.
+
+---
+
+## What It Must Do Before Kubernetes
+
+The list is short and each item is a thing that breaks `kubeadm` if missing:
+
+- swap disabled
+- kernel modules and sysctl settings for container networking
+- container runtime installed
+- `open-iscsi` — required later by [Longhorn](../../platform/storage/longhorn), and much easier to do here
+- SSH hardening, unattended upgrades, time synchronisation
+
+That fourth item is the one usually discovered late: Longhorn volumes fail to attach with an unhelpful error, and the cause is a package that should have been installed at provisioning time.
 
 Ansible is an automation tool that connects to machines, usually over SSH, and applies a desired configuration. Its instructions are written as playbooks. A playbook might create users, install packages, configure SSH, mount disks or prepare Kubernetes prerequisites.
 

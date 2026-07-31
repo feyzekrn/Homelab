@@ -45,6 +45,22 @@ The principle: the authentication hurdle belongs as far outside as possible, not
 
 ---
 
+## Prerequisites
+
+| Requirement | Why |
+|---|---|
+| A running cluster with [Cilium](../../infrastructure/kubernetes/cilium) | It is the one family-facing app that is a cluster workload |
+| [Longhorn](../../infrastructure/platform/storage/longhorn) | Its configuration and state have to survive rescheduling |
+| [MetalLB](../../infrastructure/kubernetes/metallb) + [Traefik](../../infrastructure/platform/ingress/traefik) | Reachable under a hostname on the LAN |
+| [NATS](../../infrastructure/platform/messaging/nats) | The MQTT broker its sensors speak to |
+| **IoT VLAN (40) configured** | The zone model only works if the devices are actually penned into it |
+| Firewall rule `k8s → IoT` | One-directional: Home Assistant may initiate, the devices may not |
+| [NetBird](../../infrastructure/platform/ingress/netbird) | Access from outside — this app is not exposed publicly by default |
+
+**The VLAN work is the real prerequisite**, and it is the one that needs hardware: the IoT zone requires the managed switch and [OPNsense](../../setup/networking/router/opnsense) as gateway. Home Assistant runs perfectly well on a flat network first — it just does not get the isolation that makes cheap smart devices acceptable on the network at all.
+
+---
+
 ## Infrastructure Dependencies
 
 | Dependency | Purpose |

@@ -2,9 +2,20 @@
 
 [<- Back to Security](../README.md)
 
-External Secrets Operator syncs secrets from an external secret manager into Kubernetes `Secret` resources.
+External Secrets Operator syncs secrets from an external secret manager into Kubernetes `Secret` resources (`k8s`).
 
-It separates secret values from Git-managed Kubernetes manifests.
+It separates secret values from Git-managed Kubernetes manifests: Git holds a reference to *which* secret is needed, the operator fetches the actual value from [Vault](../secret-store) at runtime.
+
+---
+
+## Prerequisites
+
+| Requirement | Why |
+|---|---|
+| [Vault](../secret-store) | The backend it reads from — deploy it first |
+| A running cluster with [Cilium](../../../kubernetes/cilium) | It runs as a controller pod |
+| Kubernetes auth configured in Vault | So the operator authenticates with a workload identity, not a static token |
+| [Argo CD](../../../kubernetes/gitops/argocd) | The reason this exists — GitOps must never contain plain secret values |
 
 Many Helm charts and Kubernetes applications expect credentials to appear as Kubernetes `Secret` objects. That creates a GitOps problem: the chart values and manifests belong in Git, but the secret values must not be stored in Git as plain text.
 
@@ -66,7 +77,9 @@ This pattern is especially useful for Helm charts that are not written to call a
 
 ## Runtime Status
 
-External Secrets Operator is currently `⚫ Inactive`. It is a core candidate once GitOps is introduced and secrets need to be managed without committing plain values to Git.
+External Secrets Operator is `⚫ Inactive`. It is deployed **together with [Vault](../secret-store)** — Vault stores the secrets, this operator makes them usable by Helm charts that expect a Kubernetes `Secret`. Neither is much use without the other.
+
+Order: Vault first, then this, then anything that consumes a credential.
 
 ---
 

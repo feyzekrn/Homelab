@@ -4,7 +4,7 @@
 
 Immich is a self-hosted photo and video management platform designed as a direct replacement for Google Photos and iCloud Photos.
 
-In this homelab, Immich is the **planned family photo cloud**. Its mobile apps automatically back up photos and videos from iOS and Android in the background, the web UI provides timeline, search, albums and sharing, and machine-learning features (face recognition, object search) run entirely locally.
+In this homelab, Immich is the **chosen family photo cloud**, running as an **LXC container on [`pve0`](../../setup/compute/proxmox-cluster)** (`lxc`). Its mobile apps automatically back up photos and videos from iOS and Android in the background, the web UI provides timeline, search, albums and sharing, and machine-learning features (face recognition, object search) run entirely locally.
 
 Immich is deliberately opinionated about one job: photos. Nextcloud can also store photos, but Immich's mobile backup, timeline performance and ML-powered search are in a different league — which is why this homelab runs both, with a clear split: [Nextcloud](../nextcloud) for files, calendars and contacts; Immich for the photo library.
 
@@ -21,6 +21,35 @@ Immich fits the "replace iCloud" goal precisely where it hurts most — photos:
 - OAuth/OIDC login means [Keycloak](../../infrastructure/platform/security/rights-management/keycloak) accounts work here too
 
 It is also an excellent platform test: Immich is a multi-service deployment (server, machine-learning service, PostgreSQL with vector extension, Redis) with real storage growth — much closer to a production application than a single-container app.
+
+---
+
+## Why It Runs On `pve0`
+
+**It is the most storage-hungry application in the homelab, and the least replaceable.** Photo originals live on the `tank/immich` dataset of the [ZFS pool](../../infrastructure/platform/storage/zfs-nas) by **bind-mount** — a local path, not a network share. The cluster's ~250 GB of Longhorn capacity is not a photo library, and it never will be.
+
+**The machine learning wants the right hardware.** Face recognition and semantic search want real CPU and 2–4 GB of RAM. The MS-01's i9-12900H has it; the Tiny nodes have four Skylake cores that the cluster components already share. Later, when a GPU goes into the MS-01's PCIe slot, Immich's ML is one of its first consumers — and it is already on that machine.
+
+**And it holds the data the family would actually miss.** Photos are the least replaceable thing in this homelab. They belong where cluster experiments cannot reach them.
+
+**Its database runs inside the container.** PostgreSQL with the vector extension and Redis both live in the Immich LXC rather than in the cluster. That keeps it one self-contained `vzdump` and avoids a cross-world dependency for a service the family uses daily.
+
+---
+
+## Prerequisites
+
+| Requirement | Why |
+|---|---|
+| **Disks in `pve0`** → [ZFS pool](../../infrastructure/platform/storage/zfs-nas) | `tank/immich` holds the originals — the hard blocker |
+| PostgreSQL **with the vector extension** | Not stock PostgreSQL; Immich needs `pgvecto.rs` or equivalent for search |
+| Redis in the container | Job queue — and this one needs persistence, or queued work is lost on restart |
+| RAM headroom (2–4 GB for ML) | Budget it against the 32 GB on `pve0`, alongside ZFS ARC and the other guests |
+| [Caddy](../../infrastructure/platform/ingress/caddy) | HTTPS with a real certificate |
+| [Cloudflare Tunnel](../../infrastructure/platform/ingress/cloudflare-tunnel) | **Not optional here** — background upload from mobile data is the entire point |
+| [Keycloak](../../infrastructure/platform/security/rights-management/keycloak) | Family SSO via native OIDC |
+| `vzdump` + `zfs send` off-box | Two layers, because these photos have no other copy once iCloud is cancelled |
+
+**The backup requirement is the strict one.** Every other application here can be rebuilt from documentation. A lost photo library cannot, and the ZFS mirror does not help against a deletion that replicates instantly to both disks.
 
 ---
 
@@ -72,14 +101,15 @@ The phones keep using their native camera apps. The Immich app syncs the camera 
 
 | Dependency | Purpose |
 |---|---|
-| [`postgresql`](../../infrastructure/platform/databases/postgresql) | Metadata database (requires the pgvecto.rs/vector extension) |
-| [`redis`](../../infrastructure/platform/databases/redis) | Job queue and caching |
-| [`longhorn`](../../infrastructure/platform/storage/longhorn) | Photo/video storage volumes |
-| [`traefik`](../../infrastructure/platform/ingress/traefik) | HTTP(S) ingress |
-| [`cert-manager`](../../infrastructure/platform/ingress/cert-manager) | TLS certificates |
+| [`zfs-nas`](../../infrastructure/platform/storage/zfs-nas) | `tank/immich` bind-mounted read-write — the originals |
+| [`postgresql`](../../infrastructure/platform/databases/postgresql) | Metadata database with the vector extension, **inside the container** |
+| [`redis`](../../infrastructure/platform/databases/redis) | Job queue, **inside the container**, with persistence enabled |
+| [`caddy`](../../infrastructure/platform/ingress/caddy) | HTTPS reverse proxy with automatic certificates |
+| [`adguard-home`](../../infrastructure/platform/dns/adguard-home) | Split DNS for the internal hostname |
 | [`cloudflare-tunnel`](../../infrastructure/platform/ingress/cloudflare-tunnel) | Mobile upload from outside the LAN |
 | [`keycloak`](../../infrastructure/platform/security/rights-management/keycloak) | Family SSO via OIDC |
-| [`velero`](../../infrastructure/platform/backup/velero) | Backups — irreplaceable data lives here |
+| `vzdump` + `zfs send` | Backups — the least replaceable data in the homelab |
+| [`bitwarden`](../../infrastructure/platform/security/password-manager/bitwarden) | Holds the break-glass admin credential |
 
 ---
 
@@ -106,35 +136,28 @@ The phones keep using their native camera apps. The Immich app syncs the camera 
 
 ## Hands-On Start
 
-Deployment files should eventually live under `helm-charts`.
+There is **no Helm chart** — Immich is a Proxmox guest and follows the `docs` · `config` pattern.
 
 First evaluation checklist:
 
-1. Deploy PostgreSQL (with vector extension) and Redis first.
-2. Deploy Immich server + machine learning with dedicated storage volumes.
+1. Create the container; install PostgreSQL **with the vector extension** and Redis inside it.
+2. Bind-mount `tank/immich` and deploy the Immich server plus the ML service.
 3. Create one test user, install the mobile app, verify background backup on the LAN.
-4. Add Keycloak OIDC login and one account per family member.
+4. Add Keycloak OIDC login and one account per family member, keeping a local admin as break-glass.
 5. Test shared albums and partner sharing between two users.
-6. Enable remote upload through Cloudflare Tunnel.
-7. Back up database and originals with Velero and **test a restore** before deleting anything from iCloud.
+6. Enable remote upload through Cloudflare Tunnel — without it, backup only happens at home.
+7. **Restore a full `vzdump` into a fresh container and confirm the library is intact.**
+8. Only then cancel the iCloud storage plan.
+
+**Read the release notes before every upgrade.** Immich moves fast and has shipped breaking changes between minor versions. Pinning a version and upgrading deliberately is the correct posture for the one application whose data cannot be re-created.
 
 ---
 
 ## Runtime Status
 
-Immich is currently `⚫ Inactive`. It is planned as the family photo platform once storage, backup and identity are production-ready — photos are the least replaceable data in the homelab, so backups come first.
+Immich is currently `⚫ Inactive`, blocked on **disks in `pve0`** — there is no `tank/immich` yet.
 
----
-
-## Future Deployment Link
-
-Planned deployment location:
-
-```text
-../../helm-charts/applications/immich/
-```
-
----
+It is deliberately the **last** of the three family apps to build. Not because it is hardest, but because it is the one where a mistake is permanent: it should go live only after the backup path has been proven by restoring [Nextcloud](../nextcloud) at least once. Photos are the data with no second copy once iCloud is switched off, and step 8 above exists for that reason.
 
 ## Documentation
 

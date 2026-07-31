@@ -27,6 +27,48 @@ Both worlds watch each other: a responder service on each side monitors the heal
 
 ---
 
+## The Bridge: One Node With A Foot In Both Worlds
+
+The two-world split has one weakness, and it shows up the moment a service has users on both sides. [Keycloak](../../infrastructure/platform/security/rights-management/keycloak) is the example that forced the question: the family apps live on `pve0` so that cluster experiments cannot reach them — but if their *login* is a cluster workload, rebuilding the cluster locks the family out anyway. The dependency returns through the front door.
+
+The answer is a deliberate bridge. **A VM on `pve0` permanently joins the Kubernetes cluster as a node**, and workloads that must survive a cluster rebuild are constrained to always keep one replica on it.
+
+```text
+        Kubernetes cluster
+   ┌──────────┬──────────┬──────────┬─────────────────┐
+   │  node0   │  node1   │  node2   │  pve-node (VM)  │
+   │  Tiny    │  Tiny    │  Tiny    │  on pve0        │
+   └──────────┴──────────┴──────────┴─────────────────┘
+        experimentation field         the anchor
+        wiped and rebuilt freely      survives the rebuild
+```
+
+Keycloak then runs three replicas: two on the Tiny nodes, one on the anchor. Wipe the three Tinys and an instance is still serving logins, on a machine that was never part of the experiment.
+
+### What makes it actually work
+
+Three things decide whether this is real resilience or a diagram:
+
+| Concern | Why it matters |
+|---|---|
+| **The database must be anchored too** | Pods are stateless; the state is in PostgreSQL. If that runs on cluster storage, the surviving pod has nothing to authenticate against. Anchored workloads keep their database as an LXC on `pve0` |
+| **Running pods survive a dead control plane** | Kubelet does not stop pods when the API server is unreachable — so the anchored replica keeps working during a rebuild. If it *crashes* in that window, nothing reschedules it |
+| **Control-plane membership is a real choice** | Making the anchor a control-plane member closes the gap above. That argues for 2 Tinys + the VM as control plane rather than 3 Tinys + a worker, to keep the etcd count odd |
+
+### The placement rule this produces
+
+The bridge only earns its complexity for a specific class of workload, so the rule that decides placement is worth stating plainly:
+
+> **Place a component by who consumes it, not by how much availability it needs.**
+
+- Consumers **only inside the cluster** → runs on the cluster, no anchor. [Argo CD](../../infrastructure/kubernetes/gitops/argocd) is the clearest case: it is useless when the cluster is gone, so its availability is coupled to the cluster's by nature. Moving it out would also convert GitOps from a pull model into a push model holding cluster credentials outside the cluster.
+- Consumers **only outside the cluster** → runs on `pve0`. [Caddy](../../infrastructure/platform/ingress/caddy), [AdGuard Home](../../infrastructure/platform/dns/adguard-home), the NAS.
+- Consumers **in both worlds** → runs on the cluster **with an anchor**, or on `pve0` if the cluster adds nothing. Keycloak takes the first path; [MinIO](../../infrastructure/platform/storage/minio) takes the second, because a backup target must outlive the thing it backs up.
+
+Anchoring is not free — it costs a permanent VM, RAM on `pve0` and a scheduling constraint that has to be maintained. It is meant for the short list of services whose outage is felt by people who never asked for a homelab.
+
+---
+
 ## ⚠️ The Proxmox Host Is Optional
 
 Anyone rebuilding this setup should know up front: **the MS-01 is not a requirement. The homelab this repository describes is the Kubernetes cluster, and that runs on three mini PCs for well under 300 €.** The workstation was added later, when the project grew beyond "learn Kubernetes" into "also host the household's data".

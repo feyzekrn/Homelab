@@ -2,9 +2,24 @@
 
 [<- Back to Databases](../README.md)
 
-Redis is an in-memory data store commonly used for caching, session storage, rate limiting, lightweight queues and pub/sub.
+Redis is an in-memory data store commonly used for caching, session storage, rate limiting, lightweight queues and pub/sub. It is the **chosen cache** for this homelab (`k8s`).
 
 It is not a replacement for PostgreSQL, MySQL or MongoDB. In most systems, Redis sits next to a primary database and improves speed or coordination for specific access patterns.
+
+Like [PostgreSQL](../postgresql), it appears in both worlds: a cluster instance for cluster workloads, and a Redis inside each family app's container on `pve0` — [Nextcloud](../../../../applications/nextcloud) uses it for file locking, [Immich](../../../../applications/immich) for its job queue. Same reasoning: each app stays one self-contained backup with no shared dependency.
+
+---
+
+## Prerequisites
+
+| Requirement | Why |
+|---|---|
+| A running cluster with [Cilium](../../../kubernetes/cilium) | For the cluster instance |
+| An application that actually needs it | Redis deployed "in advance" is RAM spent on nothing |
+| [Longhorn](../../storage/longhorn) | **Only if** persistence is enabled — see below |
+| [Vault](../../security/secret-store) | For the auth password, if exposed beyond one namespace |
+
+**Decide first what is safe to lose.** Redis can run purely in memory (fast, everything gone on restart) or with persistence to disk. For a cache, losing the contents is fine and a volume is wasted overhead. For a job queue — Immich's case — losing the contents means losing queued work. The same software, two entirely different deployment shapes, and the choice belongs to the workload rather than to a default.
 
 Redis stores data primarily in memory, which makes it very fast. Applications use it for data that must be accessed quickly or shared briefly between services: cache entries, login sessions, counters, locks, rate limits and small queues.
 
@@ -84,7 +99,7 @@ Redis is best for fast, short-lived or cache-like data. PostgreSQL and MySQL sho
 
 ## Runtime Status
 
-Redis is currently `⚫ Inactive`. Add it when a real application needs caching, sessions, rate limiting or lightweight queue patterns.
+Redis is currently `⚫ Inactive`. It is deployed **on demand, never in advance** — the first real consumers are the family apps on `pve0` (inside their own containers), and the cluster instance follows when a custom service needs caching or sessions.
 
 ---
 

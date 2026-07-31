@@ -28,8 +28,8 @@ In companies, the same distinction matters: platform services enable product app
 
 - run personal cloud applications
 - test real stateful workloads
-- expose apps through Traefik (k8s) or Caddy (pve)
-- connect apps to Keycloak SSO
+- expose apps through Traefik (`k8s`) or Caddy (`lxc`)
+- connect apps to Keycloak SSO — except Jellyfin, which keeps local accounts
 - validate backups with user data
 - decide which apps deserve long-term operational support
 - keep user-facing workloads separate from cluster-critical services
@@ -40,9 +40,17 @@ In companies, the same distinction matters: platform services enable product app
 
 Each row links up to three locations, following the [Component Layout Convention](../README.md#component-layout-convention): `docs` (local README), `chart` (planned Helm chart under [`helm-charts`](../helm-charts)) and `config` (optional Terraform next to the docs). Chart and config directories are created when an application becomes active; documented alternatives get docs only.
 
-`Idle RAM` is a rough ballpark for the app itself — databases, caches and storage it depends on are counted in the [platform catalog](../infrastructure/platform/README.md). Note that the apps, not the infrastructure glue, are where the real memory goes: Immich's machine learning alone outweighs the entire ingress and DNS stack many times over.
+`Idle RAM` is a rough ballpark for the app itself. For the `lxc` apps it **includes their bundled PostgreSQL and Redis**, since those run inside the same container rather than as shared platform services — the reasoning is in each app's page. Note that the apps, not the infrastructure glue, are where the real memory goes: Immich's machine learning alone outweighs the entire ingress and DNS stack many times over.
 
-`Runs on` marks the target world: `k8s` (bare-metal cluster) or `pve` (LXC/VM on the Proxmox host) — see the [compute overview](../setup/compute) for the reasoning behind the split.
+`Runs on` marks the target world, using the same vocabulary as the [platform catalog](../infrastructure/platform/README.md#how-to-read-this-catalog):
+
+| Value | Meaning |
+|---|---|
+| `k8s` | Workload on the bare-metal Kubernetes cluster |
+| `lxc` | Container on the Proxmox host `pve0` |
+| `—` | Documented alternative — nothing to deploy |
+
+See the [compute overview](../setup/compute) for the reasoning behind the split.
 
 | Name | Path | Status | Runs on | Idle RAM | Recommendation | Purpose |
 |---|---|---|---|---|---|---|
@@ -53,7 +61,9 @@ Each row links up to three locations, following the [Component Layout Convention
 | ownCloud | [docs](./owncloud) | ⚫ Inactive | — | ~0.2 GB (oCIS) | Documented alternative to Nextcloud | Lean file sync platform (oCIS); not planned for deployment |
 | Plex | [docs](./plex) | ⚫ Inactive | — | ~0.5–1 GB | Documented alternative to Jellyfin | Polished media server; not planned for deployment |
 
-**Why the split falls this way.** The three media and file apps land in containers on the Proxmox host: they hold family data, they must survive cluster experiments, and they read their datasets as local bind-mounts from the ZFS pool — no network storage path involved, and no dependency on the cluster being healthy. Home Assistant is the deliberate exception: it controls physical devices, an outage is felt immediately, and its state is small enough to move — which is exactly what multi-node failover is for.
+**Why the split falls this way.** The three media and file apps land in containers on the Proxmox host: they hold family data, they must survive cluster experiments, and they read their datasets as local bind-mounts from the ZFS pool — no network storage path involved. Home Assistant is the deliberate exception: it controls physical devices, an outage is felt immediately, and its state is small enough to move — which is exactly what multi-node failover is for.
+
+**The one thread back to the cluster is identity.** Nextcloud and Immich authenticate against [Keycloak](../infrastructure/platform/security/rights-management/keycloak), which is a cluster workload — so on paper a cluster rebuild would lock the family out of apps that are deliberately not on the cluster. That is resolved by [anchoring](../setup/compute/README.md#the-bridge-one-node-with-a-foot-in-both-worlds): Keycloak keeps one replica pinned to a Proxmox-hosted cluster node, and its database lives on `pve0` outside cluster storage. Jellyfin sidesteps the question entirely with local accounts, because its OIDC support is a third-party plugin not worth depending on.
 
 ---
 

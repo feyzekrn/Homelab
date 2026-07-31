@@ -80,7 +80,22 @@ NATS is best when the system needs simple, fast communication with low operation
 
 ## Runtime Status
 
-NATS is currently `⚫ Inactive`. Keep it documented and ready, but run it when a service actually needs eventing.
+NATS is currently `⚫ Inactive`. Unlike the other messaging options, it has a **concrete first consumer**: [Home Assistant](../../../../applications/home-assistant) needs an MQTT broker for sensors and devices, and NATS serves that role here rather than adding a separate Mosquitto.
+
+That pairing sets the timing — NATS is deployed when Home Assistant is, not before. Custom services using it as an event bus come later.
+
+---
+
+## Prerequisites
+
+| Requirement | Why |
+|---|---|
+| A running cluster with [Cilium](../../../kubernetes/cilium) | It runs as pods |
+| [Longhorn](../../storage/longhorn) | **Only with JetStream** — plain pub/sub keeps nothing and needs no volume |
+| A real consumer | [Home Assistant](../../../../applications/home-assistant) or a custom service. Deployed in advance it is idle RAM |
+| Firewall rule from the IoT VLAN | Devices in VLAN 40 may reach the broker and nothing else — see the [network design](../../../../setup/networking/design.md) |
+
+That last row is the security-relevant one: the IoT zone is the least trustworthy network in the flat, and the MQTT broker is the *single* address it is allowed to talk to.
 
 ---
 

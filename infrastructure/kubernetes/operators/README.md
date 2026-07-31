@@ -103,6 +103,31 @@ Each custom operator should document:
 
 ---
 
+## Prerequisites
+
+Operators are a category rather than a single component, so the prerequisites are the same for any of them:
+
+| Requirement | Why |
+|---|---|
+| A running cluster with [Cilium](../cilium) | They are controllers running as pods |
+| [Argo CD](../gitops/argocd) | An operator installed by hand is drift by definition — CRDs belong in Git |
+| Whatever the operator manages | A PostgreSQL operator without a database to manage is just a controller burning RAM |
+| An understanding of the manual path first | See below |
+
+**Learn the manual deployment before adopting its operator.** An operator hides exactly the mechanics this homelab exists to expose: running PostgreSQL by hand teaches volumes, init, backups and failover; the operator then automates work that is already understood. Adopted the other way round, a broken operator is unfixable because the thing it abstracts was never learned.
+
+There is also a concrete ordering trap: operators own CRDs, and [Velero](../../platform/backup/velero) restores fail when custom resources come back before the controller that understands them. Restore order is worth testing while it is still cheap.
+
+---
+
+## Runtime Status
+
+`⚫ Inactive` — no operator is deployed, and none is planned as a starting point. The first realistic candidates are the [Keycloak Operator](../../platform/security/rights-management/keycloak) and a PostgreSQL operator, both **after** the manual versions have been run and understood.
+
+Custom operators written for this homelab — the Intel vPro and hardware-control ideas — belong in [`services`](../../../services), not here. This directory documents the pattern and tracks third-party operators in use.
+
+---
+
 ## Deployment Rule
 
 Operator documentation lives here. Operator Helm charts, values and installation files should be linked from:

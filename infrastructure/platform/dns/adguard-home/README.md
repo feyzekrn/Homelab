@@ -6,6 +6,22 @@ AdGuard Home is a network-wide DNS resolver with built-in ad, tracker and malwar
 
 In this homelab, AdGuard Home is the **chosen LAN-facing resolver**: the DNS server that all household devices receive via DHCP. It filters unwanted domains, caches answers, forwards internal homelab zones to CoreDNS and sends everything else to an encrypted public upstream.
 
+**It runs in both worlds** (`lxc + k8s`): the primary instance is a container on [`pve0`](../../../../setup/compute/proxmox-cluster), with a synced replica on the cluster. The primary belongs on the Proxmox side because DNS serves the entire household — an outage is not "a service is down", it is "the internet is broken" for everyone in the flat, and that must not depend on the experimentation field.
+
+---
+
+## Prerequisites
+
+| Requirement | Why |
+|---|---|
+| Proxmox VE running | The primary is an LXC — that is all it needs |
+| A static IP | Clients get this address by DHCP; it cannot move |
+| Control over DHCP | Fritz!Box now, [OPNsense](../../../../setup/networking/router/opnsense) later, to hand out the resolver |
+| [CoreDNS](../coredns) | Only for internal zone forwarding — optional at first |
+| [MetalLB](../../../kubernetes/metallb) | **Only for the `k8s` replica**, which comes much later |
+
+**Nothing here waits for the cluster.** The primary instance runs on the current flat network, which makes it the earliest component in this repository that delivers visible everyday value.
+
 It works at the DNS level: when a device asks for a known ad or tracking domain, AdGuard Home answers with a blocked response instead of the real IP. Every device on the network benefits — phones, TVs, consoles — without installing anything on them.
 
 ---
@@ -106,7 +122,13 @@ First evaluation checklist:
 
 ## Runtime Status
 
-AdGuard Home is currently `⚫ Inactive`. It is planned as the household resolver once the cluster networking baseline (MetalLB, stable IPs) is in place.
+AdGuard Home is currently `⚫ Inactive`. It is **one of the first services in the whole homelab** — the primary instance is an LXC on [`pve0`](../../../../setup/compute/proxmox-cluster) and needs neither the cluster nor MetalLB, so it can run today on the flat interim network.
+
+That makes it the earliest component that delivers visible household value: network-wide ad and tracker blocking, before a single Kubernetes node exists.
+
+The `k8s` replica comes much later and is a convenience, not a requirement — it needs MetalLB for a stable service IP and exists so DNS survives `pve0` being rebooted for maintenance.
+
+**One rule when it goes live:** DNS is the service whose outage looks like "the internet is broken" to everyone in the house. Hand it out via DHCP only after it has resolved reliably for a day, and keep a second resolver in the DHCP handout.
 
 ---
 

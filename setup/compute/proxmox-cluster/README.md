@@ -82,9 +82,16 @@ The target layout for this machine — each guest documented in its own section 
 | Nextcloud, Jellyfin, Immich | LXC  | Family-facing apps with bind-mounted datasets            |
 | Caddy                  | LXC       | Reverse proxy for the Proxmox world                      |
 | AdGuard Home (primary) | LXC       | DNS + filtering, synced to a replica on the cluster      |
+| Vaultwarden            | LXC       | Family password manager                                  |
+| PostgreSQL (identity)  | LXC       | Database for Keycloak — anchored outside the cluster      |
+| **`pve-node`**         | **VM**    | **Permanent Kubernetes node — the anchor for critical workloads** |
 | Responder              | LXC       | Watchdog for the k8s nodes (health checks + vPro revive) |
 | Reserve k8s workers    | VM        | Join the cluster on demand when extra capacity is needed |
 | AI workloads *(later)* | VM + GPU  | Central AI box once a GPU is installed                   |
+
+**`pve-node` is not a reserve worker.** It joins the Kubernetes cluster permanently and exists for one purpose: workloads that serve both worlds — [Keycloak](../../../infrastructure/platform/security/rights-management/keycloak) first among them — keep one replica pinned to it, so a cluster rebuild never takes the household's logins with it. The reasoning, and the rule for deciding what deserves an anchor, is in [the compute overview](../README.md#the-bridge-one-node-with-a-foot-in-both-worlds).
+
+The consequence for this machine: it is no longer purely the stable world. One of its guests is a full member of the experimentation field, and that guest has to be treated accordingly — it gets rebuilt when the cluster does.
 
 ---
 

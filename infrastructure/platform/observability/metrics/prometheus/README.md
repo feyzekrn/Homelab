@@ -2,9 +2,9 @@
 
 [<- Back to Metrics](../README.md)
 
-Prometheus collects and stores metrics from Kubernetes, nodes and applications.
+Prometheus collects and stores metrics from Kubernetes, nodes and applications. It is the **chosen metrics stack** (`k8s`).
 
-It is the default metrics system in the Kubernetes ecosystem and the best first choice for this homelab.
+It runs on the cluster, but it is the one observability component that deliberately **looks beyond it**: `pve0`, the MikroTik switch and OPNsense are scrape targets too. Monitoring is the exception to the two-world separation — a dashboard that only shows half the homelab is not worth opening.
 
 Prometheus is a time-series database and monitoring system. It regularly scrapes metrics from configured targets, stores those measurements and lets users query them with PromQL.
 
@@ -19,6 +19,20 @@ Prometheus is pull-based by default: it usually asks targets for metrics instead
 Prometheus teaches the standard Kubernetes observability model: scraping targets, labels, recording rules, alert rules and exporters.
 
 It is also a practical foundation for the homelab. Before adding a logging stack or tracing backend, Prometheus can answer the most immediate operational questions about resource usage, restarts, saturation and service health.
+
+---
+
+## Prerequisites
+
+| Requirement | Why |
+|---|---|
+| A running cluster with [Cilium](../../../../kubernetes/cilium) | It runs as pods |
+| [Longhorn](../../../storage/longhorn) | Metric storage is persistent and grows continuously |
+| A retention policy | Decided up front — the default fills a volume faster than expected |
+| [Grafana](../grafana) | Prometheus has a query UI, not a dashboard |
+| Network path into VLAN 30 | To scrape `pve0`, the switch and OPNsense across the zone boundary |
+
+**Scraping across worlds needs a firewall rule.** The management zone is deliberately closed, so allowing the cluster to reach the exporters on `pve0`, the MikroTik and OPNsense is an explicit exception that has to be written into the OPNsense ruleset. Worth planning with the [network design](../../../../../setup/networking/design.md) rather than discovering as a broken dashboard.
 
 ---
 
@@ -66,7 +80,9 @@ It is also a practical foundation for the homelab. Before adding a logging stack
 
 ## Runtime Status
 
-Prometheus is currently `⚫ Inactive`. It is optional at the beginning, but should become part of the platform once databases and services run regularly.
+Prometheus is currently `⚫ Inactive`. It is deployed together with [Grafana](../grafana), after storage works and before there are many services — early enough that the baseline of "normal" is recorded before anything is tuned.
+
+It is also a prerequisite for two later components: [Loki](../../logging/loki) shares its dashboard, and [Argo Rollouts](../../../../kubernetes/gitops/argo-rollouts) cannot gate a canary release without metrics to gate on.
 
 ---
 

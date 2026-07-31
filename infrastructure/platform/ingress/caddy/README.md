@@ -31,6 +31,20 @@ Inside the cluster the calculation reverses, and that is why it stays [Traefik](
 
 ---
 
+## Prerequisites
+
+| Requirement | Why |
+|---|---|
+| Proxmox VE running | It is an LXC, nothing more |
+| **An own domain** | Let's Encrypt does not issue for invented internal TLDs |
+| A **Cloudflare API token** | DNS-01 challenge — certificates without any inbound port being open |
+| [AdGuard Home](../../dns/adguard-home) | Split DNS, so the app hostnames resolve to Caddy inside the LAN |
+| The target apps reachable on the host | Caddy proxies to them; it does not start them |
+
+Notably **not** required: the Kubernetes cluster, [cert-manager](../cert-manager), [MetalLB](../../../kubernetes/metallb) or any cluster component. Caddy is deployable today, on the flat interim network, as soon as a domain exists.
+
+---
+
 ## Used For
 
 - reverse proxy with zero-config HTTPS on docker-compose or bare hosts

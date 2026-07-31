@@ -106,7 +106,23 @@ First evaluation checklist:
 
 ## Runtime Status
 
-CoreDNS as cluster DNS will be `🟢 Active` automatically once the cluster exists. The LAN-facing internal-zone instance is currently `⚫ Inactive`.
+CoreDNS as cluster DNS will be `🟢 Active` automatically once the cluster exists — it is installed by [bootstrap](../../../kubernetes/bootstrap) and needs no decision. The LAN-facing internal-zone instance is a separate deployment and is currently `⚫ Inactive`.
+
+---
+
+## Prerequisites
+
+**Cluster DNS:** none beyond [bootstrap](../../../kubernetes/bootstrap) and [Cilium](../../../kubernetes/cilium) — it comes with the cluster.
+
+**LAN-facing internal zone instance:**
+
+| Requirement | Why |
+|---|---|
+| [MetalLB](../../../kubernetes/metallb) | It needs a stable IP that [AdGuard Home](../adguard-home) can forward to |
+| [AdGuard Home](../adguard-home) | The actual resolver clients use; CoreDNS only answers for the internal zone |
+| A decided internal domain | `.internal` is used here — see [proxmox-cluster](../../../../setup/compute/proxmox-cluster/README.md#naming) |
+
+**It is optional for a long time.** AdGuard Home's own DNS rewrites cover internal names perfectly well at this scale. The CoreDNS instance becomes worthwhile when the number of internal names outgrows hand-maintained rewrites, or when zone data should come from Git rather than a web UI.
 
 ---
 

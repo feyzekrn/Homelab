@@ -22,6 +22,31 @@ In this homelab, bootstrap also marks the learning transition. The first Ubuntu/
 
 ---
 
+## Prerequisites
+
+| Requirement | Why |
+|---|---|
+| Three provisioned nodes | Hardware is already bought — see [k8s-cluster](../../../setup/compute/k8s-cluster) |
+| [Ansible](../../provisioning/ansible) run against them | Container runtime, kubelet, `open-iscsi`, kernel settings, swap off |
+| An IP plan | Node addresses, pod CIDR and service CIDR that collide with nothing |
+| Network reachability between nodes | The flat interim network is enough; VLANs are not required to start |
+| A decision on the [anchor node](../../../setup/compute/README.md#the-bridge-one-node-with-a-foot-in-both-worlds) | Whether the `pve0` VM is a control-plane member or a worker — see below |
+
+**The switch is not a prerequisite.** The three Tiny nodes are purchased and a cluster runs perfectly well on the current flat network at 1G. The CRS310 brings VLANs and 2.5G, both of which can be introduced underneath a running cluster later. Waiting for hardware that only changes the network layer delays the entire learning path for no reason.
+
+### The control-plane decision
+
+This is the one bootstrap choice that is expensive to change later, because it determines etcd quorum:
+
+| Layout | etcd members | Consequence |
+|---|---|---|
+| 3 Tinys control plane + anchor as worker | 3 | Simple. Rebuilding all three Tinys loses the API server; the anchored pod keeps running but nothing can reschedule it |
+| 2 Tinys + anchor as control plane | 3 | The API server survives a full Tiny rebuild — which is what makes the anchor genuinely resilient rather than partially |
+
+The second is the better fit for the [bridge architecture](../../../setup/compute/README.md#the-bridge-one-node-with-a-foot-in-both-worlds), and it costs nothing extra. Decide it before running `kubeadm init`, not after.
+
+---
+
 ## What Belongs Here
 
 Document:
@@ -42,14 +67,17 @@ Document:
 The exact commands are not defined yet, but the conceptual sequence should be:
 
 1. Provision nodes through the chosen OS workflow.
-2. Decide control plane and worker roles.
+2. Decide control plane and worker roles — including the [anchor node](#the-control-plane-decision).
 3. Create the first Kubernetes control plane.
-4. Join worker nodes.
-5. Install the CNI so pod networking works.
-6. Confirm DNS and basic pod scheduling.
-7. Install the first storage class if needed.
-8. Install or hand off to the GitOps controller.
-9. Let GitOps deploy the rest of the platform.
+4. Join the remaining nodes, including the `pve0` VM.
+5. Install [Cilium](../cilium) so pod networking works — nodes stay `NotReady` until this is done.
+6. Confirm cluster DNS and basic pod scheduling.
+7. Install [MetalLB](../metallb), then [Longhorn](../../platform/storage/longhorn) as the first storage class.
+8. Label the anchor node: `homelab/world=pve` and `node.longhorn.io/create-default-disk=false`.
+9. Install [Argo CD](../gitops/argocd) and hand off.
+10. Let GitOps deploy the rest of the platform.
+
+Step 8 is easy to forget and awkward to notice: without the labels, Longhorn will happily place replicas on the anchor's virtual disk and the scheduling constraints that keep [Keycloak](../../platform/security/rights-management/keycloak) anchored have nothing to match on.
 
 ---
 

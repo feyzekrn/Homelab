@@ -38,17 +38,20 @@ In a homelab, logging is useful once there are enough services that `kubectl log
 | Name | Path | Status | Runs on | Idle RAM | Recommendation | Role |
 |---|---|---|---|---|---|---|
 | Fluent Bit | [docs](./fluent-bit) · [chart](../../../../helm-charts/infrastructure/platform/observability/logging/fluent-bit) · [config](./fluent-bit/terraform) | ⚫ Inactive | k8s | ~30–50 MB / node | Chosen collector | Lightweight log collector on nodes |
+| Loki | [docs](./loki) · [chart](../../../../helm-charts/infrastructure/platform/observability/logging/loki) · [config](./loki/terraform) | ⚫ Inactive | k8s | ~0.2–0.4 GB | Chosen backend | Label-indexed log store, queried through Grafana |
 | OpenSearch | [docs](./opensearch) | ⚫ Inactive | — | ~2–4 GB+ | Documented alternative | Search and analytics backend similar to Elasticsearch |
 
-**The backend is still open.** Fluent Bit collects; where the logs land is the second decision. OpenSearch is the powerful answer and the expensive one — 2–4 GB before a single log line matters. Loki is the lighter path and pairs naturally with the chosen Grafana, which makes it the likely choice when logging becomes real.
+**Two halves of one system.** Fluent Bit tails logs on every node and pushes them; [Loki](./loki) stores and serves them. Neither is useful alone, and Loki has to exist before Fluent Bit is deployed — a collector with no reachable backend fills its buffer and silently drops.
 
 ---
 
 ## Recommended Direction
 
-Use Fluent Bit for collection and OpenSearch for storage and search.
+**Fluent Bit collects, Loki stores, [Grafana](../metrics/grafana) displays.**
 
-This is similar to an ELK-style setup, but avoids tying the project too early to a heavier Elasticsearch and Logstash deployment. Loki should also remain a serious alternative if the goal is a lighter Kubernetes-native log backend.
+The decision that shapes this stack is what gets indexed. [OpenSearch](./opensearch) indexes the full text of every log line, which is what makes it powerful and what makes it cost 2–4 GB of RAM before storing anything. Loki indexes only labels — namespace, pod, container — and greps the rest on demand, bringing the same practical capability down to a few hundred megabytes.
+
+At homelab scale that trade is one-sided. The questions actually asked here are "what did this pod do around this spike", scoped by pod and time, which is exactly Loki's shape. Full-text search across months of logs is a real capability this project has no use for — and Loki shares the Grafana that already exists for metrics, so a latency graph and the log lines behind it end up one click apart.
 
 ---
 

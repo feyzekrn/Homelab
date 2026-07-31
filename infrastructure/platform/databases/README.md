@@ -2,9 +2,17 @@
 
 [<- Back to Platform](../README.md)
 
-This directory documents shared database systems that may run inside the cluster.
+This directory documents the database systems used across the homelab — **in both worlds**, not only on the cluster.
 
-Running databases on Kubernetes is useful for learning, but it is also one of the fastest ways to discover whether storage, backups and observability are actually working.
+Running databases on Kubernetes is useful for learning, and it is also one of the fastest ways to discover whether storage, backups and observability are actually working. But not every database here belongs on the cluster, and where each one runs follows from what it serves:
+
+| Instance | Runs on | Serves |
+|---|---|---|
+| Cluster PostgreSQL / Redis | `k8s` | Custom services and cluster workloads |
+| Identity PostgreSQL | `lxc` on `pve0` | [Keycloak](../security/rights-management/keycloak) — must outlive a cluster rebuild |
+| Per-app databases | inside each app's `lxc` | [Nextcloud](../../../applications/nextcloud), [Immich](../../../applications/immich) |
+
+The rule behind the split is the same one used everywhere in this catalog: **a database lives where the thing it serves lives.** Sharing one instance across both worlds would be tidier and would quietly create the dependency that the two-world architecture exists to avoid.
 
 A database stores state that must survive application restarts. That state can be relational rows, JSON documents, cache entries, time-series measurements or short-lived coordination data.
 

@@ -4,7 +4,21 @@
 
 Fluent Bit is a lightweight log collector commonly deployed as a DaemonSet on Kubernetes nodes.
 
-It tails container logs, enriches them with Kubernetes metadata and forwards them to a backend such as OpenSearch.
+It tails container logs, enriches them with Kubernetes metadata and forwards them to a backend — here, [Loki](../loki).
+
+Fluent Bit and Loki are two halves of one system: Fluent Bit collects on every node, Loki stores and serves. Neither is useful alone.
+
+---
+
+## Prerequisites
+
+| Requirement | Why |
+|---|---|
+| A running cluster with [Cilium](../../../../kubernetes/cilium) | It runs as a DaemonSet on every node |
+| [Loki](../loki) | The destination. Deploy it first, or Fluent Bit buffers into nothing |
+| [Grafana](../../metrics/grafana) | Where the collected logs are actually read |
+
+Deploy Loki before Fluent Bit. A collector with no reachable backend fills its buffer and starts dropping, which looks like a collector bug and is not one.
 
 In Kubernetes, each node writes container logs locally. Fluent Bit runs on every node, reads those logs, adds useful metadata such as namespace, pod name and container name, optionally filters or parses the records and forwards them to a log backend.
 
@@ -16,7 +30,7 @@ The DaemonSet model is important: one Fluent Bit pod runs per node, so every nod
 
 Fluent Bit is smaller and simpler than Logstash for node-level log collection. It is a good first collector for a homelab.
 
-It also teaches the normal logging pipeline shape: collect, enrich, filter, buffer and forward. Those ideas apply whether the final backend is OpenSearch, Loki, ClickHouse or a managed logging service.
+It also teaches the normal logging pipeline shape: collect, enrich, filter, buffer and forward. Those ideas apply whether the final backend is Loki, OpenSearch, ClickHouse or a managed logging service — which is why the collector choice is independent of the backend choice.
 
 ---
 
@@ -24,7 +38,7 @@ It also teaches the normal logging pipeline shape: collect, enrich, filter, buff
 
 - collecting container logs
 - adding Kubernetes metadata
-- forwarding logs to OpenSearch
+- forwarding logs to [Loki](../loki)
 - filtering noisy logs
 - learning log parsing and routing pipelines
 
