@@ -8,6 +8,8 @@ This page documents the complete power chain for the lab: how mains AC becomes t
 >
 > The unit also cost **less** than the 500W one it replaces (~75 €), which makes this the rare upgrade with no trade-off to document.
 
+> 🛒 **Also bought since:** 3× Lenovo slim-tip pigtail (3-pin, ~3 € each) and a **second KFZ fuse box**, so each regulated rail gets its own distributor instead of the 19V branch hanging off a loose inline holder. The 230V side gets a panel-mount IEC inlet with an integrated fuse holder. **Still missing: the two converters** — see [What to actually buy](#what-to-actually-buy).
+
 ---
 
 ## Circuit Diagrams
@@ -15,11 +17,13 @@ This page documents the complete power chain for the lab: how mains AC becomes t
 **Config C — Current build (3 nodes + switch + MS-01, two regulated rails):**
 
 ```
-C:  230V AC → PSU 25.2V → Kill + Fuse → split:
+C:  230V AC → IEC inlet (AC fuse) → PSU 25.2V → Kill + Main Fuse → split:
                                           ├─ inline  3A → MikroTik  (25.2V raw)
-                                          ├─ DC-DC 20V → KFZ Box   → Lenovo nodes
-                                          └─ DC-DC 19V → inline 15A → MS-01 (pve0)
+                                          ├─ DC-DC 20V → KFZ Box A → Lenovo nodes
+                                          └─ DC-DC 19V → KFZ Box B → MS-01 (pve0)
 ```
+
+> ⚠️ **The fuse in the IEC inlet does not replace the DC main fuse.** It protects the *mains* side against a fault inside the PSU — roughly 2A at 230V. The 25A ANL fuse protects the *DC* rail, where the PSU can source 29.8A into a short. They guard different faults and both are needed.
 
 **Superseded configs** — these described the lab before `pve0` joined the rail. Kept because the reasoning behind the switch relocation still applies:
 
@@ -34,7 +38,7 @@ B:  230V AC → PSU 25.2V → Kill + Fuse → split:
 
 <img src="../schematics/power-schematic-expanded.svg" alt="Config B: 5 nodes on the 20V converter, switch relocated to the raw 25.2V feed" width="900">
 
-> ⬜ **The two SVGs above still show configs A and B and no longer match the build.** They need to be redrawn for Config C — second converter, MS-01 branch, relocated switch.
+> ⬜ **The two SVGs above still show configs A and B and no longer match the build.** They need to be redrawn for Config C — second converter, MS-01 branch, relocated switch, and now a second fuse box on the 19V rail.
 
 ---
 
@@ -46,33 +50,41 @@ B:  230V AC → PSU 25.2V → Kill + Fuse → split:
 | 2 | Kill Switch + Main Fuse | 25.2V | 25.2V (protected) |
 | 3a | Inline fuse 3A | 25.2V | 25.2V → MikroTik |
 | 3b | Buck Converter #1 (40A) | 25.2V | 20V DC, ~20A usable |
-| 3c | Buck Converter #2 (40A) | 25.2V | 19V DC, ~20A usable |
-| 4 | KFZ Fuse Box (6-port) | 20V | 20V to each node |
+| 3c | Buck Converter #2 | 25.2V | 19V DC |
+| 4a | KFZ Fuse Box A (6-port) | 20V | 20V + 5A blade to each node |
+| 4b | KFZ Fuse Box B (6-port) | 19V | 19V + 15A blade to the MS-01 |
 | 5 | Loads | — | 3× Node · MikroTik · MS-01 |
+
+**Why two fuse boxes.** A KFZ box has a **common +/- bus**, so one box can only ever carry one voltage. The 20V nodes and the 19V MS-01 therefore cannot share one — this is the same constraint that already forced the MikroTik onto its own inline fuse. Box B holds a single load today, which looks wasteful for ~8 €, but it buys a proper screw-terminal landing point for the 2.5 mm² MS-01 run instead of a floppy inline holder, and it is where a second 19V load would go.
 
 ---
 
 ## Parts List
 
-| Part                      | Spec |           Price | Where to find it |
-|---------------------------|---|----------------:|---|
-| **PSU 750W MEAN WELL UHP-750-24** ✅ | 230V AC → 25.2V DC, ~29.8A, fanless |     **50,00 €** | [reichelt.de](https://www.reichelt.com/de/en/shop/product/switching_power_supply_closed_750_w_24_v_31_3_a-306672) |
-| **DC-DC Buck Converter ×2** | **Step-Down**, input incl. 25V, output adj. 19–20V, **40A** rated | ~25–35 € each | [eBay search](https://www.ebay.de/sch/i.html?_nkw=DC-DC+Buck+Converter+Step+Down+einstellbar+40A) |
-| KFZ Fuse Box              | 6-port blade fuse, common +/- bus |           ~ 8 € | [eBay listing](https://www.ebay.de/itm/317781950022) |
-| **AC emergency switch**   | Switched PDU / rack strip, reachable from outside |        ~ 20–40 € | [Conrad](https://www.conrad.de/de/o/not-aus-schalter-0216440.html) |
-| DC Kill Switch            | Rocker/push, ≥25A **DC-rated** |         ~ 4–8 € | [Amazon](https://www.amazon.de/s?k=12V+DC+Notaus+Schalter+30A) |
-| Main Fuse 25A             | ANL / blade, main rail protection |         ~ 2–5 € | [Amazon](https://www.amazon.de/s?k=ANL+Sicherung+25A) |
-| Blade fuses 3A / 5A / 15A | Per-branch protection (switch / node / MS-01) |       ~ 5 € set | [Amazon](https://www.amazon.de/s?k=KFZ+Sicherungen+Sortiment) |
-| Cable 4 mm² red/black     | Main feed (PSU → converters → box) |       ~ 2–3 €/m | [Amazon](https://www.amazon.de/s?k=kabel+4mm2+rot+schwarz) |
-| Cable 2.5 mm² red/black   | MS-01 run (9.5A) | ~ 1.20–2.00 €/m | [Amazon](https://www.amazon.de/s?k=kabel+2.5mm2+rot+schwarz) |
-| Cable 1.5 mm² red/black   | Per-node runs to slim-tip connector | ~ 0.80–1.50 €/m | [Amazon](https://www.amazon.de/s?k=kabel+1.5mm2+rot+schwarz) |
-| MS-01 DC plug             | Barrel jack pigtail, **verify size on the unit** |         ~ 5 € | — |
+✅ = bought · ⬜ = still needed
+
+| | Part                      | Spec |           Price | Where to find it |
+|:--:|---------------------------|---|----------------:|---|
+| ✅ | **PSU 750W MEAN WELL UHP-750-24** | 230V AC → 25.2V DC, ~29.8A, fanless |     **50,00 €** | [reichelt.de](https://www.reichelt.com/de/en/shop/product/switching_power_supply_closed_750_w_24_v_31_3_a-306672) |
+| ✅ | **Lenovo slim-tip pigtail ×3** | Yellow square tip, **3-pin** (+ / − / ID), bare-wire tail | **3,00 € each** — 9 € | eBay / AliExpress |
+| ✅ | **KFZ Fuse Box ×2** | 6-port blade fuse, common +/- bus — one per regulated rail |    ~ 8 € each | [eBay listing](https://www.ebay.de/itm/317781950022) |
+| ⬜ | **DC-DC Buck Converter ×2** | **Step-Down**, in ≥25V, **out adjustable through 20V**, ≥20A — [full spec below](#what-to-actually-buy) | ~ 30 € each | [eBay search](https://www.ebay.de/sch/i.html?_nkw=XY6020L) |
+| ⬜ | ID resistor 270–280 Ω ×3 | ¼ W, slim-tip centre pin → GND — [why](#the-third-pin-is-not-a-second-ground) |       ~ 2 € set | any electronics shop |
+| ⬜ | **AC emergency switch**   | Switched PDU / rack strip, reachable from outside |        ~ 20–40 € | [Conrad](https://www.conrad.de/de/o/not-aus-schalter-0216440.html) |
+| ⬜ | IEC inlet, panel-mount | With integrated fuse holder — **AC-side protection only** |       ~ 3–6 € | [Amazon](https://www.amazon.de/s?k=Kaltger%C3%A4testecker+Einbau+Sicherungshalter) |
+| ⬜ | DC Kill Switch            | Rocker/push, ≥25A **DC-rated** |         ~ 4–8 € | [Amazon](https://www.amazon.de/s?k=12V+DC+Notaus+Schalter+30A) |
+| ⬜ | Main Fuse 25A             | ANL / blade, main **DC** rail protection |         ~ 2–5 € | [Amazon](https://www.amazon.de/s?k=ANL+Sicherung+25A) |
+| ⬜ | Blade fuses 3A / 5A / 15A | Per-branch protection (switch / node / MS-01) |       ~ 5 € set | [Amazon](https://www.amazon.de/s?k=KFZ+Sicherungen+Sortiment) |
+| ⬜ | Cable 4 mm² red/black     | Main feed (PSU → converters) |       ~ 2–3 €/m | [Amazon](https://www.amazon.de/s?k=kabel+4mm2+rot+schwarz) |
+| ⬜ | Cable 2.5 mm² red/black   | MS-01 run (9.5A) | ~ 1.20–2.00 €/m | [Amazon](https://www.amazon.de/s?k=kabel+2.5mm2+rot+schwarz) |
+| ⬜ | Cable 1.5 mm² red/black   | Per-node runs to slim-tip connector | ~ 0.80–1.50 €/m | [Amazon](https://www.amazon.de/s?k=kabel+1.5mm2+rot+schwarz) |
+| ⬜ | MS-01 DC plug             | Barrel jack pigtail, **verify size on the unit** |         ~ 5 € | — |
 
 **Buy two identical converter modules.** Set one to 20.0V (nodes) and one to 19.0V (MS-01). Same part, same spare, one thing to learn — the output voltage is what you dial in, the current rating is what you buy.
 
 > ⚠️ **It must say BUCK / STEP-DOWN.** A *Boost* converter steps voltage **up** and cannot do this job at all. This page previously linked a "500W 20A DC-DC **Boost** Converter" — that part was wrong and would never have worked. Boost = up, Buck = down; you need down.
 
-> ⚠️ **Derate no-name modules by 50%.** The printed rating is a peak figure under lab cooling. A module labelled 40A carries roughly 20A continuously in a rack — which is what the 16.25A node load needs. A "20A" module is a ~10A module and only covers three nodes.
+> ⚠️ **Derate no-name modules by 50%.** The printed rating is a peak figure under lab cooling. A passively-cooled board labelled 40A carries roughly 20A continuously in a rack. Actively-cooled modules do better — see [What to actually buy](#what-to-actually-buy) for where this rule bends.
 
 ---
 
@@ -203,7 +215,81 @@ At 20V output:           20V × 20A = 400W   ← the number used in every table 
 Node load (5 nodes):     16.25 A → 81% ✅
 ```
 
-A module printed "20A" is therefore a ~10A part and covers three nodes, not five. This derating is why the parts list specifies 40A for a 16.25A load — it is not over-engineering, it is reading the spec honestly.
+A passively-cooled module printed "20A" is therefore a ~10A part and covers three nodes, not five. This derating is why the parts list asks for headroom — it is not over-engineering, it is reading the spec honestly.
+
+---
+
+## What to Actually Buy
+
+The PSU, the fuse boxes and the slim-tip pigtails are bought. The converters are the last thing standing between the parts pile and a powered rack, so this section is the shopping spec rather than a link to a search.
+
+### The four hard requirements
+
+| # | Requirement | Why it is on the list |
+|---|---|---|
+| 1 | **Buck / Step-Down** | A Boost module physically cannot go 25.2V → 20V |
+| 2 | Input range **includes 25.2V** | Anything like "6–70V" or "10–60V" is fine |
+| 3 | **Output range reaches at least 24V** | ← the trap. See below |
+| 4 | ≥ 20A printed, with a heatsink | The node rail's cold-start peak is 9.75A today, 16.25A at five nodes |
+
+**Requirement 3 is the one that eats orders.** The single most common high-current buck module sold as "20A 300W adjustable step-down" has an output range of **0.8–13V** or **1.2–15V**. It is a perfectly good module — for making 12V or 5V. It cannot produce 20V no matter how the pot is turned, and the listing photo looks identical to one that can. Before ordering, find the output range in the listing text and check that **20V sits inside it**, not just the input range.
+
+A second, subtler limit: most of these boards specify **maximum output ≈ input − 2V**. At a 25.2V rail that caps the output at ~23.2V, so 20V and 19V both clear it comfortably — but it is why this design cannot be stretched much further, and why the PSU's 25.2V matters rather than being an arbitrary number.
+
+### The recommendation: 2× XY6020L
+
+The **XY6020L** (6–70V in, 0–60V out, 20A / 1200W, ~30 €) fits all four requirements and is worth naming specifically, because it fixes the weakest part of this whole design:
+
+**The output voltage is set digitally, not with a trim pot.** Accuracy is ±0.4%, so 20.00V lands within ±0.08V and stays there. Everything on this page argues that +5.3% is out of spec for the MS-01 — and then the original plan handed that tolerance to a screwdriver and a multimeter on a no-name board. A numeric setpoint with a display is the difference between "I think it's 20V" and "it is 20V".
+
+It also brings, in order of how much they matter here:
+
+- **OVP** — the failure mode that kills three nodes at once is a converter that fails through to its input voltage. Over-voltage protection does not make that impossible, but it is the only guard this chain has against it
+- **A per-rail current limit (CC)** — a hard ceiling upstream of the blade fuses, settable per rail
+- **A temperature-controlled fan and a proper baseplate** — which is what lets it beat the 50% derating rule
+
+**The honest trade-off: it has a fan.** The PSU was chosen fanless precisely because this lab lives in a living space, and the node rail's continuous load (~120W) is above the module's fan threshold (>2A / >50W / >50°C), so it will run. It is a small 30mm fan, not an ATX supply, but it is not nothing — and it is the one place where this recommendation works against the silence requirement the rest of the page defends. A larger passive heatsink and generous derating is the quieter alternative, at the cost of setting the voltage by hand.
+
+### What the two rails get
+
+With active cooling, ~15A continuous out of 20A printed is realistic — better than the blanket 50% rule, which is written for bare passively-cooled boards:
+
+```
+XY6020L printed:      20 A / 1200 W
+Realistic continuous: ~15 A
+At 20V output:        20V × 15A = 300W
+```
+
+**Converter #1 — nodes @ 20.0V**
+
+| Nodes | Cold-start peak | % of 300W | Staggered boot | % of 300W |
+|---:|---:|---:|---:|---:|
+| 3 *(today)* | 9.75 A | **65%** ✅ | 6.00 A | 40% ✅ |
+| 4 | 13.00 A | **87%** ⚠️ | 8.00 A | 53% ✅ |
+| 5 | 16.25 A | **108%** ❌ | 10.00 A | 67% ✅ |
+| 6 | 19.50 A | 130% ❌ | 12.00 A | 80% ⚠️ |
+
+**Converter #2 — MS-01 @ 19.0V**
+
+| Case | Current | % of 285W (15A @ 19V) |
+|---|---:|---:|
+| Measured sustained (90–95W) | 4.9 A | 33% ✅ |
+| Measured burst (115W) | 6.05 A | 40% ✅ |
+| Nameplate (180W, i.e. with a GPU) | 9.47 A | **63%** ✅ |
+
+Converter #2 is comfortable in every case including a future GPU. Converter #1 is comfortable today and stays comfortable to six nodes **as long as staggered boot is configured** — which promotes that BIOS setting from "sensible" back to "do it before the fourth node". If you would rather not depend on it, buy a 40A-class module for the node rail instead and keep the 400W figure the tables below use; the MS-01 rail does not need it either way.
+
+### Commissioning — set the voltage before anything is connected
+
+The order here is not optional. A converter shipped at its factory default, connected to a node, is how boards die.
+
+1. **Feed the module from the PSU with nothing on the output.** No fuse box, no node, no MS-01
+2. **Set the current limit (CC) first.** Many CC-CV modules ship with CC at zero and simply produce no output — that looks like a dead module and gets returned. Set it above the rail's cold-start peak: **~16A for the node rail, ~12A for the MS-01**
+3. **Set the voltage and verify it with a multimeter at the output terminals** — 20.00V and 19.00V. Trust the meter over the display
+4. **Check the fixed-preset switch.** The XY6020L has a 3-position toggle for hard-coded 5/9/12/24/36/48/60V outputs. It must be in the adjustable position — a module quietly stuck on the 24V preset feeds 24V into a 20V node
+5. **Set "output on at power-up".** These modules remember their output-enable state, and one that boots with the output off means nothing comes back after a power cut. This is the setting that turns a mains blip into a manual trip to the rack
+6. **Then** connect the fuse box, and only then a single node — [with its ID resistor in place](#the-third-pin-is-not-a-second-ground). Verify 20V at the slim-tip before it touches a machine
+7. Bring up the remaining nodes one at a time
 
 ---
 
@@ -290,7 +376,7 @@ Staggered boot is still worth setting up — it costs nothing and it is what kee
 
 ### And the converters?
 
-Converter #1 now feeds nodes only, so it has gained a lot of room:
+Converter #1 now feeds nodes only, so it has gained a lot of room. This table assumes a **40A-class module (400W usable)**; for the 20A-class module actually recommended, [the equivalent table is here](#what-the-two-rails-get) and the percentages are roughly a third higher:
 
 | Nodes | Load @ 20V | Current | % of 400W |
 |---:|---:|---:|---:|
@@ -299,7 +385,7 @@ Converter #1 now feeds nodes only, so it has gained a lot of room:
 | 5 | 325 W | 16.25 A | 81% ✅ |
 | 6 | 390 W | 19.50 A | 98% ❌ |
 
-Converter #2 must carry the MS-01's 9.47A at 19V. A **10A unit is the bare minimum and leaves no margin** — 15A is the sensible buy, since the difference is a few euros and the MS-01 is the load most likely to grow (a GPU in that PCIe slot is on the roadmap).
+Converter #2 must carry the MS-01's 9.47A at 19V. A **10A unit is the bare minimum and leaves no margin** — the sensible buy is a module printed ≥20A, which lands at 63% even at the full 180W nameplate, since the difference is a few euros and the MS-01 is the load most likely to grow (a GPU in that PCIe slot is on the roadmap).
 
 Note where this leaves the two limits: **converter #1 runs out at 6 nodes (98%), while the PSU at that point is still at 55%.** The converter is decisively the first component to go, and by a wide margin — which is the healthy arrangement, because a 25–40 € buck module is a much cheaper thing to outgrow than a power supply.
 
@@ -333,16 +419,20 @@ Confirming the parts actually work together:
 | Converter #1 output = node spec | Nodes need exactly 20V | 20V regulated | ✅ |
 | Converter #1 current ≥ load | 3 nodes = 9.75A | 20A limit | ✅ 49% |
 | Converter #2 output = MS-01 spec | MS-01 needs 19V | 19V regulated | ⬜ not yet bought |
-| Converter #2 current ≥ load | MS-01 = 9.47A | ≥10A required | ⬜ buy 15A |
+| Converter #2 current ≥ load | MS-01 = 9.47A | ≥10A required | ⬜ [buy ≥20A printed](#what-to-actually-buy) |
+| Converter output range | Must reach 20V | Many 20A modules stop at 13V | ⬜ [check before ordering](#the-four-hard-requirements) |
+| Converter max output vs input | ≈ Vin − 2V = 23.2V | 20V and 19V needed | ✅ |
+| Slim-tip ID line | ~270 Ω centre pin → GND | Bare pigtails, unmeasured | ⬜ [measure, then solder](#the-third-pin-is-not-a-second-ground) |
 | MikroTik voltage range | Accepts 18–28V | Fed 25.2V raw | ✅ |
 | PSU power ≥ total load | 433W nameplate / 364W measured | 751W | ✅ 58% / 48% |
-| Fuse box voltage | Single rail OK | 20V common bus | ✅ |
+| Fuse box A voltage | Single rail OK | 20V common bus, 3 of 6 ports used | ✅ |
+| Fuse box B voltage | Single rail OK | 19V common bus, 1 of 6 ports used | ✅ |
 
-**Every stage matches, and the PSU line is comfortable again** — with the 500W unit it stood at ⚠️ 87%. See [the sizing verdict](#is-750w-enough). The two remaining ⬜ rows are the second converter, which is the last part still needed before `pve0` can join the rail.
+**Every stage matches, and the PSU line is comfortable again** — with the 500W unit it stood at ⚠️ 87%. See [the sizing verdict](#is-750w-enough). The remaining ⬜ rows are all downstream of one purchase: the two converters.
 
 Two deliberate constraints shape this layout:
 
-- **The KFZ fuse box has a common +/- bus**, so every port carries the same voltage. Only the 20V nodes can share it. The MS-01 and the switch each need their own inline fuse outside the box — they are on different voltages and physically cannot hang off that bus.
+- **A KFZ fuse box has a common +/- bus**, so every port carries the same voltage. This is why there are two of them — one per regulated rail — and why the MikroTik still cannot use either: it sits on the raw 25.2V feed and needs its own inline fuse.
 - **The switch moved to the raw 25.2V feed earlier than originally planned.** Config B deferred this until five nodes; adding the MS-01 pulled it forward, because every watt taken off converter #1 is margin the nodes get back.
 
 ---
@@ -399,14 +489,15 @@ Peak current: 65W / 20V = 3.25A
 → Branch fuse: 5A blade
 ```
 
-### MS-01 run (Converter #2 → barrel jack)
+### MS-01 run (Converter #2 → Fuse Box B → barrel jack)
 
 ```
 Peak current: 180W / 19V = 9.47A
 → Cable: 2.5 mm² copper (rated ~21A) — 1.5 mm² would technically pass,
   but 9.5A continuous on it runs warm and the 15A fuse sits too close
   to the cable's own 16A rating to be a real protection margin
-→ Branch fuse: 15A blade, inline (not in the KFZ box — different voltage)
+→ Branch fuse: 15A blade in fuse box B (its own box — different voltage
+  from the node rail, and a common +/- bus can only carry one)
 ```
 
 > ⚠️ **The MS-01 uses a barrel jack, not a slim-tip.** Measure the plug on the original adapter before ordering a pigtail — Minisforum has shipped more than one barrel size across revisions, and this page does not assume which one your unit has.
@@ -423,9 +514,35 @@ Current at 25.2V raw: 34W / 25.2V = 1.35A
 
 ## The Lenovo Slim-Tip (Square) Connector
 
-The M910q Tiny does not use a barrel jack. It uses Lenovo's **slim-tip / square connector** — a rectangular plug (outside ~11×4mm, with a centre pin) carrying 20V DC. These are not generic, so each node cable needs either a salvaged OEM slim-tip pigtail or a compatible aftermarket slim-tip-to-bare-wire lead.
+The M910q Tiny does not use a barrel jack. It uses Lenovo's **slim-tip / square connector** — a rectangular yellow plug (outside ~11×4mm, with a centre pin) carrying 20V DC. These are not generic, so each node cable needs either a salvaged OEM slim-tip pigtail or a compatible aftermarket slim-tip-to-bare-wire lead. **Three bought at ~3 € each**, one per node.
 
 > ⚠️ **Polarity is critical.** Reversing +/- on 20V DC destroys the board instantly with no warning. Verify polarity with a multimeter before connecting any node for the first time.
+
+### The third pin is not a second ground
+
+The pigtails have **three** conductors, and the third one is the part that decides whether this build works:
+
+| Contact | Function |
+|---|---|
+| Top plate | **+20V** |
+| Bottom plate + shell | **GND** |
+| **Centre pin** | **ID** — a resistance to GND that tells the machine the adapter's wattage |
+
+Lenovo's power controller measures the resistance between the centre pin and ground at plug-in and configures the machine from it ([ThinkWiki](https://www.thinkwiki.org/wiki/Power_Connector)):
+
+| Adapter | ID resistance |
+|---|---:|
+| 45 W | 120 Ω |
+| **65 W** ← the M910q's OEM brick | **~270–280 Ω** |
+| 90 W | 550 Ω |
+| 135 W | 1 kΩ |
+| 170 W | 1.9 kΩ |
+
+A bare pigtail has three wires and **no resistor**. With the ID line open the machine sees "unknown adapter" — the documented consequence on ThinkPads is refused charging; on a Tiny the reported outcomes range from a BIOS warning to running at a reduced power limit to not powering on at all. None of those are things to discover across three nodes at once.
+
+So: **solder a 270 Ω ¼ W resistor between the centre-pin wire and the negative wire, at the connector end.** Do it on one node, boot it, confirm the BIOS is quiet and the CPU is not power-limited, and only then build the other two.
+
+> ⬜ **Measure the pigtails before soldering.** Some aftermarket slim-tip leads already have the resistor moulded into the plug. Probe centre pin → shell with a multimeter: **~250–280 Ω means it is already there** and a second resistor in parallel would halve the value and misreport the wattage. Open circuit (OL) means you need to add it.
 
 Build notes:
 - Strip ~8mm on the bare end, use ferrules into the fuse box screw terminals
@@ -436,10 +553,12 @@ Build notes:
 
 ## Upgrade Path
 
-**Now — required before `pve0` goes on the rail**
-- ⬜ **Buy the 19V converter** (15A). The MS-01 must not run on the 20V node rail
+**Now — the last parts standing between the pile and a powered rack**
+- ⬜ **Buy both converters** — same module twice, [output range must reach 20V](#the-four-hard-requirements). This is the only remaining blocker for the whole chain, not just for `pve0`
+- ⬜ **Measure the slim-tip pigtails** for a built-in ID resistor; add 270 Ω where missing, and [prove it on one node first](#the-third-pin-is-not-a-second-ground)
 - ⬜ **Relocate the MikroTik** to the raw 25.2V feed with an inline 3A fuse — originally a 5-node step, pulled forward by the MS-01
-- ⬜ 2.5 mm² cable + 15A inline fuse for the MS-01 branch; verify its barrel-jack size
+- ⬜ 2.5 mm² cable for the MS-01 branch into fuse box B (15A blade); verify its barrel-jack size
+- ⬜ **25A ANL main fuse on the DC rail** — the fused IEC inlet does not cover this
 
 **Short term — replace assumptions with measurements**
 - Measure real per-node draw with a clamp meter under Kubernetes load — replace the 65W spec-peak with measured values

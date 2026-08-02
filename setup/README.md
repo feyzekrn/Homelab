@@ -24,7 +24,7 @@ The MikroTik CRS310 as the central 2.5G data switch and why Layer 3 routing on t
 
 ### [🔋 Power Supply — PSU, DC/DC Converter & Fuse Box](./power-supply)
 
-How the lab is powered cleanly and safely. Covers the power supply unit, DC/DC conversion, fuse box setup and the reasoning behind centralising power distribution instead of running individual adapters per device. Every machine now hangs off one PSU — including the MS-01, which needs **19V** where the Tiny nodes need **20V**, so the rail splits into two regulated branches. That page also carries the sizing math for when the 500W supply runs out.
+How the lab is powered cleanly and safely. Covers the power supply unit, DC/DC conversion, fuse box setup and the reasoning behind centralising power distribution instead of running individual adapters per device. Every machine now hangs off one PSU — including the MS-01, which needs **19V** where the Tiny nodes need **20V**, so the rail splits into two regulated branches, each with its own fuse box. That page also carries the sizing math for what runs out first, and the shopping spec for the two converters that are still missing.
 
 ---
 
@@ -60,7 +60,7 @@ The **two HDDs form the ZFS pool** as a mirror — 2 TB usable, which carries th
 
 Storage is deliberately **two-tier**: the existing 1 TB NVMe stays the fast tier for the hypervisor, VM disks and anything latency-sensitive, while the HDD mirror is the bulk tier. Media streaming and photo storage are sequential workloads that do not benefit from NVMe — spending the money on capacity instead of speed is the right trade here.
 
-The MS-01 block is **optional** — see [the compute overview](./compute#-the-proxmox-host-is-optional). Without it the total drops to roughly 806 €, and the Kubernetes cluster this project is built around still works completely.
+The MS-01 block is **optional** — see [the compute overview](./compute#-the-proxmox-host-is-optional). Without it the total drops to roughly 803 €, and the Kubernetes cluster this project is built around still works completely.
 
 **Networking & Power**
 
@@ -71,8 +71,10 @@ The MS-01 block is **optional** — see [the compute overview](./compute#-the-pr
 |   ⬜   | Patch Panel 12-Port Cat.6a 10" 1HE |   1 |      ~ 35 € |      ~ 35 € |
 |   ⬜   | 0.25m Slim Patch Cables            |  10 |       ~ 2 € |      ~ 20 € |
 |   ✅   | PSU MEAN WELL UHP-750-24           |   1 |      ~ 50 € |      ~ 50 € |
-|   ⬜   | DC-DC **Buck** Converter 40A       |   2 |      ~ 30 € |      ~ 60 € |
-|   ⬜   | KFZ Fuse Box 6-Port                |   1 |       ~ 8 € |       ~ 8 € |
+|   ✅   | Lenovo slim-tip pigtail (3-pin)    |   3 |       ~ 3 € |       ~ 9 € |
+|   ✅   | KFZ Fuse Box 6-Port                |   2 |       ~ 8 € |      ~ 16 € |
+|   ⬜   | DC-DC **Buck** Converter, ≥20A     |   2 |      ~ 30 € |      ~ 60 € |
+|   ⬜   | IEC inlet, panel-mount + AC fuse   |   1 |       ~ 5 € |       ~ 5 € |
 |   ⬜   | Schaltbare PDU / Not-Aus (230V)    |   1 |      ~ 30 € |      ~ 30 € |
 |   ⬜   | DC Kill Switch + fuses + cable     |   1 |      ~ 25 € |      ~ 25 € |
 |   ⬜   | Fritz!Box 7490 (used)              |   1 |      ~ 40 € |      ~ 40 € |
@@ -86,16 +88,18 @@ The **access point** is what carries the household WLAN once OPNsense becomes th
 
 | | |
 | --- | ----------: |
-| **Total (all listed parts)** | **~ 1421 €** |
-| **Already spent** ✅ | **~ 828 €** |
-| **Still outstanding** ⬜ | **~ 593 €** |
-| *Without the optional MS-01 block* | *~ 781 €* |
+| **Total (all listed parts)** | **~ 1443 €** |
+| **Already spent** ✅ | **~ 853 €** |
+| **Still outstanding** ⬜ | **~ 590 €** |
+| *Without the optional MS-01 block* | *~ 803 €* |
 
 The MS-01 line item is 500 €, but dropping it saves 640 € — the second converter exists only to give that machine its 19V, and the two HDDs only exist to be its storage pool, so both leave with it.
 
 > ✅ **The 750W PSU takes the power question off the table.** It was bought for 50 € — cheaper than the 500W unit originally planned — and at three nodes the lab sits at 48% even on measured figures. The first component to run out is now clearly the **node converter at six nodes (98%)**, while the PSU is still at 55%. Staggered boot remains worth setting up, but it is no longer what makes the budget work. The full calculation is in [power-supply](./power-supply#is-750w-enough).
 
-> ⚠️ **The two converters must be BUCK (step-down) modules**, and their printed current rating should be read at roughly half. Both are the same part — one dialled to 20V for the nodes, one to 19V for the MS-01. See [power-supply](./power-supply#buck-not-boost--get-the-type-right-first).
+> ⚠️ **The two converters must be BUCK (step-down) modules whose *output* range reaches 20V.** The most common high-current buck module tops out at 13V and cannot do this job despite matching every other spec. Both are the same part — one dialled to 20.0V for the nodes, one to 19.0V for the MS-01. Full shopping spec in [power-supply](./power-supply#what-to-actually-buy).
+
+> ⚠️ **The slim-tip pigtails need an ID resistor.** The third pin is not a second ground — it tells the Lenovo which adapter is attached, and a bare pigtail leaves it open. Measure first, then solder ~270 Ω. See [power-supply](./power-supply#the-third-pin-is-not-a-second-ground).
 
 ---
 
