@@ -5,7 +5,7 @@
 This guide gets written when phase 2 actually starts — Talos moves quickly, and a walkthrough written a year in advance would be stale on day one. The rough shape is already clear:
 
 1. **Generate the image** via the [image factory](https://factory.talos.dev/) (schematic with the needed system extensions), record version and checksum in the [README](./README.md).
-2. **Write the image to USB** — same macOS `dd` workflow as in the [Ubuntu guide](../ubuntu-server-24.04/getting-started.md#1-create-the-bootable-usb-macos), with one extra step first:
+2. **Write the image to USB** — same macOS `dd` workflow as in the [Ubuntu guide](../ubuntu-server-26.04/getting-started.md#1-create-the-bootable-usb-macos), with one extra step first:
 
    ```bash
    xz -dk ./talos-metal-amd64-<version>.raw.xz

@@ -12,7 +12,7 @@ The long-term goal of this project is not only to run workloads. The goal is to 
 
 | Phase | Duration | Operating system | Used for | Main reason |
 |---|---:|---|---|---|
-| 1 | ~1 year | [Ubuntu Server 24.04 LTS](./ubuntu-server-24.04) | First cluster build, Linux administration, Kubernetes learning, networking experiments, storage and service hosting | Exposes the underlying system instead of hiding it |
+| 1 | ~1 year | [Ubuntu Server 26.04 LTS](./ubuntu-server-26.04) | First cluster build, Linux administration, Kubernetes learning, networking experiments, storage and service hosting | Exposes the underlying system instead of hiding it |
 | 2 | After phase 1 | [Talos Linux](./talos) | Rebuilt bare-metal Kubernetes cluster with immutable nodes and IaC from the start | Closer to the real target architecture |
 
 Phase 1 is not the final architecture. It is the training ground.
@@ -21,9 +21,9 @@ Phase 2 is the real bare-metal Kubernetes approach: wipe the nodes, install Talo
 
 ---
 
-## Phase 1 — Ubuntu Server 24.04 LTS
+## Phase 1 — Ubuntu Server 26.04 LTS
 
-For the first year all nodes run **[Ubuntu Server 24.04 LTS](./ubuntu-server-24.04)**.
+For the first year all nodes run **[Ubuntu Server 26.04 LTS](./ubuntu-server-26.04)**.
 
 Ubuntu is the right starting point because it keeps the full Linux system visible. That matters for this project. Before making the cluster minimal and immutable, I want to understand what is actually happening on the nodes: boot process, services, logs, packages, network interfaces, kernel modules, disks, mounts, systemd units and the way Kubernetes interacts with all of it.
 
@@ -121,7 +121,7 @@ The project exists to build skills, especially around cloud-native infrastructur
 
 Each operating system has its own folder with the same two files:
 
-- [Ubuntu Server 24.04 LTS](./ubuntu-server-24.04) — why this OS, exact installer version and checksum notes, plus a [getting-started guide](./ubuntu-server-24.04/getting-started.md) covering the full path from bootable USB to a freshly updated node with SSH access
+- [Ubuntu Server 26.04 LTS](./ubuntu-server-26.04) — why this OS, exact installer version and checksum notes, plus a [getting-started guide](./ubuntu-server-26.04/getting-started.md) covering the full path from bootable USB to a freshly updated node with SSH access
 - [Talos Linux](./talos) — the phase-2 target OS; its [getting-started guide](./talos/getting-started.md) gets filled in when the rebuild starts
 
 The OS folders double as the local staging area for installer images. Large ISO and image files should stay out of Git — the repository tracks the version, filename, source URL and checksum notes; the actual installer files can be placed in the matching folder when needed.
@@ -132,9 +132,9 @@ The OS folders double as the local staging area for installer images. Large ISO 
 
 | Node | Phase 1 OS | Phase 2 OS |
 |---|---|---|
-| Node 1 | [Ubuntu Server 24.04 LTS](./ubuntu-server-24.04) | [Talos Linux](./talos) |
-| Node 2 | [Ubuntu Server 24.04 LTS](./ubuntu-server-24.04) | [Talos Linux](./talos) |
-| Node 3 | [Ubuntu Server 24.04 LTS](./ubuntu-server-24.04) | [Talos Linux](./talos) |
+| Node 1 | [Ubuntu Server 26.04 LTS](./ubuntu-server-26.04) | [Talos Linux](./talos) |
+| Node 2 | [Ubuntu Server 26.04 LTS](./ubuntu-server-26.04) | [Talos Linux](./talos) |
+| Node 3 | [Ubuntu Server 26.04 LTS](./ubuntu-server-26.04) | [Talos Linux](./talos) |
 
 If more nodes are added during the Ubuntu phase, they should follow the same rule: Ubuntu first for learning and consistency, Talos later during the full rebuild.
 
@@ -145,3 +145,4 @@ If more nodes are added during the Ubuntu phase, they should follow the same rul
 | Date | Decision |
 |---|---|
 | 2026-06-17 | Start with Ubuntu Server 24.04 LTS on all nodes for roughly one year to build Linux, cloud-native and networking skills. Rebuild later with Talos Linux and infrastructure as code from the beginning. |
+| 2026-08-13 | Phase 1 moves to **Ubuntu Server 26.04 LTS**. 26.04 shipped on 2026-04-20 and replaced 24.04 as the current LTS before the first node was prepared; the phase-1 reasoning is release-independent, so the newer LTS is used. Rationale and image metadata: [Ubuntu Server 26.04 LTS](./ubuntu-server-26.04). |

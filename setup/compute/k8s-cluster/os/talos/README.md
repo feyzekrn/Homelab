@@ -4,7 +4,7 @@
 
 Talos Linux is planned for phase 2 of the homelab.
 
-After roughly one year of running Ubuntu Server 24.04 LTS, all nodes are expected to be wiped and rebuilt with Talos. This is the real bare-metal Kubernetes phase: immutable nodes, declarative machine configuration and infrastructure as code from the beginning. The full reasoning lives in the [OS Strategy](../README.md).
+After roughly one year of running Ubuntu Server 26.04 LTS, all nodes are expected to be wiped and rebuilt with Talos. This is the real bare-metal Kubernetes phase: immutable nodes, declarative machine configuration and infrastructure as code from the beginning. The full reasoning lives in the [OS Strategy](../README.md).
 
 **In this folder:** [Getting Started](./getting-started.md) — the install walkthrough; gets written when the rebuild starts.
 

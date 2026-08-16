@@ -1,6 +1,6 @@
-# Ubuntu Server 24.04 — Getting Started
+# Ubuntu Server 26.04 — Getting Started
 
-[← Back to Ubuntu Server 24.04 LTS](./README.md)
+[← Back to Ubuntu Server 26.04 LTS](./README.md)
 
 Step by step from a downloaded ISO to a freshly updated node that can be reached over SSH. Written for the Lenovo M910q Tiny nodes, prepared from a Mac.
 
@@ -8,36 +8,57 @@ Step by step from a downloaded ISO to a freshly updated node that can be reached
 
 ## 1. Create the Bootable USB (macOS)
 
-Download the ISO (see [Image Metadata](./README.md#image-metadata)) and verify its checksum:
+macOS ships everything needed: `diskutil` to manage the stick and `dd` to write the image. The Ubuntu Server ISO is a hybrid image and can be written raw to a USB stick as-is — no Rufus, no Etcher required.
+
+**Verify the checksum first:**
 
 ```bash
-shasum -a 256 ./ubuntu-24.04.x-live-server-amd64.iso
+shasum -a 256 ~/Downloads/ubuntu-26.04-live-server-amd64.iso
 ```
 
-Compare against the value from <https://releases.ubuntu.com/24.04/> and record it in the README.
+Compare against the value in [Image Metadata](./README.md#image-metadata) / <https://releases.ubuntu.com/26.04/SHA256SUMS>. Doing this *before* writing saves debugging an installer that fails halfway through.
 
 **Identify the USB stick:**
 
 ```bash
-diskutil list
+diskutil list external
 ```
 
-Find the stick by its size and name (e.g. `/dev/disk4`, listed as *external, physical*). **Double-check this — writing to the wrong disk destroys its data.**
+Find the stick by its size and name (e.g. `/dev/disk4`, listed as *external, physical*). **Double-check this — writing to the wrong disk destroys its data.** `external` in the filter is deliberate: it keeps the internal NVMe out of the output entirely.
 
-**Unmount it (unmount, not eject):**
+**Clear the stick (unmount, not eject):**
 
 ```bash
 diskutil unmountDisk /dev/diskX
 ```
 
+If the stick still carries a previous installer image, macOS re-mounts its partitions the moment they appear and `dd` fails with `Resource busy`. Wiping the partition table is the reliable fix — nothing left to mount, nothing that can re-mount:
+
+```bash
+diskutil eraseDisk free EMPTY /dev/diskX
+```
+
 **Write the ISO:**
 
 ```bash
-sudo dd if=./ubuntu-24.04.x-live-server-amd64.iso of=/dev/rdiskX bs=4m status=progress
+sudo dd if=/Users/<user>/Downloads/ubuntu-26.04-live-server-amd64.iso of=/dev/rdiskX bs=1m
 ```
 
-- `rdiskX` (with the `r`) instead of `diskX` — the raw device is several times faster
-- macOS may show a "disk not readable" popup afterwards — expected (the stick now carries a Linux filesystem). Click *Ignore*, **not** *Initialize*.
+Details that matter:
+
+- `rdiskX` (with the `r`) instead of `diskX` — the raw device is several times faster. `~2.9 GB` takes roughly 100 seconds at ~30 MB/s
+- `bs=1m` — without a block size, `dd` writes in 512-byte chunks and the write takes hours. `bs=4m` works too
+- **No `status=progress`** — that is GNU `dd` syntax and macOS does not accept it. Press **Ctrl+T** during the write to print the current progress instead
+- **`~` is already `/Users/<user>`.** A path like `~/Users/<user>/Downloads/...` expands to `/Users/<user>/Users/<user>/Downloads/...` and fails with `No such file or directory`. Easiest way to avoid it: type `sudo dd if=` and then drag the ISO from Finder into the Terminal window
+- macOS may show a "disk not readable" popup afterwards — expected (the stick now carries a Linux filesystem). Click *Ignore*, **not** *Initialize*
+
+A successful run ends with a byte count that matches the ISO size exactly:
+
+```text
+2783+1 records in
+2783+1 records out
+2918598656 bytes transferred in 97.559106 secs (29916210 bytes/sec)
+```
 
 **Flush and eject:**
 
@@ -46,6 +67,15 @@ sync
 diskutil eject /dev/diskX
 ```
 
+### If `dd` fails
+
+| Message | Cause | Fix |
+|---|---|---|
+| `No such file or directory` | Path wrong — usually a doubled `~/Users/<user>/` | Drag the ISO into Terminal, or use exactly one of `~/Downloads/…` or `/Users/<user>/Downloads/…` |
+| `Resource busy` | A partition of the stick is mounted | `diskutil unmountDisk /dev/diskX`, or `diskutil eraseDisk free EMPTY /dev/diskX` if it keeps re-mounting |
+| `Operation not permitted` | Terminal lacks disk access | System Settings → Privacy & Security → Full Disk Access → enable Terminal, then restart Terminal |
+| Nothing happens for minutes | Normal — `dd` is silent | Ctrl+T for progress |
+
 ---
 
 ## 2. Boot the Node from the Stick
@@ -53,6 +83,8 @@ diskutil eject /dev/diskX
 1. Plug in the stick, power on the M910q and press **F12** for the boot menu (**F1** enters BIOS setup if boot options need changing).
 2. Pick the USB stick as boot device.
 3. Choose **Try or Install Ubuntu Server** in the GRUB menu.
+
+If the stick does not appear in the boot menu at all, disable Secure Boot in BIOS setup and retry.
 
 ---
 
