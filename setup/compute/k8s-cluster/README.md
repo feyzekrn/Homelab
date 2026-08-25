@@ -39,7 +39,13 @@ The form factor is also a deliberate choice. These machines are silent, compact 
 
 ### Why the M.2 2.5G Network Adapter?
 
-The M910q Tiny has an M.2 slot that sits unused in the default configuration. Adding a 2.5G adapter there gives each node a second physical network interface. The plan is to use **both ports separately**: the onboard 1G port for management traffic — SSH, monitoring, fallback — and the 2.5G M.2 adapter for actual cluster traffic. Kubernetes inter-node communication, Longhorn replication, databases and message brokers all go over the fast 2.5G path. This way the two traffic types never compete for bandwidth on the same cable.
+The M910q Tiny has an M.2 slot that sits unused in the default configuration. Adding a 2.5G adapter there gives each node a second physical network interface. The plan is to use **both ports separately, and both untagged**: the 2.5G M.2 adapter carries everything that stays inside the homelab — Kubernetes inter-node communication, Longhorn replication, databases, message brokers, plus SSH and monitoring — while the onboard 1G port carries nothing but internet uplink: image pulls and updates. This way a container pull can never compete with a Longhorn rebuild on the same cable, and neither node needs a VLAN-aware bridge, because the switch attaches the tags.
+
+The two cables are colour-coded — 🔵 blue for the data plane, 🟡 yellow for the uplink plane — following the scheme in [`cabling.md`](../../networking/cabling.md).
+
+> ⚠️ **One consequence to configure deliberately:** with two untagged NICs, the **default route must sit on the yellow 1G interface** and the blue 2.5G interface must have no gateway at all. And Kubernetes has to be pinned to the blue interface explicitly — Cilium's device selection, the etcd peer addresses, the Longhorn storage network and the MetalLB pool. Left on autodetection, a node can silently elect the 1G NIC and the entire cluster runs at a third of its speed while looking perfectly healthy.
+
+> ⚠️ **vPro/AMT is bound to the onboard NIC** — the yellow one. Out-of-band management therefore lives in the uplink VLAN, which is why that zone has to be firewalled as management-grade rather than as a plain internet zone. Details in [`cabling.md`](../../networking/cabling.md).
 
 If you use the exact same setup make sure to use the M.2 A+E 2.5GbE I226-V from Intel. They are some Euros more expensive but are more plug and play then the Realtek RTL8125B which are running quite OK on linux but are making issues on VMs or specially on Talos.
 I am going to plug those into the Wifi-modem slot since it is already empty, make sure to buy the 2230 version of the size not the 2260 (2260 is the bigger SSD slot). You can also buy one for a SSD NVME slot but for my Lenovo Tiny's those slots are on the backside not comfortable to reach.

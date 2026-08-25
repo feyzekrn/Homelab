@@ -6,7 +6,7 @@ This section covers every hardware decision made for this homelab — what was b
 
 ## Plan Overview
 
-The homelab consists of **two compute worlds** connected through a single managed switch: three identical mini PCs forming a bare-metal Kubernetes cluster, and one Minisforum MS-01 workstation running Proxmox VE as the stable infrastructure host (NAS, router/firewall, DNS, family apps). Each Kubernetes node runs a dual-cable setup: one port for management traffic, one for cluster data. The hardware was chosen to be affordable enough to start immediately, efficient enough to run 24/7 at home without noise or significant electricity cost, and upgradeable enough to grow without replacing the base platform.
+The homelab consists of **two compute worlds** connected through a single managed switch: three identical mini PCs forming a bare-metal Kubernetes cluster, and one Minisforum MS-01 workstation running Proxmox VE as the stable infrastructure host (NAS, router/firewall, DNS, family apps). Each Kubernetes node runs a dual-cable setup: the 2.5G port for homelab data, the 1G port for internet uplink — [colour-coded per plane](./networking/cabling.md), untagged on both, so a node never has to handle a VLAN tag. The hardware was chosen to be affordable enough to start immediately, efficient enough to run 24/7 at home without noise or significant electricity cost, and upgradeable enough to grow without replacing the base platform.
 
 Everything reusable was taken from old hardware first. Only what was actually missing got purchased new or used from eBay.
 
@@ -67,9 +67,13 @@ The MS-01 block is **optional** — see [the compute overview](./compute#-the-pr
 | Status | Item                               | Qty |  Unit price |       Total |
 | :----: | ---------------------------------- | --: | ----------: | ----------: |
 |   ⬜   | MikroTik CRS310                    |   1 |     ~ 180 € |     ~ 180 € |
-|   ⬜   | SFP+ DAC cable (MS-01 ↔ switch)    |   1 |      ~ 25 € |      ~ 25 € |
-|   ⬜   | Patch Panel 12-Port Cat.6a 10" 1HE |   1 |      ~ 35 € |      ~ 35 € |
-|   ⬜   | 0.25m Slim Patch Cables            |  10 |       ~ 2 € |      ~ 20 € |
+|   ⬜   | SFP+ SR transceiver (MS-01 ↔ switch) |   2 |      ~ 12 € |      ~ 24 € |
+|   ⬜   | OM3 LC-LC duplex patch, 1 m        |   1 |       ~ 6 € |       ~ 6 € |
+|   ⬜   | Patch Panel 10" 12-Port, unbestückt |  1 |      ~ 12 € |      ~ 12 € |
+|   ⬜   | Cat.6a feed-through keystone       |  12 |       ~ 2 € |      ~ 24 € |
+|   ⬜   | 0.25m Slim Patch Cables (front)    |  10 |       ~ 2 € |      ~ 20 € |
+|   ⬜   | 0.5m Patch Cables (rear + `pve0`)  |   8 |     ~ 2.5 € |      ~ 20 € |
+|   ⬜   | 2–3m Patch Cable, yellow (WAN)     |   1 |       ~ 5 € |       ~ 5 € |
 |   ✅   | PSU MEAN WELL UHP-750-24           |   1 |      ~ 50 € |      ~ 50 € |
 |   ✅   | Lenovo slim-tip pigtail (3-pin)    |   3 |       ~ 3 € |       ~ 9 € |
 |   ✅   | KFZ Fuse Box 6-Port                |   2 |       ~ 8 € |      ~ 16 € |
@@ -77,10 +81,10 @@ The MS-01 block is **optional** — see [the compute overview](./compute#-the-pr
 |   ⬜   | IEC inlet, panel-mount + AC fuse   |   1 |       ~ 5 € |       ~ 5 € |
 |   ⬜   | Schaltbare PDU / Not-Aus (230V)    |   1 |      ~ 30 € |      ~ 30 € |
 |   ⬜   | DC Kill Switch + fuses + cable     |   1 |      ~ 25 € |      ~ 25 € |
-|   ⬜   | Fritz!Box 7490 (used)              |   1 |      ~ 40 € |      ~ 40 € |
+|   ✅   | Fritz!Box 7490 (used)              |   1 |      ~ 40 € |      ~ 40 € |
 |   ⬜   | WiFi access point, VLAN-capable    |   1 |      ~ 60 € |      ~ 60 € |
 
-The **Fritz!Box** replaces the ISP router for the transition phase: it can do static routes and hand out a custom DNS server, [neither of which the Speedport can](./networking/router#the-isp-router-problem). Afterwards it stays at the WAN edge as the DSL modem.
+The **Fritz!Box** has replaced the ISP router and is the gateway of the house today: it can do static routes and hand out a custom DNS server, [neither of which the Speedport could](./networking/router#the-isp-router-problem). Afterwards it stays at the WAN edge as the DSL modem.
 
 The **access point** is what carries the household WLAN once OPNsense becomes the gateway. It has to support multiple SSIDs with a VLAN tag each (802.1Q) so that family and IoT devices land in different zones — a cheap repeater cannot do this, and the Fritz!Box cannot take the role because as the modem it sits on the untrusted side of the firewall.
 
@@ -88,7 +92,7 @@ The **access point** is what carries the household WLAN once OPNsense becomes th
 
 | | |
 | --- | ----------: |
-| **Total (all listed parts)** | **~ 1443 €** |
+| **Total (all listed parts)** | **~ 1474 €** |
 | **Already spent** ✅ | **~ 853 €** |
 | **Still outstanding** ⬜ | **~ 590 €** |
 | *Without the optional MS-01 block* | *~ 803 €* |

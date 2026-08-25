@@ -6,7 +6,7 @@ AdGuard Home is a network-wide DNS resolver with built-in ad, tracker and malwar
 
 In this homelab, AdGuard Home is the **chosen LAN-facing resolver**: the DNS server that all household devices receive via DHCP. It filters unwanted domains, caches answers, forwards internal homelab zones to CoreDNS and sends everything else to an encrypted public upstream.
 
-**It runs in both worlds** (`lxc + k8s`): the primary instance is a container on [`pve0`](../../../../setup/compute/proxmox-cluster), with a synced replica on the cluster. The primary belongs on the Proxmox side because DNS serves the entire household — an outage is not "a service is down", it is "the internet is broken" for everyone in the flat, and that must not depend on the experimentation field.
+**It runs in both worlds** (`lxc + k8s`): the primary instance is a container on [`pve0`](../../../../setup/compute/proxmox-cluster), with a replica on the cluster later — two independent resolvers built from one config file, see [keeping both instances in sync](#keeping-both-instances-in-sync). The primary belongs on the Proxmox side because DNS serves the entire household — an outage is not "a service is down", it is "the internet is broken" for everyone in the flat, and that must not depend on the experimentation field.
 
 ---
 
@@ -105,6 +105,27 @@ It is also a genuinely useful always-on service: the first component where the f
 
 ---
 
+## Keeping Both Instances in Sync
+
+Stated plainly, because the phrase "synced replica" above suggests otherwise: **AdGuard Home has no clustering.** No shared backend, no leader election, no replication. The LXC primary and the `k8s` replica are two entirely independent resolvers that happen to be configured the same way. Whatever keeps them aligned has to be added from outside.
+
+Two ways to do that:
+
+| Approach | How it works | Cost |
+|---|---|---|
+| [AdGuardHome-Sync](https://github.com/bakito/adguardhome-sync) | A small service copies the config from the primary to the replica through AdGuard's API, on a schedule | One more always-on component; the primary's UI stays the source of truth |
+| **Git as the single source** | One `AdGuardHome.yaml` in this repository, rolled out to the LXC by [`ansible`](../../../provisioning/ansible) and to the cluster by [`flux`](../../../kubernetes/gitops/flux) | Nothing syncs at runtime; the UI becomes read-only in practice |
+
+**Chosen: Git as the single source.** It is the same decision the rest of this repository makes — the description lives in version control, the running thing is derived from it. It also avoids a runtime dependency whose only job is to repair drift that would not exist if both copies came from one file. The tradeoff is real and worth naming: changes made by clicking in the AdGuard UI are no longer authoritative, and a change made there is lost on the next rollout.
+
+**What never syncs, either way:** the query log, the statistics and per-instance TLS material. Those are local observations, not configuration — there is nothing to merge and no reason to try.
+
+**Sync is not failover.** Two identically configured resolvers do not help while nothing switches the clients between them. The Fritz!Box hands out exactly one local DNS server and has no field for a second, so during the interim phase the fallback is manual: clear that field and the household resolves through the router again. Real failover needs either [OPNsense](../../../../setup/networking/router/opnsense) as the DHCP server, handing out two resolvers, or a shared VIP in front of both — both far later than the replica itself.
+
+> ⚠️ `AdGuardHome.yaml` contains the admin password hash and, depending on the upstream, credentials. It belongs in this repository encrypted (`sops`/`age` or `ansible-vault`), never in plain text.
+
+---
+
 ## Hands-On Start
 
 Deployment files should eventually live under `helm-charts`.
@@ -146,5 +167,6 @@ Planned deployment location:
 
 - [AdGuard Home documentation](https://github.com/AdguardTeam/AdGuardHome/wiki)
 - [AdGuard Home GitHub](https://github.com/AdguardTeam/AdGuardHome)
+- [AdGuardHome-Sync](https://github.com/bakito/adguardhome-sync) — the API-based alternative to the chosen Git-as-source approach
 - [Wikipedia: AdGuard](https://en.wikipedia.org/wiki/AdGuard)
 - [Wikipedia: DNS sinkhole](https://en.wikipedia.org/wiki/DNS_sinkhole)

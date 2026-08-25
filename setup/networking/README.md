@@ -2,7 +2,7 @@
 
 [← Back to Setup Overview](../README.md)
 
-**In this folder:** [`design.md`](./design.md) — VLANs, DHCP, firewall zones and addressing · [`mikrotik`](./mikrotik) — switch configuration docs and Terraform · [`router`](./router) — the gateway layer: OPNsense as router and firewall.
+**In this folder:** [`design.md`](./design.md) — VLANs, DHCP, firewall zones and addressing · [`cabling.md`](./cabling.md) — cable colours, per-device port assignment and the shopping list · [`mikrotik`](./mikrotik) — switch configuration docs and Terraform · [`router`](./router) — the gateway layer: OPNsense as router and firewall.
 
 The network is built by two devices with a clean division of labour: the **switch** carries the VLANs and moves frames at wire speed, the **router** owns every VLAN gateway and enforces the trust zones. This page covers the physical side — switch, patch panel, cabling; the router has its [own folder](./router).
 
@@ -30,24 +30,28 @@ Every cable and every zone of the target design in one view:
                                  ▼
         ┌──────────────────────────────────────────────────┐
         │  MikroTik CRS310  —  pure Layer 2, VLAN tagging   │
-        └──┬────────┬────────┬────────┬───────┬────────┬───┘
-           │1,2,3   │4,5,6   │  7     │  8    │ SFP+2  │
-           ▼        ▼        ▼        ▼       ▼        
-      node0–2   node0–2   WiFi AP   free    free
-      (2.5G)    (1G mgmt) (tagged)
-      VLAN 10   VLAN 30   VLAN 1+40
+        └──┬────────┬────────┬─────────┬───────┬───────────┘
+           │1,2,3   │4,5,6   │  7      │  8    │ SFP+2
+           ▼        ▼        ▼         ▼       ▼
+      node0–2   node0–2   pve0 mgmt  WiFi AP  free
+      (2.5G)    (1G)      (2.5G)     (tagged)
+      VLAN 10   VLAN 60   VLAN 30    VLAN 1+40
+      🔵 data   🟡 uplink  🔴 mgmt    ⚪ trunk
          │
          └── bare-metal Kubernetes: apps, Home Assistant, Longhorn, Traefik
 ```
+
+Every cable above has a colour, and the colour is the plane it belongs to — 🔵 homelab data, 🟡 internet uplink, 🔴 management, ⚪ tagged trunk. The full scheme, the per-device port assignment and the shopping list live in [`cabling.md`](./cabling.md).
 
 | Zone | VLAN | Who lives there | Reachable from |
 |---|---|---|---|
 | Home | 1 (untagged) | Family phones, laptops, TVs | Internet; apps via 80/443 only |
 | Kubernetes | 10 | The three nodes, MetalLB range | Home (apps), management |
 | Services | 20 | NAS shares, family app containers | Home (apps), k8s (storage paths) |
-| Management | 30 | Proxmox UI, switch, vPro, OPNsense GUI | Admin laptop and NetBird only |
+| Management | 30 | Proxmox UI, switch, `pve0` admin NIC, OPNsense GUI | Admin laptop and NetBird only |
 | IoT | 40 | Plugs, sensors, cameras | Nothing — may only reach the MQTT broker |
 | DMZ | 50 | Anything exposed to the internet | Tunnel only; may reach its own dataset |
+| Uplink | 60 | The nodes' onboard 1G ports, and their vPro/AMT engines | Management only — outbound to the internet, nowhere else |
 
 The rule behind the zones: **traffic is filtered where a decision is needed and switched where only throughput is needed.** Cluster-to-cluster and cluster-to-storage traffic stays inside a VLAN and never touches the router; anything crossing a trust boundary goes through OPNsense. Details and firewall rules live in [`design.md`](./design.md).
 
@@ -94,15 +98,16 @@ Even if you own a high-end Layer 3 router, pairing it with a cheap unmanaged swi
 
 ```text
                          ISP router (internet)
-                                  │
-                                  │  ← WAN, straight into pve0
+                                  │  🟡
+                                  │  ← WAN, straight into pve0 (2.5G #1)
                                   ▼
 [  node0   ]──  2.5G M.2  ──┐  [ pve0 (MS-01) ]
-[  node0   ]── 1G onboard ──┤          │
-[  node1   ]──  2.5G M.2  ──┤          │ 10G SFP+ trunk
+[  node0   ]── 1G onboard ──┤        │      │
+[  node1   ]──  2.5G M.2  ──┤    🔵  │      │  🔴 2.5G #2 — management
 [  node1   ]── 1G onboard ──┼── MikroTik CRS310 ──┘   VLAN 10/20/30/40/50 tagged
-[  node2   ]──  2.5G M.2  ──┤
+[  node2   ]──  2.5G M.2  ──┤        10G SFP+ trunk
 [  node2   ]── 1G onboard ──┘
+   🔵 2.5G = homelab data      🟡 1G = internet uplink
 ```
 
 **Why the WAN bypasses the switch.** Untrusted internet traffic never becomes a VLAN on the switch at all, which removes an entire class of mistakes: no WAN VLAN to misconfigure, no chance of a tagging error putting the raw internet next to the cluster. The MS-01 has two spare RJ45 ports, so it costs nothing — and it frees a switch port as a side effect.
@@ -113,101 +118,130 @@ The only price is a physical dependency: the cable from the ISP router has to re
 
 This is the full target wiring once [OPNsense](./router) is the router. `Untagged` means the connected device knows nothing about VLANs and the switch attaches the tag; `tagged` means the device speaks 802.1Q itself and several VLANs share the cable.
 
-| Port | Connected to | Mode | VLAN | Speed |
-|---|---|---|---|---|
-| **1** | `node0` — 2.5G M.2 adapter | untagged, PVID 10 | 10 — k8s | 2.5G |
-| **2** | `node1` — 2.5G M.2 adapter | untagged, PVID 10 | 10 — k8s | 2.5G |
-| **3** | `node2` — 2.5G M.2 adapter | untagged, PVID 10 | 10 — k8s | 2.5G |
-| **4** | `node0` — onboard NIC | untagged, PVID 30 | 30 — management | 1G |
-| **5** | `node1` — onboard NIC | untagged, PVID 30 | 30 — management | 1G |
-| **6** | `node2` — onboard NIC | untagged, PVID 30 | 30 — management | 1G |
-| **7** | WiFi access point | **tagged** | 1 (home), 40 (IoT) — one SSID per VLAN | 2.5G |
-| **8** | *free* | — | reserve: `node3` data, or a wired device in any zone | 2.5G |
-| **SFP+ 1** | `pve0` (MS-01) | **tagged trunk** | 10, 20, 30, 40, 50 — all zones | 10G |
-| **SFP+ 2** | *free* | — | reserve: second trunk (LACP), dedicated NAS link, second switch | 10G |
-| *(none)* | ISP router / modem | — | **not on the switch** — goes directly into a `pve0` RJ45 port as WAN | — |
+| Port | Connected to | Mode | VLAN | Speed | Cable |
+|---|---|---|---|---|---|
+| **1** | `node0` — 2.5G M.2 adapter | untagged, PVID 10 | 10 — k8s | 2.5G | 🔵 blue |
+| **2** | `node1` — 2.5G M.2 adapter | untagged, PVID 10 | 10 — k8s | 2.5G | 🔵 blue |
+| **3** | `node2` — 2.5G M.2 adapter | untagged, PVID 10 | 10 — k8s | 2.5G | 🔵 blue |
+| **4** | `node0` — onboard NIC | untagged, PVID 60 | 60 — uplink | 1G | 🟡 yellow |
+| **5** | `node1` — onboard NIC | untagged, PVID 60 | 60 — uplink | 1G | 🟡 yellow |
+| **6** | `node2` — onboard NIC | untagged, PVID 60 | 60 — uplink | 1G | 🟡 yellow |
+| **7** | `pve0` — 2.5G RJ45 #2 | untagged, PVID 30 | 30 — management | 2.5G | 🔴 red |
+| **8** | WiFi access point | **tagged** | 1 (home), 40 (IoT) — one SSID per VLAN | 2.5G | ⚪ white |
+| **SFP+ 1** | `pve0` (MS-01) | **tagged trunk** | 10, 20, 30, 40, 50 — all zones | 10G | 🩵 OM3 fibre |
+| **SFP+ 2** | *free* | — | reserve: second trunk (LACP), dedicated NAS link, second switch | 10G | — |
+| *(none)* | ISP router / modem | — | **not on the switch** — goes directly into `pve0` 2.5G RJ45 #1 as WAN | — | 🟡 yellow |
 
-Three things are worth reading out of that table:
+Four things are worth reading out of that table:
 
-- **The two tagged ports carry the whole design.** SFP+ 1 is what lets OPNsense have a leg in every zone over one cable, and port 7 is what lets one access point serve the family WLAN and a separate IoT WLAN as genuinely different networks.
+- **The two tagged ports carry the whole design.** SFP+ 1 is what lets OPNsense have a leg in every zone over one cable, and port 8 is what lets one access point serve the family WLAN and a separate IoT WLAN as genuinely different networks.
 
-> ⚠️ **Port 7 dictates what kind of access point can be bought.** Serving two zones from one device requires an AP that supports **multiple SSIDs with a VLAN tag per SSID** (802.1Q). A cheap repeater or a consumer router in bridge mode cannot do this — it would put every wireless device into a single network, and the IoT zone would exist on paper only. Devices that can: TP-Link Omada EAP series (~50–70 €), Ubiquiti UniFi (~100 €+), or any OpenWrt-capable router used as an AP. This is a planned purchase, not something already owned — and a **phase 2 purchase only**: while the interim setup runs, the Fritz!Box's own WLAN serves the house and port 7 stays empty. The phase table and the decision to stay interim are documented in the [router](./router/README.md#where-the-house-wifi-comes-from-in-each-phase) folder.
-- **Node cabling is split by purpose, not by speed.** The fast M.2 adapters carry cluster traffic in VLAN 10; the onboard ports carry management in VLAN 30. If a cluster experiment saturates the data path, SSH and monitoring still work.
-- **The switch itself lives in VLAN 30.** Its management IP belongs in the same zone as the node management ports and the Proxmox web UI — reachable from the admin laptop and through NetBird, from nowhere else.
+> ⚠️ **Port 8 dictates what kind of access point can be bought.** Serving two zones from one device requires an AP that supports **multiple SSIDs with a VLAN tag per SSID** (802.1Q). A cheap repeater or a consumer router in bridge mode cannot do this — it would put every wireless device into a single network, and the IoT zone would exist on paper only. Devices that can: TP-Link Omada EAP series (~50–70 €), Ubiquiti UniFi (~100 €+), or any OpenWrt-capable router used as an AP. This is a planned purchase, not something already owned — and a **phase 2 purchase only**: while the interim setup runs, the Fritz!Box's own WLAN serves the house and port 8 stays empty. The phase table and the decision to stay interim are documented in the [router](./router/README.md#where-the-house-wifi-comes-from-in-each-phase) folder.
+- **Node cabling is split by plane, not by speed.** The fast M.2 adapters carry homelab traffic in VLAN 10; the onboard ports carry nothing but internet uplink in VLAN 60. Both are untagged, so a node never sees a VLAN tag and never needs a VLAN-aware bridge. Node administration rides the blue leg together with the rest of the lab — details and the reasoning in [`cabling.md`](./cabling.md).
+- **`pve0` gets a management port of its own** (port 7, red). Without it, the machine hosting OPNsense could only be reached through OPNsense. This is the one port the previous plan did not have, and it is what a fourth node now costs.
+- **The switch itself lives in VLAN 30.** Its management IP belongs in the same zone as `pve0`'s admin NIC and the Proxmox web UI — reachable from the admin laptop and through NetBird, from nowhere else.
+
+> ⚠️ **VLAN 60 is not an internet zone, despite the name on the cable.** The Tinys' vPro/AMT engine is bound to the onboard NIC, so out-of-band management sits in VLAN 60 whether that is convenient or not. It has to be firewalled as a management zone: outbound to the internet, reachable inbound from VLAN 30 only, and never merged into the home VLAN.
 
 Interim state, before OPNsense exists: everything runs untagged in one flat network and the ISP router remains the gateway. The port assignment above only becomes real when the router does.
 
 ### Maxed Switch Setup
 
-Without a management switch, the RJ45 ports run out at four nodes: 8 ports = 4× data + 4× management. Neither the MS-01 (SFP+) nor the internet uplink (direct into the MS-01) competes for them.
+**The switch is already full at three nodes.** 3× data + 3× uplink + `pve0` management + access point = exactly 8 RJ45 ports. Neither the MS-01's trunk (SFP+) nor the internet uplink (direct into the MS-01) competes for them, but there is no reserve left either.
 
 ```text
-[  node0   ]──  2.5G M.2  ──┐
-[  node0   ]── 1G onboard ──┤
-[  node1   ]──  2.5G M.2  ──┤
-[  node1   ]── 1G onboard ──┤── MikroTik CRS310 ──┬── SFP+ 1: pve0 (trunk)
-[  node2   ]──  2.5G M.2  ──┤                     └── SFP+ 2: free
-[  node2   ]── 1G onboard ──┤
-[  node3   ]──  2.5G M.2  ──┤
-[  node3   ]── 1G onboard ──┘
+[  node0   ]──  2.5G M.2  ──┐  🔵
+[  node0   ]── 1G onboard ──┤  🟡
+[  node1   ]──  2.5G M.2  ──┤  🔵
+[  node1   ]── 1G onboard ──┤  🟡 ── MikroTik CRS310 ──┬── SFP+ 1: pve0 (trunk)
+[  node2   ]──  2.5G M.2  ──┤  🔵                      └── SFP+ 2: free
+[  node2   ]── 1G onboard ──┤  🟡
+[   pve0   ]── 2.5G  mgmt ──┤  🔴
+[  WiFi AP ]── tagged 1+40 ─┘  ⚪
 ```
 
-All eight RJ45 ports are then taken by nodes — which means the WiFi access point has to move to SFP+ 2 (via a media converter or an AP with an SFP+ uplink) or the management network has to move to its own switch. Beyond four nodes, the second option is the only sensible one.
+A fourth node needs two ports that do not exist. The way out is the [Netgear GS308](#uplink-extension-netgear-gs308-when-scaling-horizontally) below, taking over the **yellow uplink plane** — the 1G ports were never going to saturate a cheap switch anyway, and moving them frees three CRS310 ports at once.
+
+The older version of this plan reached four nodes on the same eight ports. The port that was traded away is `pve0`'s management NIC — an admin path into the hypervisor that does not depend on the router VM it hosts. That is worth more than a node slot the project does not need yet.
 
 ---
  
-## Patch Panel: HB-Digital 12-Port Cat.6a 10" 1HE
+## Patch Panel: 10" 12-Port Keystone, **Feed-Through**
+
+Every device in this design lives in the same rack, and every cable is a short patch cable. That decides the panel type: it must accept a **plugged patch cable on the back and another on the front** — a *feed-through* panel (German: *Durchgangs-Patchpanel*), fitted with RJ45 coupler keystones that are a socket on both sides.
+
+**This is the one detail that is easy to get wrong when ordering.** Most 10" panels ship with **LSA / punch-down** keystones (*Anlegetechnik*), which terminate solid installation cable with a punch tool and have no rear socket at all. They are the right module for a run that comes out of a wall, and the wrong one for a rack where the other end of every cable is three centimetres away.
+
+| Part | Details | Price | What to search for |
+|---|---|---:|---|
+| 10" 12-port keystone panel, **unbestückt** | 1HE, empty frame, takes any keystone | ~ 12 € | `Patchpanel 10 Zoll 12 Port unbestückt 1HE` |
+| Cat.6a RJ45 **feed-through** keystone | Socket/socket coupler, tool-less clip-in | ~ 2 € each | `Keystone Durchgang Cat.6a` · `RJ45 Kupplung Buchse/Buchse` |
+
+Buying the frame empty and the modules separately lands at roughly the same **~36 €** as a panel with punch-down keystones included — no money is saved by the bundled version, and its modules would go straight into a drawer. The frame itself is agnostic; any keystone panel takes any keystone.
+
+The 10" format matches the 3D-printed 1U rack mount used for the Tiny nodes. Twelve ports covers the current build — 6 node cables, `pve0`'s management port, and the drops that enter the rack from outside (WAN cable from the Fritz!Box, the access point, an admin laptop jack) — with two spare.
+
+### What the panel is actually worth here
+
+Worth being honest, because a feed-through panel does not *terminate* anything: it inserts two extra mated connector pairs into every link and buys organisation, not electrical function. At Cat.6a over well under 5 m that insertion loss is irrelevant, so the question is only whether the organisation is worth ~36 €. Two things say yes in this specific rack:
+
+- **The switch side stops being touched.** Servicing or swapping a Tiny node means unplugging at the back of the panel; the front face and the switch ports keep their layout and their labels. Without a panel, every node move is a hand behind the switch.
+- **It is what makes the colour scheme readable.** A fixed, labelled front row of eight coloured cables in port order is the thing you can read at a glance. A bundle running directly from three PCs into a switch is not, no matter what colour it is.
+
+**The 10G fibre link to `pve0` does not belong on this panel.** It is one metre between two adjacent devices and gets plugged in transceiver to transceiver — routing it through a panel would only add connectors and mating losses. The panel stays purely copper, and because it is a keystone panel a port can still be converted to LC-duplex later if own fibre is ever pulled to another room. Reasoning in [`cabling.md`](./cabling.md#the-10g-link-fibre-and-why-it-does-not-touch-the-panel).
+
+> ⚠️ **Check rack depth before ordering.** A feed-through port has a patch cable plugged in on *both* sides, so it needs the plug plus its strain-relief boot sticking out the back — roughly 4–5 cm with a normal boot. In a shallow 10" rack that competes with the switch behind it. Slim cables with short boots help, and **90° angled plugs on the rear side** save another 3–4 cm if it gets tight.
+
+> ⚠️ **Use UTP, not STP.** A shield only helps if it is grounded, and a 3D-printed 10" rack has no earthed rail to bond it to — a floating shield can act as an antenna rather than a screen. Unshielded feed-through keystones and Cat.6 UTP patch cables are entirely sufficient at these lengths and remove the question.
  
-A clean build needs a clean cable termination point. Instead of plugging patch cables directly into the switch, all node cables terminate at the patch panel first. From there, short 0.25m slim patch cables run to the switch ports — keeping the cable routing tidy and making it easy to move, relabel or replace connections without touching the longer runs.
+---
  
+## Patch Cables — Two Per Link
+
+A feed-through panel has a patch cable on both sides, so every connection is **two** cables: one from the device to the rear of the panel, one from the front of the panel to the switch beside it. Keeping the front ones as short as possible is what makes the dual-cable layout look intentional rather than chaotic.
+
 | Part | Details | Price | Where to find it |
 |---|---|---:|---|
-| HB-Digital 12-Port Patchpanel Cat.6a | 10" 1HE, STP, schwarz, 12× Cat.6a Keystone included | 35.90 € | [hb-digital.de](https://www.hb-digital.de/Patchpanel-12-Port-mit-Cat6a-RJ45-Keystone-Module-10-Patchfeld-1HE-schwarz) |
- 
-The 10" format matches the 3D-printed 1U rack mount used for the Tiny nodes. The Cat.6a Keystone modules are included and clip in tool-less via LSA snap-in — no crimping needed. With 12 ports there is enough room for the current 3-node dual-cable setup (6 ports used) and space to grow.
- 
----
- 
-## Patch Cables — 0.25m Slim
- 
-Short slim patch cables connect the patch panel front to the switch ports directly beside it. Keeping these as short as possible is what makes the dual-cable layout look intentional rather than chaotic.
- 
-| Part | Details | Price | Where to find it |
-|---|---|---:|---|
-| 0.25m Slim Patch Cable Cat.6 | Short run from patch panel to switch, per cable | ~ 1.50–2.50 € | [Amazon](https://www.amazon.de/s?k=0.25m+patchkabel+slim+cat6) |
- 
-For the current 3-node setup with dual cables: 6 node connections, plus one for the WiFi access point = **7 cables minimum**. The internet uplink is not among them — it goes straight into the MS-01, not through the patch panel. Buying 10 leaves a few spares for future nodes or replacements.
+| 0.25m Slim Patch Cable Cat.6 | Front side, panel → switch | ~ 1.50–2.50 € | [Amazon](https://www.amazon.de/s?k=0.25m+patchkabel+slim+cat6) |
+| 0.5m Patch Cable Cat.6 | Rear side, device → panel | ~ 2–3 € | [Amazon](https://www.amazon.de/s?k=0.5m+patchkabel+slim+cat6) |
+
+For the current 3-node build: **8 front-side cables** (6 node links, `pve0`'s management port, the WiFi access point) and **6 rear-side cables** for the node links. Buying two or three spares per colour is worth it — when one fails, the alternative is a wrong-coloured cable in the rack, which quietly destroys the whole convention.
+
+**Buy them colour-coded on both sides.** Because nothing is punched down, the [colour scheme](./cabling.md) runs unbroken from the node to the switch port: 3× blue and 3× yellow in each length, plus 1× red and 1× white on the front. The panel is where a cable stops being a run and becomes a labelled, colour-coded port — it no longer has to be where the colour stops.
 
 ---
 
-## Management Extension: Netgear GS308 *(When scaling horizontally)*
+## Uplink Extension: Netgear GS308 *(When scaling horizontally)*
 
-Not purchased yet — planned for a later stage when a dedicated management network becomes necessary.
+Not purchased yet — planned for the moment a fourth node is added, because that is when the CRS310 runs out of ports.
 
 | Part | Details | Price | Where to find it |
 |---|---|---:|---|
 | Netgear GS308 | 8× 1G unmanaged | current market price | [Amazon](https://www.amazon.de/NETGEAR-GS308-300PES-Netgear-neu/dp/B07PTTX7MX) |
 
-The GS308 would serve as a simple 1G extension switch. Its only job is to connect the onboard 1G ports of the Tiny nodes, providing a dedicated path for SSH, monitoring and fallback traffic. No routing or management features needed from it — the MikroTik handles all of that. The GS308 just extends the number of available 1G ports.
+The GS308 would serve as a simple 1G extension switch carrying the **yellow uplink plane**: the onboard 1G ports of the Tiny nodes, whose only job is reaching the internet (and, unavoidably, carrying vPro/AMT). No routing or VLAN features needed from it — it hangs off a single untagged VLAN 60 access port on the MikroTik and acts as a dumb port expander for that one zone.
 
 ### Maxed Dual Switch Setup
 
-Management traffic moves to a dedicated Netgear GS308, freeing all 8× 2.5G ports on the MikroTik for cluster data. With the MS-01 on SFP+ and the WAN going directly into it, this scales to **8 nodes** with a dedicated management path.
+The uplink plane moves to the Netgear GS308, freeing three CRS310 ports at once. With the MS-01 on SFP+, its management on port 7 and the WAN going directly into it, this scales to **six nodes**.
 
 ```text
-Ports 1–8 (2.5G)                      SFP+ 1 ── pve0 (MS-01), trunk: all VLANs
-[  node0 … node7  ]──  2.5G M.2 ──── MikroTik CRS310
-                                      SFP+ 2 ── Netgear GS308 (VLAN 30 trunk)
-                                                      │
-[  node0 … node7  ]── 1G onboard ─────────────────────┘
-[ MikroTik CRS310 ]── 1G onboard ─────────────────────┘
+Ports 1–6 (2.5G)  🔵  [ node0 … node5 ]── 2.5G M.2 ──┐
+Port  7    (2.5G)  🔴  [ pve0 ]── management ────────┤
+Port  8    (2.5G)  ⚪  [ WiFi AP ]── tagged 1 + 40 ──┤── MikroTik CRS310
+                                                     │      SFP+ 1 ── pve0, trunk: all VLANs
+                       [ Netgear GS308 ]─────────────┘      SFP+ 2 ── free
+                              │  🟡 one untagged VLAN 60 access port
+[ node0 … node5 ]── 1G onboard ┘
 ```
 
+Beyond six nodes the access point has to move to a wireless-capable uplink or the CRS310 has to be replaced — but at that size a second 2.5G switch is the cheaper answer anyway.
+
 The MS-01 keeps its second SFP+ port free throughout — reserve for a bonded second trunk link (LACP) if storage traffic ever justifies it, or for a direct link to a future dedicated NAS.
-The 2.5G link handles all high-throughput Kubernetes and storage traffic directly on the MikroTik's L3 hardware. The 1G link handles management, SSH, monitoring and fallback via the cheap Netgear switch. 
+The 2.5G blue links handle all high-throughput Kubernetes and storage traffic on the MikroTik. The 1G yellow links handle nothing but internet egress and out-of-band AMT, via the cheap Netgear switch.
 
 **Why this unmanaged switch does NOT cause Hairpinning:**
-Unlike using a cheap switch for the main cluster data, using it purely for the 1G management plane is perfectly fine. The Netgear switch connects to the MikroTik via a dedicated VLAN trunk. Since the MikroTik handles all inter-VLAN routing *before* pushing the packets down to the Netgear, no cluster traffic ever has to travel back up to find its destination. The Netgear simply acts as a dumb port-expander for a single, isolated management network, leaving the MikroTik's premium 2.5G ports entirely free for heavy Kubernetes data.
+Unlike using a cheap switch for the main cluster data, using it purely for the 1G uplink plane is perfectly fine. The Netgear hangs off a single untagged VLAN 60 access port, so it is one isolated broadcast domain and nothing else. No cluster traffic ever enters it, which means no cluster traffic can travel back up through it to find a destination. It is a dumb port expander for one zone, leaving the MikroTik's premium 2.5G ports entirely free for heavy Kubernetes data.
 
 ---
 
@@ -296,13 +330,15 @@ You can purchase an affordable, unmanaged 2.5G switch (such as a budget YuanLey 
 ## Upgrade Path
 
 **Short term**
-- Connect the MS-01 to the first SFP+ port as a tagged trunk (needs an SFP+ module or DAC cable — not included with either device)
-- Replace the ISP router with a [Fritz!Box 7490](./router#the-isp-router-problem) so the interim setup gets static routes and a configurable DNS handout
+- Buy the [colour-coded patch cables](./cabling.md#what-this-costs) and cable the rack to the target plan — the colours are worth applying now, while the network is still flat and nothing has to be re-pulled later
+- Connect the MS-01 to the first SFP+ port as a tagged trunk — needs 2× SFP+ SR transceivers and an OM3 LC-LC patch cord, [neither included with either device](./cabling.md#the-10g-link-fibre-and-why-it-does-not-touch-the-panel)
+- Connect `pve0`'s second 2.5G RJ45 to port 7 as the management path
+- ~~Replace the ISP router with a [Fritz!Box 7490](./router#the-isp-router-problem) so the interim setup gets static routes and a configurable DNS handout~~ — **done (August 2026)**; the house runs on `192.168.178.0/24` and `pve0` on [`.250`](./router#addressing-after-the-swap)
 
 **Mid term**
-- Purchase and set up the Netgear GS308 once the management network separation becomes relevant
 - Connect all onboard 1G ports to create the full dual-path setup
+- Purchase and set up the Netgear GS308 when a fourth node is added — the CRS310 is full at three
 
 **Long term**
-- Use the second SFP+ port for a bonded MS-01 link, a WiFi AP or a dedicated NAS connection
-- Add a second switch when expanding beyond 8 nodes
+- Use the second SFP+ port for a bonded MS-01 link or a dedicated NAS connection
+- Add a second 2.5G switch when expanding beyond six nodes

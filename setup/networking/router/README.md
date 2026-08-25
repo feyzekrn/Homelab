@@ -35,14 +35,14 @@ That trade-off is accepted knowingly, and it is the reason for two safeguards el
 
 ## The ISP Router Problem
 
-Today the ISP router — a **Telekom Speedport** — is still the gateway of the house, and the homelab lives behind it. That is workable while the lab is flat, but it blocks the interim architecture in several concrete ways. These are worth listing precisely, because together they are the reason a **Fritz!Box 7490** is planned as its replacement.
+Until August 2026 the ISP router — a **Telekom Speedport** — was the gateway of the house, with the homelab behind it. That was workable while the lab stayed flat, but it blocked the interim architecture in several concrete ways. These are worth listing precisely, because together they are the reason the **Fritz!Box 7490** was bought as its replacement — a swap that has since happened. **The 7490 is the gateway today**; the list below is the rationale, not a description of the current state.
 
-### What the Speedport cannot do
+### What the Speedport could not do
 
 | Limitation | What breaks because of it |
 |---|---|
 | **No static routes** | This is the big one. A phone in the home network that opens `jellyfin.home` sends the packet to its gateway — the Speedport — which has no idea that `10.0.20.0/24` lives behind OPNsense and drops it. Without a static route, **nothing in the home network can reach anything in the lab.** |
-| **No DHCP reservations** | Every device that needs a stable address has to configure it statically and hope the DHCP pool never hands the same address to a phone. That is why `pve0` sits at `.250`, deliberately far above the pool — a workaround, not a solution. |
+| **No DHCP reservations** | Every device that needed a stable address had to be configured statically and hope the DHCP pool never handed the same address to a phone. That is why `pve0` sits at `.250`, deliberately far above the pool — see [addressing](#addressing-after-the-swap) for why that placement survived the swap on purpose. |
 | **No custom DNS handout** | The router hands out *itself* as the DNS server and cannot be told to hand out another. That means [AdGuard Home](../../../infrastructure/platform/dns/adguard-home) cannot become the resolver for the household without touching every device by hand — no filtering, no split DNS, no internal names. |
 | **No VLAN support (802.1Q)** | It cannot participate in a tagged network at all, so it can never be the gateway for more than one zone. |
 | **Weak or absent bridge mode** | Putting a second router behind it produces double NAT, which complicates inbound paths and makes some protocols awkward. |
@@ -68,7 +68,18 @@ The 7490 is old hardware (2013) and deliberately not bought for performance — 
 
 Being honest about its limits: the 7490 tops out at roughly 100 Mbit VDSL and WiFi AC, and it has no fibre modem. If the internet connection is or becomes faster than that, it is a bottleneck as a gateway — another reason to reduce it to modem duty as soon as OPNsense takes over.
 
-> ⚠️ **It cannot be modem and house WiFi at the same time.** As the modem it sits *in front of* OPNsense at the WAN edge; an access point has to sit *behind* OPNsense in the home VLAN. Its own WiFi would therefore land on the untrusted side of the firewall, which is exactly where the family should not be. So the household WLAN needs a **separate access point** on switch port 7 — and one that can tag VLANs, because it has to serve the home and IoT zones as separate networks. That purchase belongs to **phase 2 only** — as long as the interim setup runs, the Fritz!Box's own WLAN serves the house and no AP exists; see the phase table below and the [port assignment](../README.md#port-assignment--every-port-on-the-crs310).
+> ⚠️ **It cannot be modem and house WiFi at the same time.** As the modem it sits *in front of* OPNsense at the WAN edge; an access point has to sit *behind* OPNsense in the home VLAN. Its own WiFi would therefore land on the untrusted side of the firewall, which is exactly where the family should not be. So the household WLAN needs a **separate access point** on switch port 8 — and one that can tag VLANs, because it has to serve the home and IoT zones as separate networks. That purchase belongs to **phase 2 only** — as long as the interim setup runs, the Fritz!Box's own WLAN serves the house and no AP exists; see the phase table below and the [port assignment](../README.md#port-assignment--every-port-on-the-crs310).
+
+### Addressing after the swap
+
+The swap moved the house from the Speedport's `192.168.2.0/24` to the Fritz!Box default `192.168.178.0/24`, so `pve0` had to be reconfigured — a static address does not follow its router. It kept its host number: **`192.168.178.250/24`, gateway `192.168.178.1`**, set in `/etc/network/interfaces` with the node name pointed at the same address in `/etc/hosts`.
+
+Notably, `.250` stayed **static on the host and outside the DHCP pool** even though the 7490 can finally do reservations. That is a deliberate choice, not inertia:
+
+- A reservation is a rule for a *DHCP answer*. A statically configured host never asks, so the reservation would sit in the router doing nothing. Static-plus-reservation is not belt and braces, it is decoration.
+- Switching `pve0` to DHCP to make the reservation meaningful would put the hypervisor's management address into the router's memory. A reset or replaced Fritz!Box would then move it — while `/etc/hosts` still claims the old one.
+
+So the two roles stay separated: **servers static above the pool, consumer devices by reservation inside it.** The AVM default pool ends at `.200`, which already leaves `.200`–`.254` free; the only router-side task is to keep it that way.
 
 ### The two paths, and why the purchase is still worth it
 
@@ -85,11 +96,11 @@ The two paths above are not just a routing question — they decide which device
 
 | Phase | Family gateway | House WiFi comes from | Separate AP needed? |
 |---|---|---|---|
-| **Today** | Speedport | Speedport | no |
-| **Phase 1 — interim** *(current plan)* | Fritz!Box | The Fritz!Box's own WLAN | **no** |
-| **Phase 2 — target** | OPNsense | Access point behind the switch (port 7) | **yes** |
+| **Before the swap** | Speedport | Speedport | no |
+| **Phase 1 — interim** *(current state)* | Fritz!Box | The Fritz!Box's own WLAN | **no** |
+| **Phase 2 — target** | OPNsense | Access point behind the switch (port 8) | **yes** |
 
-The logic: in phase 1 the Fritz!Box is a normal home router — it routes the family *and* radiates the WLAN, exactly as consumer routers do. In phase 2 it is demoted to a modem *in front of* OPNsense, which puts its WiFi on the untrusted side of the firewall — anyone connecting there would stand outside every zone. At that moment, and only at that moment, the house needs a new WLAN source *behind* the firewall: the access point on switch port 7 (bought, or the old Speedport recycled as a dumb untagged AP for the home VLAN only).
+The logic: in phase 1 the Fritz!Box is a normal home router — it routes the family *and* radiates the WLAN, exactly as consumer routers do. In phase 2 it is demoted to a modem *in front of* OPNsense, which puts its WiFi on the untrusted side of the firewall — anyone connecting there would stand outside every zone. At that moment, and only at that moment, the house needs a new WLAN source *behind* the firewall: the access point on switch port 8 (bought, or the old Speedport recycled as a dumb untagged AP for the home VLAN only).
 
 ### Why phase 2 is the better and safer design
 
@@ -118,7 +129,7 @@ Phase 2 is documented as the target because it is genuinely superior, not just t
 | Name | Path | Status | Runs on | Recommendation | Role |
 |---|---|---|---|---|---|
 | OPNsense | [docs](./opnsense) | ⚫ Inactive | vm | Chosen router and firewall | Full routing, firewall, DHCP, DNS and VPN platform |
-| Fritz!Box 7490 | — | ⬜ To buy | hardware | Planned interim gateway, then modem | Replaces the Speedport for static routes and DNS handout |
+| Fritz!Box 7490 | — | 🟢 Active | hardware | Interim gateway today, modem later | Replaced the Speedport for static routes and DNS handout |
 | RouterOS 7 on the CRS310 | [switch docs](../mikrotik) | 🟡 Available | hardware | Held in reserve | The switch could route and filter by itself — see below |
 | pfSense | [docs](./pfsense) | ⚫ Inactive | — | Documented alternative | The older, closely related BSD firewall distribution |
 | OpenWrt | — | — | — | Not planned | Excellent on small hardware, weaker as a multi-VLAN firewall platform |
