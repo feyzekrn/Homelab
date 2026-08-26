@@ -1,0 +1,197 @@
+"$schema" = 'https://starship.rs/config-schema.json'
+
+# Powerline-Prompt. Farbschema und Abstaende siehe Kopf von gen.py.
+# Links : [OS Host Rolle] > [Verzeichnis] > [Git]  ---Linie---  [Kontext Uhr]
+# Zeile 2: Eingabe
+#
+# Erzeugt von ~/.config/starship-tools/gen.py — nicht direkt editieren,
+# sonst gehen beim naechsten Lauf die Aenderungen verloren.
+# Diese Datei geht 1:1 auch auf die Homelab-Hosts: ~/bin/starship-deploy
+
+format = """\
+[](fg:#6487b0)\
+[$os$username$hostname${custom.proxmox}${custom.k8snode}$container](bg:#6487b0 fg:#12101a)\
+[](fg:#6487b0 bg:#81a1c1)\
+[ $directory ](bg:#81a1c1 fg:#12101a)\
+$git_branch$git_status${custom.gitend}${custom.nogitend}\
+$fill\
+[](fg:#8fbcbb)\
+[$kubernetes$nodejs$python$java$dotnet$golang$rust$terraform$cmd_duration](bg:#8fbcbb fg:#12101a)\
+$character\
+[](fg:#8fbcbb bg:#6ca7a6)\
+[$time](bg:#6ca7a6 fg:#12101a)\
+[](fg:#6ca7a6)
+
+[❯](bold fg:#88c0d0) """
+
+add_newline = true
+
+# Die durchgehende Linie zwischen linker und rechter Seite (wie p10k-Frame)
+[fill]
+symbol = "─"
+style = "fg:#3b4252"
+
+# == Linke Seite ===========================================================
+
+[os]
+disabled = false
+format = "[ $symbol ]($style)"
+style = "bg:#6487b0 fg:#12101a"
+
+[os.symbols]
+Macos = "󰀵"
+Linux = "󰌽"
+Debian = "󰣚"
+Ubuntu = "󰕈"
+Raspbian = "󰐿"
+Alpine = ""
+Arch = "󰣇"
+Fedora = "󰣛"
+Redhat = "󱄛"
+RedHatEnterprise = "󱄛"
+Windows = "󰖳"
+Unknown = "󰒋"
+
+[username]
+show_always = false
+style_user = "bg:#6487b0 fg:#12101a"
+style_root = "bg:#6487b0 fg:#810e16"
+format = "[$user@]($style)"
+
+[hostname]
+ssh_only = false
+ssh_symbol = ""
+style = "bg:#6487b0 fg:#12101a"
+format = "[$hostname ]($style)"
+
+# Rollen-Icons leben im selben Segment -> kein Stummel wenn sie fehlen
+[custom.proxmox]
+description = "Proxmox VE Host"
+when = "test -d /etc/pve"
+command = ""
+symbol = ""
+style = "bg:#6487b0 fg:#12101a"
+format = "[$symbol ]($style)"
+
+[custom.k8snode]
+description = "Kubernetes Node"
+when = "test -d /var/lib/kubelet || test -d /var/lib/rancher/k3s || test -d /var/lib/rancher/rke2"
+command = ""
+symbol = "󱃾"
+style = "bg:#6487b0 fg:#12101a"
+format = "[$symbol ]($style)"
+
+[container]
+symbol = "󰡨"
+style = "bg:#6487b0 fg:#12101a"
+format = "[$symbol $name ]($style)"
+
+[directory]
+style = "bg:#81a1c1 fg:#12101a"
+format = "[$path]($style)[$read_only]($read_only_style)"
+read_only = " 󰌾"
+read_only_style = "bg:#81a1c1 fg:#12101a"
+truncation_length = 3
+truncate_to_repo = true
+truncation_symbol = "…/"
+
+# Git bekommt ein eigenes Segment. Der Eingangs-Trenner steckt IM Modul,
+# damit ausserhalb eines Repos nichts uebrig bleibt.
+[git_branch]
+symbol = "󰘬"
+style = "bg:#88c0d0 fg:#12101a"
+format = "[](fg:#81a1c1 bg:#3f899f)[](fg:#3f899f bg:#88c0d0)[ $symbol $branch]($style)"
+
+[git_status]
+style = "bg:#88c0d0 fg:#12101a"
+format = "[( $all_status$ahead_behind)]($style)"
+conflicted = "="
+ahead = "^${count}"
+behind = "v${count}"
+diverged = "^${ahead_count}v${behind_count}"
+untracked = "?${count}"
+stashed = "*${count}"
+modified = "!${count}"
+staged = "+${count}"
+renamed = "r${count}"
+deleted = "x${count}"
+
+# Abschluss-Pfeil der linken Gruppe: Farbe haengt davon ab, ob Git da ist.
+[custom.gitend]
+description = "Abschluss wenn im Git-Repo"
+when = 'd=$PWD; while [ -n "$d" ]; do [ -e "$d/.git" ] && exit 0; d=${d%/*}; done; exit 1'
+command = ""
+symbol = ""
+style = "fg:#88c0d0"
+format = "[ ](bg:#88c0d0)[$symbol]($style)"
+
+[custom.nogitend]
+description = "Abschluss wenn kein Git-Repo"
+when = 'd=$PWD; while [ -n "$d" ]; do [ -e "$d/.git" ] && exit 1; d=${d%/*}; done; exit 0'
+command = ""
+symbol = ""
+style = "fg:#81a1c1"
+format = "[$symbol]($style)"
+
+# == Rechte Seite (ein Segment, damit nie ein leerer Stummel entsteht) =====
+
+[time]
+disabled = false
+time_format = "%H:%M"
+style = "bg:#6ca7a6 fg:#12101a"
+format = "[ 󰅐 $time ]($style)"
+
+[cmd_duration]
+min_time = 0
+show_milliseconds = false
+style = "bg:#8fbcbb fg:#12101a"
+format = "[ 󰔛 $duration]($style)"
+
+[kubernetes]
+disabled = false
+symbol = "󱃾"
+style = "bg:#8fbcbb fg:#12101a"
+format = '[ $symbol $context(\({$namespace}\))]($style)[](fg:#8fbcbb bg:#528988)[](fg:#528988 bg:#8fbcbb)'
+
+[nodejs]
+symbol = "󰎙"
+style = "bg:#8fbcbb fg:#12101a"
+format = "[ $symbol $version]($style)[](fg:#8fbcbb bg:#528988)[](fg:#528988 bg:#8fbcbb)"
+
+[python]
+symbol = "󰌠"
+style = "bg:#8fbcbb fg:#12101a"
+format = '[ $symbol $version]($style)[](fg:#8fbcbb bg:#528988)[](fg:#528988 bg:#8fbcbb)'
+
+[java]
+symbol = "󰬷"
+style = "bg:#8fbcbb fg:#12101a"
+format = "[ $symbol $version]($style)[](fg:#8fbcbb bg:#528988)[](fg:#528988 bg:#8fbcbb)"
+
+[dotnet]
+symbol = "󰌛"
+style = "bg:#8fbcbb fg:#12101a"
+format = "[ $symbol $tfm]($style)[](fg:#8fbcbb bg:#528988)[](fg:#528988 bg:#8fbcbb)"
+
+[golang]
+symbol = "󰟓"
+style = "bg:#8fbcbb fg:#12101a"
+format = "[ $symbol $version]($style)[](fg:#8fbcbb bg:#528988)[](fg:#528988 bg:#8fbcbb)"
+
+[rust]
+symbol = "󱘗"
+style = "bg:#8fbcbb fg:#12101a"
+format = "[ $symbol $version]($style)[](fg:#8fbcbb bg:#528988)[](fg:#528988 bg:#8fbcbb)"
+
+[terraform]
+symbol = "󱁢"
+style = "bg:#8fbcbb fg:#12101a"
+format = "[ $symbol $workspace]($style)[](fg:#8fbcbb bg:#528988)[](fg:#528988 bg:#8fbcbb)"
+
+# == Eingabezeile ==========================================================
+
+[character]
+format = "$symbol"
+success_symbol = "[ 󰸞 ](bold fg:#084920 bg:#8fbcbb)"
+error_symbol = "[ 󱎘 ](bold fg:#810e16 bg:#8fbcbb)"
+vimcmd_symbol = "[ ❮ ](bold fg:#810e16 bg:#8fbcbb)"

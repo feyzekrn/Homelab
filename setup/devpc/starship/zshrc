@@ -1,0 +1,68 @@
+# ~/.zshrc — zsh ohne Framework, Prompt via Starship
+# Homebrew/PATH wird in ~/.zprofile gesetzt.
+
+export PATH="$HOME/bin:$PATH"
+
+# ── History ───────────────────────────────────────────────────────────────
+HISTFILE=~/.zsh_history
+HISTSIZE=50000
+SAVEHIST=50000
+setopt SHARE_HISTORY          # History zwischen Sessions teilen
+setopt HIST_IGNORE_ALL_DUPS   # Duplikate raus
+setopt HIST_IGNORE_SPACE      # Befehl mit führendem Leerzeichen wird nicht gemerkt
+setopt HIST_REDUCE_BLANKS
+setopt EXTENDED_HISTORY       # mit Zeitstempel
+
+# ── Navigation / Komfort ──────────────────────────────────────────────────
+setopt AUTO_CD                # "Projects" statt "cd Projects"
+setopt AUTO_PUSHD             # jedes cd landet auf dem Verzeichnis-Stack
+setopt PUSHD_IGNORE_DUPS
+setopt INTERACTIVE_COMMENTS   # # Kommentare auch interaktiv erlaubt
+
+# ── Completion ────────────────────────────────────────────────────────────
+fpath=(/opt/homebrew/share/zsh/site-functions $fpath)
+autoload -Uz compinit
+# compinit nur einmal am Tag komplett prüfen, sonst Cache nutzen (schnellerer Start)
+if [[ -n ~/.zcompdump(#qN.mh+24) ]]; then compinit; else compinit -C; fi
+
+zstyle ':completion:*' menu select                      # Auswahl mit Pfeiltasten
+zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'  # Groß-/Kleinschreibung egal
+zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
+zstyle ':completion:*' group-name ''
+zstyle ':completion:*:descriptions' format '%F{yellow}%d%f'
+
+# ── Keybindings ───────────────────────────────────────────────────────────
+bindkey -e                                # Emacs-Style (ctrl+a, ctrl+e, ctrl+r)
+bindkey '^[[A' history-search-backward     # Pfeil hoch: History nach Präfix filtern
+bindkey '^[[B' history-search-forward
+
+# ── Aliases ───────────────────────────────────────────────────────────────
+alias ll='ls -lah'
+alias la='ls -A'
+alias ..='cd ..'
+alias ...='cd ../..'
+alias g='git'
+alias gs='git status -sb'
+alias reload='exec zsh'
+
+# JSON hübsch formatieren: `json datei.json`, `curl ... | json`, `json '.items[]' datei.json`
+json() {
+  if (( $# == 0 )); then
+    jq .
+  elif [[ -f $1 ]]; then
+    jq . "$1"
+  else
+    jq "$@"
+  fi
+}
+# JSON aus der Zwischenablage formatieren und zurückkopieren
+jsonclip() { pbpaste | jq . | tee /dev/tty | pbcopy; }
+
+# ── Plugins ───────────────────────────────────────────────────────────────
+source /opt/homebrew/share/zsh-autosuggestions/zsh-autosuggestions.zsh
+
+# ── Prompt ────────────────────────────────────────────────────────────────
+eval "$(starship init zsh)"
+
+# syntax-highlighting muss als Letztes geladen werden
+source /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh

@@ -63,6 +63,10 @@ Homelab/
 │   ├── networking/       #   Network design, switch and router
 │   │   ├── mikrotik/     #     Switch docs + Terraform
 │   │   └── router/       #     OPNsense (VM): gateways, firewall zones
+│   ├── devpc/            #   The workstation: Homebrew, Warp, shell, prompt
+│   │   ├── macos/        #     One-script setup (Linux/Windows planned)
+│   │   ├── starship/     #     Prompt config + its generator
+│   │   └── servers/      #     Same prompt on the nodes and pve0
 │   └── power-supply/     #   PSU, DC/DC conversion, fuse box
 ├── infrastructure/       # The software infrastructure
 │   ├── provisioning/     #   Ansible: machines become consistent servers
@@ -90,6 +94,7 @@ Hardware decisions and everything attached to them: each hardware area is a fold
 | [`/setup/compute/k8s-cluster`](/setup/compute/k8s-cluster) | ✅ Active | The 3 Kubernetes nodes (CPU, RAM, storage) and the [OS running on them](/setup/compute/k8s-cluster/os) |
 | [`/setup/compute/proxmox-cluster`](/setup/compute/proxmox-cluster) | ✅ Active | The MS-01 Proxmox host and its [Proxmox VE installation](/setup/compute/proxmox-cluster/os) |
 | [`/setup/networking`](/setup/networking) | ✅ Active | Switch purchase, [network design](/setup/networking/design.md), [MikroTik config](/setup/networking/mikrotik) and the [router/firewall](/setup/networking/router) |
+| [`/setup/devpc`](/setup/devpc) | ✅ Active | The workstation: Homebrew, [Warp](/setup/devpc#warp-as-the-terminal), shell and [prompt](/setup/devpc/terminal-designs.md) — as [a script](/setup/devpc/macos/bootstrap.sh), plus the [same prompt for the servers](/setup/devpc/servers) |
 | [`/setup/power-supply`](/setup/power-supply) | ✅ Active | PSU, DC/DC conversion and fuse box |
 
 ### 🏗️ Infrastructure — The Software World
