@@ -10,6 +10,8 @@ This page documents the complete power chain for the lab: how mains AC becomes t
 
 > 🛒 **Also bought since:** 3× Lenovo slim-tip pigtail (3-pin, ~3 € each) and a **second KFZ fuse box**, so each regulated rail gets its own distributor instead of the 19V branch hanging off a loose inline holder. The 230V side gets a panel-mount IEC inlet with an integrated fuse holder. **Still missing: the two converters** — see [What to actually buy](#what-to-actually-buy).
 
+> ⚡ **The lab is running on an interim power path right now.** The two converters are still unbought, so the nodes are powered by **2× 240W USB-C PD chargers** with USB-C → slim-tip cables, and the MS-01 stays on its own OEM brick. **This page still describes the DC rail as the target** — every table below is the plan, not the present. What is actually plugged in is documented in [The interim power path](#the-interim-power-path-usb-c-pd).
+
 ---
 
 ## Circuit Diagrams
@@ -59,6 +61,59 @@ B:  230V AC → PSU 25.2V → Kill + Fuse → split:
 
 ---
 
+## The Interim Power Path (USB-C PD)
+
+**This is what is actually powering the lab today.** It exists because the two buck converters are the [last unbought part](#what-to-actually-buy) of the DC chain, and waiting for them would mean waiting to run the cluster at all.
+
+```text
+  230V ── Good Connections 10" PDU (switched) ──┬── USB-C PD 240W  #1 ──┬── node0   (USB-C → slim-tip)
+                                                │                      └── node1   (USB-C → slim-tip)
+                                                │
+                                                ├── USB-C PD 240W  #2 ──┬── node2   (USB-C → slim-tip)
+                                                │                      └── DeskPi 9" monitor (USB-C)
+                                                │
+                                                ├── MS-01 OEM brick ─────── pve0  (19V, standalone)
+                                                └── CRS310 OEM brick ────── switch
+```
+
+| Item | Qty | Unit | Total |
+|---|--:|--:|--:|
+| USB-C PD charger, 240W | 2 | ~40 € | **~80 €** |
+| USB-C → Lenovo slim-tip cable | 3 | 3 € | **9 €** |
+| | | **Interim total** | **~89 €** |
+
+### Why this works electrically
+
+A 240W USB-C supply is **USB PD 3.1 EPR**, and it reaches 240W as 48V × 5A. The Tiny nodes cannot use that: the slim-tip cable negotiates the **20V** fixed profile, and 20V is capped at 5A by the standard. So each node cable is a **100W** channel regardless of what the charger is rated for — comfortably above the M910q's [65W / 3.25A cold-start peak](#per-node-power--the-real-numbers), and the 240W figure is mostly headroom that this application never touches.
+
+**The 240W rating still buys something, just not per-node headroom:** it is what lets one charger carry two 20V/3.25A negotiations at the same time without either port dropping to a lower profile.
+
+> ⚠️ **Verify simultaneous per-port output, not the total.** Multi-port GaN chargers advertise a *combined* figure and re-allocate when several ports are active — a "240W" unit can drop to 140W + 100W, or worse, shift one port down to the 15V or 9V profile. A Tiny that gets 15V instead of 20V does not run at reduced power; it does not boot. Check the per-port table on the charger itself, with both node cables plugged in.
+
+### What this path gets right by accident
+
+**The ID resistor problem disappears.** The [whole soldering exercise](#the-third-pin-is-not-a-second-ground) — measuring bare pigtails, adding 270 Ω between the centre pin and ground, proving it on one node before building the others — exists because a bare slim-tip pigtail has no ID line. A commercial USB-C → slim-tip cable has that resistance built into the plug; it is what makes the machine accept the adapter at all. For the interim, that entire ⬜ item is moot.
+
+**The central kill switch survives.** The [switched 10" PDU](#the-emergency-switch-belongs-on-the-230v-side) is upstream of all four supplies, so one flip still kills everything in the rack. This was the main objection to per-device bricks in the [alternatives table](#alternatives-considered), and the PDU answers it independently of which DC topology sits behind it.
+
+**Efficiency is a wash, or slightly better.** A GaN PD charger runs ~92–94% at load. The planned chain is PSU (~91%) × buck converter (~94%) ≈ **86%**. The interim is not the compromise it looks like on this axis — it is a few points ahead.
+
+> 💡 **Leave the MEAN WELL out of the interim entirely.** With only the CRS310 on it, a 751W supply would run at ~4.5% load, which is the worst point on its efficiency curve. The switch has its own OEM adapter; use it, and keep the PSU in the box until the converters arrive.
+
+### What it does not solve
+
+- **Four supplies instead of one**, each with its own wall wart and its own cable run — the "cable chaos" objection is real and unaddressed.
+- **No per-branch fusing under one roof.** Each charger protects itself, which is genuinely adequate, but there is no single point where the lab's protection is visible and documented.
+- **The MS-01 is off the shared budget.** That is the [documented honest fallback](#alternatives-considered), not a failure — it removes the largest single load and the whole 19V-versus-20V problem in one move.
+
+### The question this raises, honestly
+
+The interim answers two of the three objections that ruled out per-device bricks in the first place. What remains for the DC rail is **cable tidiness** and **the learning value of building a documented power chain** — both real reasons in this project, neither of them electrical.
+
+So the converters stay the plan, and this page stays written for them. But the interim should not be dismantled the day they arrive: it is now the fallback that keeps the lab running while the rail is being commissioned, and [commissioning](#commissioning--set-the-voltage-before-anything-is-connected) is exactly the step where nodes should not be depending on the thing being commissioned.
+
+---
+
 ## Parts List
 
 ✅ = bought · ⬜ = still needed
@@ -68,9 +123,11 @@ B:  230V AC → PSU 25.2V → Kill + Fuse → split:
 | ✅ | **PSU 750W MEAN WELL UHP-750-24** | 230V AC → 25.2V DC, ~29.8A, fanless |     **50,00 €** | [reichelt.de](https://www.reichelt.com/de/en/shop/product/switching_power_supply_closed_750_w_24_v_31_3_a-306672) |
 | ✅ | **Lenovo slim-tip pigtail ×3** | Yellow square tip, **3-pin** (+ / − / ID), bare-wire tail | **3,00 € each** — 9 € | eBay / AliExpress |
 | ✅ | **KFZ Fuse Box ×2** | 6-port blade fuse, common +/- bus — one per regulated rail |    ~ 8 € each | [eBay listing](https://www.ebay.de/itm/317781950022) |
+| ✅ | **USB-C PD charger, 240W ×2** | [Interim path](#the-interim-power-path-usb-c-pd) — 2 nodes on one, 1 node + DeskPi monitor on the other | **~40 € each** — 80 € | — |
+| ✅ | **USB-C → slim-tip cable ×3** | ID resistance built into the plug — [no soldering needed](#the-third-pin-is-not-a-second-ground) | **3,00 € each** — 9 € | — |
 | ⬜ | **DC-DC Buck Converter ×2** | **Step-Down**, in ≥25V, **out adjustable through 20V**, ≥20A — [full spec below](#what-to-actually-buy) | ~ 30 € each | [eBay search](https://www.ebay.de/sch/i.html?_nkw=XY6020L) |
 | ⬜ | ID resistor 270–280 Ω ×3 | ¼ W, slim-tip centre pin → GND — [why](#the-third-pin-is-not-a-second-ground) |       ~ 2 € set | any electronics shop |
-| ⬜ | **AC emergency switch**   | Switched PDU / rack strip, reachable from outside |        ~ 20–40 € | [Conrad](https://www.conrad.de/de/o/not-aus-schalter-0216440.html) |
+| ✅ | **AC emergency switch** — Good Connections 10" PDU | **1HE rack strip**, 4× Schuko, **switch**, child protection, alu profile | **24,57 €** | [Amazon](https://www.amazon.de/gp/product/B01MA5J013) |
 | ⬜ | IEC inlet, panel-mount | With integrated fuse holder — **AC-side protection only** |       ~ 3–6 € | [Amazon](https://www.amazon.de/s?k=Kaltger%C3%A4testecker+Einbau+Sicherungshalter) |
 | ⬜ | DC Kill Switch            | Rocker/push, ≥25A **DC-rated** |         ~ 4–8 € | [Amazon](https://www.amazon.de/s?k=12V+DC+Notaus+Schalter+30A) |
 | ⬜ | Main Fuse 25A             | ANL / blade, main **DC** rail protection |         ~ 2–5 € | [Amazon](https://www.amazon.de/s?k=ANL+Sicherung+25A) |
@@ -441,6 +498,8 @@ Two deliberate constraints shape this layout:
 
 There are **two** switches in this design, and they do different jobs. Getting them mixed up is the mistake worth avoiding.
 
+> ✅ **Bought (August 2026): Good Connections 10" 1HE PDU**, 4× Schuko with a switch and child protection, 24,57 €. It is the *switched rack strip* variant this section recommends, in the rack format the rest of the build uses — the mushroom-button-and-contactor version below stays a documented alternative, not a to-do.
+
 ### The emergency switch belongs on the 230V side
 
 For a real emergency — fire, smoke, burning smell — the switch has to cut **mains**, not the DC rail. A DC kill switch sits *downstream* of the PSU and can only de-energize what hangs off it. The Fritz!Box, the access point, and any device with its own wall wart would stay live. For the case you actually want an emergency stop for, that is useless.
@@ -520,6 +579,8 @@ The M910q Tiny does not use a barrel jack. It uses Lenovo's **slim-tip / square 
 
 ### The third pin is not a second ground
 
+> ⏸️ **Not currently blocking anything.** The nodes run on [USB-C PD](#the-interim-power-path-usb-c-pd), and the USB-C → slim-tip cables carry the ID resistance inside the plug. This section applies to the **bare pigtails**, and becomes live again when the DC rail is commissioned. Keeping it is the point: it is the part of the DC build that is easiest to forget once the interim has been working for months.
+
 The pigtails have **three** conductors, and the third one is the part that decides whether this build works:
 
 | Contact | Function |
@@ -553,8 +614,11 @@ Build notes:
 
 ## Upgrade Path
 
-**Now — the last parts standing between the pile and a powered rack**
-- ⬜ **Buy both converters** — same module twice, [output range must reach 20V](#the-four-hard-requirements). This is the only remaining blocker for the whole chain, not just for `pve0`
+**Now — the last parts standing between the pile and the *planned* rail**
+
+The rack is no longer waiting on any of this: it is powered and running on the [interim USB-C path](#the-interim-power-path-usb-c-pd). That removes the urgency from every line below and changes what they are for — this is now a build to be done deliberately, not a blocker to be cleared.
+
+- ⬜ **Buy both converters** — same module twice, [output range must reach 20V](#the-four-hard-requirements). Still the one part the whole chain waits on
 - ⬜ **Measure the slim-tip pigtails** for a built-in ID resistor; add 270 Ω where missing, and [prove it on one node first](#the-third-pin-is-not-a-second-ground)
 - ⬜ **Relocate the MikroTik** to the raw 25.2V feed with an inline 3A fuse — originally a 5-node step, pulled forward by the MS-01
 - ⬜ 2.5 mm² cable for the MS-01 branch into fuse box B (15A blade); verify its barrel-jack size
@@ -612,7 +676,7 @@ With a bigger converter the supply carries eight nodes at two-thirds load. At th
 **Whenever a GPU goes into `pve0`** — recheck every table on this page. That is the change that pushes the MS-01 from 115W toward its 180W nameplate and invalidates the measured column outright.
 
 **Not yet budgeted**
-- ⬜ **The DeskPi 9" monitor.** Deliberately left out of every table until its actual draw is known. A panel that size is typically 10–20W, which is small — but it should be added to the budget before it is plugged in, not after
+- ⚡ **The DeskPi 9" monitor** — now powered over USB-C from PD charger #2, sharing it with `node2`. It is still absent from every DC table below, and correctly so: it is not on the rail. A panel that size is typically 10–20W. **Measure it before the rail is built**, because at that point it needs either a place in the budget or a decision to stay on USB-C permanently — the latter is probably right, since a monitor is the one load that genuinely wants its own switch
 
 ---
 
@@ -621,11 +685,12 @@ With a bigger converter the supply carries eight nodes at two-thirds load. At th
 | Alternative | Advantage | Why not chosen |
 |---|---|---|
 | Individual 65W OEM bricks per node | Plug-and-play, no wiring | Cable chaos, no central kill switch, no shared efficiency |
+| **USB-C PD 240W + slim-tip cables** ⚡ *in use* | Plug-and-play, ID resistor solved in the cable, ~93% efficient, kill switch preserved by the PDU | Four supplies instead of one, no unified fusing — [the interim path](#the-interim-power-path-usb-c-pd). Two of the three objections above do **not** apply to it |
 | ATX PC power supply | Cheap, available everywhere | Audible fan, not designed for continuous single-rail DC load |
 | 24V PSU + step-down | Slightly closer to 20V target | 25.2V unit was available fanless; 24V offers less trim headroom |
 | Sizing PSU exactly to load | Cheaper, smaller | No margin for simultaneous cold-start inrush — rail collapse risk. Moot here: the 750W unit was the cheaper buy |
 | **500W instead of 750W** | Nominally the "right" size for a 3-node lab | Would have made the PSU the first component to run out, and cost ~25 € *more* at the prices actually found |
-| **Leave the MS-01 on its 180W brick** | Zero risk, zero cost, frees the largest single load off the shared budget | Loses the central kill switch and single-rail tidiness for the biggest machine — **the honest fallback if the second converter is not worth the wiring** |
+| **Leave the MS-01 on its 180W brick** ⚡ *in use* | Zero risk, zero cost, frees the largest single load off the shared budget | Loses single-rail tidiness for the biggest machine — but **not** the kill switch, since the brick plugs into the switched PDU. This was written as the honest fallback and is now the interim reality |
 | **Trim converter #1 down to 19.5V for both** | One converter instead of two | Puts *three* nodes out of spec to accommodate one machine — strictly worse than the problem it solves |
 | **Series resistor to drop 20V → 19V** | Costs cents | A resistor drops `I × R`, not a fixed voltage; the MS-01's current varies 6.7× so the rail wanders 1.3V and undervolts under load — [worse than feeding a flat 20V](#why-you-cannot-fix-this-with-a-resistor) |
 | **Series Schottky diode** | ~0.5V drop, roughly current-independent — actually works, unlike the resistor | Still unregulated and temperature-dependent, needs a heatsink at 9.5A, lands at ~19.5V not 19V. Acceptable as a last resort, not as a design |

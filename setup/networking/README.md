@@ -172,12 +172,17 @@ Every device in this design lives in the same rack, and every cable is a short p
 
 **This is the one detail that is easy to get wrong when ordering.** Most 10" panels ship with **LSA / punch-down** keystones (*Anlegetechnik*), which terminate solid installation cable with a punch tool and have no rear socket at all. They are the right module for a run that comes out of a wall, and the wrong one for a rack where the other end of every cable is three centimetres away.
 
-| Part | Details | Price | What to search for |
-|---|---|---:|---|
-| 10" 12-port keystone panel, **unbestückt** | 1HE, empty frame, takes any keystone | ~ 12 € | `Patchpanel 10 Zoll 12 Port unbestückt 1HE` |
-| Cat.6a RJ45 **feed-through** keystone | Socket/socket coupler, tool-less clip-in | ~ 2 € each | `Keystone Durchgang Cat.6a` · `RJ45 Kupplung Buchse/Buchse` |
+✅ = bought (August 2026)
 
-Buying the frame empty and the modules separately lands at roughly the same **~36 €** as a panel with punch-down keystones included — no money is saved by the bundled version, and its modules would go straight into a drawer. The frame itself is agnostic; any keystone panel takes any keystone.
+| | Part | Details | Price |
+|:--:|---|---|---:|
+| ✅ | **GeeekPi 10" 12-port keystone panel**, unbestückt | **0.5U**, empty frame, DeskPi RackMate compatible | **12,99 €** |
+| ✅ | **deleyCON Cat.6a RJ45 feed-through keystone**, 12-pack | Socket/socket coupler, tool-less clip-in, **shielded** | **28,99 €** (2,42 €/ea) |
+| ✅ | **ROLINE LC/LC duplex OM3 keystone** | Fibre coupler, black, for the [10G trunk on port 10](./cabling.md#why-the-fibre-goes-through-the-panel-after-all) | **4,29 €** |
+
+Buying the frame empty and the modules separately landed at **46,27 €** — near enough to the ~36 € estimated that the conclusion holds: no money is saved by a panel with punch-down keystones included, and its modules would go straight into a drawer. The frame itself is agnostic; any keystone panel takes any keystone.
+
+**The panel that was bought is 0.5U, not 1HE.** That is better than planned rather than a compromise — it is half the rack height for the same twelve ports, and it is dimensioned for the DeskPi RackMate the rest of the rack is built around. The consequence is purely geometric and it matters for cable lengths: twelve ports sit in **one row across the full width**, while the CRS310 clusters its eight ports in **two rows on the left half**. See [the switch has two port rows, the panel has one](./cabling.md#the-switch-has-two-port-rows-the-panel-has-one).
 
 The 10" format matches the 3D-printed 1U rack mount used for the Tiny nodes. Twelve ports covers the current build — 6 node cables, `pve0`'s management port, and the drops that enter the rack from outside (WAN cable from the Fritz!Box, the access point, an admin laptop jack) — with two spare.
 
@@ -188,11 +193,18 @@ Worth being honest, because a feed-through panel does not *terminate* anything: 
 - **The switch side stops being touched.** Servicing or swapping a Tiny node means unplugging at the back of the panel; the front face and the switch ports keep their layout and their labels. Without a panel, every node move is a hand behind the switch.
 - **It is what makes the colour scheme readable.** A fixed, labelled front row of eight coloured cables in port order is the thing you can read at a glance. A bundle running directly from three PCs into a switch is not, no matter what colour it is.
 
-**The 10G fibre link to `pve0` does not belong on this panel.** It is one metre between two adjacent devices and gets plugged in transceiver to transceiver — routing it through a panel would only add connectors and mating losses. The panel stays purely copper, and because it is a keystone panel a port can still be converted to LC-duplex later if own fibre is ever pulled to another room. Reasoning in [`cabling.md`](./cabling.md#the-10g-link-fibre-and-why-it-does-not-touch-the-panel).
+**The 10G fibre link to `pve0` now lives on this panel too** — port 10, via an LC-duplex keystone. This page originally argued the opposite, and the reversal is a direct consequence of the keystone format: converting a port to LC-duplex turned out to be a 4,29 € part rather than a future project, and the same argument that justifies the panel for copper (*the switch side stops being touched*) applies with more force to the one link whose transceivers are the most delicate parts in the rack. The measured cost is ~0.3 dB out of a 2.9 dB budget. Reasoning in [`cabling.md`](./cabling.md#why-the-fibre-goes-through-the-panel-after-all).
 
 > ⚠️ **Check rack depth before ordering.** A feed-through port has a patch cable plugged in on *both* sides, so it needs the plug plus its strain-relief boot sticking out the back — roughly 4–5 cm with a normal boot. In a shallow 10" rack that competes with the switch behind it. Slim cables with short boots help, and **90° angled plugs on the rear side** save another 3–4 cm if it gets tight.
 
-> ⚠️ **Use UTP, not STP.** A shield only helps if it is grounded, and a 3D-printed 10" rack has no earthed rail to bond it to — a floating shield can act as an antenna rather than a screen. Unshielded feed-through keystones and Cat.6 UTP patch cables are entirely sufficient at these lengths and remove the question.
+> ⚠️ **The keystones that were bought are shielded — the patch cables must stay UTP.** This page asked for unshielded keystones, and the deleyCON 12-pack is Cat.6a **geschirmt**. The reasoning behind the original rule still stands: a shield only helps if it is grounded, and a 3D-printed 10" rack has no earthed rail to bond it to, so a *connected* floating shield can act as an antenna rather than a screen.
+>
+> What makes the purchase harmless is that a shield needs a continuous path to do anything at all. **With UTP patch cables on both sides, the keystone's shield is connected to nothing and is simply inert metal** — no antenna, no ground loop, no difference to the unshielded part. The rule therefore changes rather than disappears:
+>
+> - **Buy UTP patch cables.** This is no longer a preference but the thing that keeps the shielded keystones neutral. An STP patch cable would bond the shield to a device chassis at one end and leave it floating at the other — the exact configuration the original warning was about.
+> - **Do not bond the panel frame to anything.** There is nothing to bond it to, and a partial earth is worse than none.
+>
+> At these lengths the whole question is academic either way. It is written down because the parts on the shelf now contradict the sentence that was here, and a reader comparing the two would otherwise assume one of them is a mistake.
  
 ---
  
@@ -200,14 +212,36 @@ Worth being honest, because a feed-through panel does not *terminate* anything: 
 
 A feed-through panel has a patch cable on both sides, so every connection is **two** cables: one from the device to the rear of the panel, one from the front of the panel to the switch beside it. Keeping the front ones as short as possible is what makes the dual-cable layout look intentional rather than chaotic.
 
-| Part | Details | Price | Where to find it |
+> ⬜ **This is the only part of the rack still unbought**, and it is unbought for a reason worth writing down: the two constraints below rule out most of what a search returns.
+
+| Part | Details | Price | Status |
 |---|---|---:|---|
-| 0.25m Slim Patch Cable Cat.6 | Front side, panel → switch | ~ 1.50–2.50 € | [Amazon](https://www.amazon.de/s?k=0.25m+patchkabel+slim+cat6) |
-| 0.5m Patch Cable Cat.6 | Rear side, device → panel | ~ 2–3 € | [Amazon](https://www.amazon.de/s?k=0.5m+patchkabel+slim+cat6) |
+| Cat.6/6a patch, front side, panel → switch | **Mixed lengths**, see below | ~ 1–2,50 € | ⬜ measure first |
+| 0.5 m patch, rear side, device → panel | Uniform length, follows shelf position | ~ 2–3 € | ⬜ |
 
 For the current 3-node build: **8 front-side cables** (6 node links, `pve0`'s management port, the WiFi access point) and **6 rear-side cables** for the node links. Buying two or three spares per colour is worth it — when one fails, the alternative is a wrong-coloured cable in the rack, which quietly destroys the whole convention.
 
 **Buy them colour-coded on both sides.** Because nothing is punched down, the [colour scheme](./cabling.md) runs unbroken from the node to the switch port: 3× blue and 3× yellow in each length, plus 1× red and 1× white on the front. The panel is where a cable stops being a run and becomes a labelled, colour-coded port — it no longer has to be where the colour stops.
+
+### The two constraints that make this harder than it looks
+
+**1. No single front-side length works.** The panel puts twelve ports in one row across the full width; the CRS310 clusters eight ports in two rows on the left half. The runs therefore range from a few centimetres to over twenty, and the uniform 0.25 m this page used to specify only fits the middle of the panel. Full geometry in [`cabling.md`](./cabling.md#the-switch-has-two-port-rows-the-panel-has-one) — **mount both parts and measure before ordering.**
+
+Do not go below 0.2 m for any run. An RJ45 latch is not built for axial load; a cable under permanent tension slowly works the plug out of full seating, and the result is an intermittent link that appears and disappears when someone walks past the rack. That is the most expensive fault class to diagnose and it is bought for ten cents of saved cable.
+
+**2. Colour and "UTP" together are the binding constraint.** Two traps, both easy to walk into:
+
+- **Most short Cat.6a cables are S/FTP.** Anything with `SFTP`, `S/FTP` or `PiMF` in the title bonds a shield the rack cannot ground — see the keystone warning above. Cat.6a in **28 AWG slim UTP** does exist and is ideal here (thin, flexible, short boots, transparent plugs that leave the port LED visible), but the shielding is often only discoverable in the reviews rather than the spec.
+- **The good slim lines are colourless.** The widely sold 28 AWG Cat.6a slim series on Amazon (Ercielook and its relabels) comes in **black and white only** — no blue, yellow or red, which makes it unusable for this rack. Its **white** variant is, by coincidence, exactly right for the single white AP cable.
+
+Where colour is actually available:
+
+| Source | What it gives | Note |
+|---|---|---|
+| **1aTTack.de** (Amazon) | Cat.6 UTP, per-colour multipacks, 0.25 m from ~1,05 €/ea | Not slim — normal jacket with kink protection. Fine for the front side |
+| **patchkabel.de** | Free combination of length **and** colour, guaranteed UTP | The reliable answer when Amazon has the wrong colour in the right length |
+
+Slim pays off mainly on the **rear** side, where the plug plus boot competes with rack depth. On the front there is nothing behind the cable, so a normal jacket is no disadvantage.
 
 ---
 
@@ -330,9 +364,11 @@ You can purchase an affordable, unmanaged 2.5G switch (such as a budget YuanLey 
 ## Upgrade Path
 
 **Short term**
-- Buy the [colour-coded patch cables](./cabling.md#what-this-costs) and cable the rack to the target plan — the colours are worth applying now, while the network is still flat and nothing has to be re-pulled later
-- Connect the MS-01 to the first SFP+ port as a tagged trunk — needs 2× SFP+ SR transceivers and an OM3 LC-LC patch cord, [neither included with either device](./cabling.md#the-10g-link-fibre-and-why-it-does-not-touch-the-panel)
-- Connect `pve0`'s second 2.5G RJ45 to port 7 as the management path
+- ⬜ **Mount panel and switch, then measure the front-side runs** — this is now the gate on the last purchase, see [the two constraints](#the-two-constraints-that-make-this-harder-than-it-looks)
+- ⬜ Buy the [colour-coded patch cables](./cabling.md#what-this-costs) and cable the rack to the target plan — the colours are worth applying now, while the network is still flat and nothing has to be re-pulled later
+- ~~Buy the optics for the SFP+ trunk~~ — **done (August 2026)**: 2× Intel-coded 10Gtek SR, OM3 cords 0.5 m + 0.3 m, LC-duplex keystone. The link now [runs through panel port 10](./cabling.md#why-the-fibre-goes-through-the-panel-after-all)
+- ⬜ Connect the MS-01 to the first SFP+ port as a tagged trunk — the modules fail *at first light-up or not at all*, so this is worth testing before the rack is closed up
+- ⬜ Connect `pve0`'s second 2.5G RJ45 to port 7 as the management path
 - ~~Replace the ISP router with a [Fritz!Box 7490](./router#the-isp-router-problem) so the interim setup gets static routes and a configurable DNS handout~~ — **done (August 2026)**; the house runs on `192.168.178.0/24` and `pve0` on [`.250`](./router#addressing-after-the-swap)
 
 **Mid term**
